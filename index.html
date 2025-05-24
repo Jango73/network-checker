@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Connection Checker</title>
+  <!-- Local scripts -->
+  <script src="./lib/react.production.min.js"></script>
+  <script src="./lib/react-dom.production.min.js"></script>
+  <script src="./lib/babel.min.js"></script>
+  <script src="./lib/i18next.min.js"></script>
+  <script src="./lib/axios.min.js"></script>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    #root { display: flex; flex-direction: column; min-height: 100vh; padding: 20px; }
+    .dark { background: #121212; color: #fff; }
+    .light { background: #fff; color: #000; }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    .config { margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    select, input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    select[multiple] { height: 100px; }
+    button { padding: 10px 20px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:disabled { background: #aaa; }
+    button:hover:not(:disabled) { background: #1565c0; }
+    .card { border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 10px; }
+    .card.suspect { background: #ffccbc; }
+    .dark .card { border-color: #555; background: #424242; }
+    .dark .card.suspect { background: #ff8a65; }
+    .alert { color: #d32f2f; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .dark th, .dark td { border-color: #555; }
+    .whois-btn { background: none; border: none; cursor: pointer; vertical-align: middle; }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #fff; border-top-color: #1976d2; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    // Workaround for Babel in-browser
+    window.$RefreshReg$ = () => {};
+    window.$RefreshSig$ = () => () => {};
+
+    // Main React component
+    const { useState, useEffect } = React;
+    const { shell, ipcRenderer } = window.require('electron');
+
+    // Static country list (partial ISO 3166-1)
+    const countries = ['France', 'United States', 'Germany', 'United Kingdom', 'Ukraine', 'Nigeria', 'Ghana', 'South Africa', 'Kenya', 'Algeria', 'Morocco', 'Egypt', 'China', 'Russia', 'Spain', 'Italy', 'Greece', 'South Korea'];
+
+    // Initialize i18next
+    i18next.init({
+      lng: 'en',
+      resources: {
+        en: { translation: { appTitle: 'Network Connection Checker', scan: 'Scan Now', interval: 'Scan Interval (min)', countriesFriendly: 'Friendly Countries', countriesSuspect: 'Suspect Countries', bannedIPs: 'Banned IPs', suspectProviders: 'Suspect Providers', connectionsByCountry: 'Connections by Country', darkMode: 'Dark Mode', loading: 'Scanning...', noConnections: 'No active connections found.' } },
+        fr: { translation: { appTitle: 'Vérificateur de Connexions Réseau', scan: 'Lancer le Scan', interval: 'Intervalle de Scan (min)', countriesFriendly: 'Pays Amis', countriesSuspect: 'Pays Suspects', bannedIPs: 'IPs Bannies', suspectProviders: 'Fournisseurs Suspects', connectionsByCountry: 'Connexions par Pays', darkMode: 'Mode Sombre', loading: 'Scan en cours...', noConnections: 'Aucune connexion active trouvée.' } },
+        it: { translation: { appTitle: 'Controllore Connessioni di Rete', scan: 'Scansiona Ora', interval: 'Intervallo di Scansione (min)', countriesFriendly: 'Paesi Amici', countriesSuspect: 'Paesi Sospetti', bannedIPs: 'IP Bloccati', suspectProviders: 'Fornitori Sospetti', connectionsByCountry: 'Connessioni per Paese', darkMode: 'Modalità Scura', loading: 'Scansione in corso...', noConnections: 'Nessuna connessione attiva trovata.' } },
+        de: { translation: { appTitle: 'Netzwerkverbindungsprüfer', scan: 'Jetzt Scannen', interval: 'Scan-Intervall (min)', countriesFriendly: 'Freundliche Länder', countriesSuspect: 'Verdächtige Länder', bannedIPs: 'Gesperrte IPs', suspectProviders: 'Verdächtige Anbieter', connectionsByCountry: 'Verbindungen nach Land', darkMode: 'Dunkler Modus', loading: 'Scanne...', noConnections: 'Keine aktiven Verbindungen gefunden.' } },
+        es: { translation: { appTitle: 'Verificador de Conexiones de Red', scan: 'Escanear Ahora', interval: 'Intervalo de Escaneo (min)', countriesFriendly: 'Países Amigos', countriesSuspect: 'Países Sospechosos', bannedIPs: 'IPs Prohibidas', suspectProviders: 'Proveedores Sospechosos', connectionsByCountry: 'Conexiones por País', darkMode: 'Modo Oscuro', loading: 'Escaneando...', noConnections: 'No se encontraron conexiones activas.' } },
+        el: { translation: { appTitle: 'Έλεγχος Συνδέσεων Δικτύου', scan: 'Σάρωση Τώρα', interval: 'Διάστημα Σάρωσης (min)', countriesFriendly: 'Φιλικές Χώρες', countriesSuspect: 'Ύποπτες Χώρες', bannedIPs: 'Απαγορευμένες IPs', suspectProviders: 'Ύποπτοι Πάροχοι', connectionsByCountry: 'Συνδέσεις ανά Χώρα', darkMode: 'Σκοτεινή Λειτουργία', loading: 'Σάρωση σε εξέλιξη...', noConnections: 'Δεν βρέθηκαν ενεργές συνδέσεις.' } },
+        ru: { translation: { appTitle: 'Проверка сетевых соединений', scan: 'Сканировать сейчас', interval: 'Интервал сканирования (мин)', countriesFriendly: 'Дружественные страны', countriesSuspect: 'Подозрительные страны', bannedIPs: 'Заблокированные IP', suspectProviders: 'Подозрительные провайдеры', connectionsByCountry: 'Соединения по странам', darkMode: 'Тёмный режим', loading: 'Сканирование...', noConnections: 'Активные соединения не найдены.' } },
+        zh: { translation: { appTitle: '网络连接检查器', scan: '立即扫描', interval: '扫描间隔（分钟）', countriesFriendly: '友好国家', countriesSuspect: '可疑国家', bannedIPs: '禁止的IP', suspectProviders: '可疑提供商', connectionsByCountry: '按国家分类的连接', darkMode: '暗模式', loading: '正在扫描...', noConnections: '未找到活动连接。' } },
+        ko: { translation: { appTitle: '네트워크 연결 확인기', scan: '지금 스캔', interval: '스캔 간격 (분)', countriesFriendly: '친화적 국가', countriesSuspect: '의심스러운 국가', bannedIPs: '차단된 IP', suspectProviders: '의심스러운 제공업체', connectionsByCountry: '국가별 연결', darkMode: '다크 모드', loading: '스캔 중...', noConnections: '활성 연결이 없습니다.' } },
+      }
+    });
+
+    const App = () => {
+      // State management
+      const [connections, setConnections] = useState([]);
+      const [friendlyCountries, setFriendlyCountries] = useState(['France', 'United States']);
+      const [suspectCountries, setSuspectCountries] = useState(['Ukraine', 'Nigeria']);
+      const [bannedIPs, setBannedIPs] = useState([]);
+      const [suspectProviders, setSuspectProviders] = useState(['DigitalOcean', 'Hetzner']);
+      const [intervalMin, setIntervalMin] = useState(30);
+      const [isDarkMode, setIsDarkMode] = useState(false);
+      const [isScanning, setIsScanning] = useState(false);
+      const [language, setLanguage] = useState('en');
+
+      // Load config from file on mount
+      useEffect(() => {
+        ipcRenderer.invoke('load-config').then(config => {
+          if (config) {
+            setFriendlyCountries(config.friendlyCountries || ['France', 'United States']);
+            setSuspectCountries(config.suspectCountries || ['Ukraine', 'Nigeria']);
+            setBannedIPs(config.bannedIPs || []);
+            setSuspectProviders(config.suspectProviders || ['DigitalOcean', 'Hetzner']);
+            setIntervalMin(config.intervalMin || 30);
+            setIsDarkMode(config.isDarkMode || false);
+            setLanguage(config.language || 'en');
+            i18next.changeLanguage(config.language || 'en');
+          }
+        });
+      }, []);
+
+      // Save config on change
+      useEffect(() => {
+        ipcRenderer.invoke('save-config', {
+          friendlyCountries, suspectCountries, bannedIPs, suspectProviders, intervalMin, isDarkMode, language
+        });
+      }, [friendlyCountries, suspectCountries, bannedIPs, suspectProviders, intervalMin, isDarkMode, language]);
+
+      // Periodic scanning
+      useEffect(() => {
+        if (intervalMin > 0) {
+          const interval = setInterval(() => scanConnections(), intervalMin * 60 * 1000);
+          return () => clearInterval(interval);
+        }
+      }, [intervalMin]);
+
+      // Scan network connections
+      const scanConnections = async () => {
+        setIsScanning(true);
+        try {
+          // Get netstat output
+          const netstatOutput = await ipcRenderer.invoke('run-netstat');
+          const lines = netstatOutput.split('\n').filter(line => line.includes('ESTABLISHED'));
+          const ipSet = new Set(lines.map(line => {
+            const parts = line.trim().split(/\s+/);
+            return parts[2]?.split(':')[0]; // Foreign address
+          }).filter(ip => ip && !/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|127\.|::1|0\.0\.0\.0)/.test(ip)));
+
+          // Get process names
+          const processMap = await ipcRenderer.invoke('get-process-name');
+
+          const connections = [];
+          let requestCount = 0;
+
+          for (const ip of ipSet) {
+            try {
+              const response = await axios.get(`http://ip-api.com/json/${ip}`);
+              if (response.data.status === 'success') {
+                const { country, isp, org } = response.data;
+                const isSuspect = bannedIPs.includes(ip) || suspectCountries.includes(country) || suspectProviders.some(p => isp.includes(p) || org.includes(p));
+                // Find the line for this IP and get the PID
+                const line = lines.find(l => l.includes(ip));
+                const parts = line.trim().split(/\s+/);
+                const pid = parts[parts.length - 1]; // PID is the last column
+                const processName = processMap[pid] || 'Unknown';
+                connections.push({
+                  ip,
+                  country,
+                  isp,
+                  org,
+                  isSuspect,
+                  pid: isNaN(pid) ? 'Unknown' : pid,
+                  processName
+                });
+                if (isSuspect) {
+                  new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
+                }
+              }
+            } catch (error) {
+              console.error(`Error checking IP ${ip}:`, error);
+            }
+            requestCount++;
+            if (requestCount >= 45) {
+              await new Promise(resolve => setTimeout(resolve, 60000));
+              requestCount = 0;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          setConnections(connections);
+        } catch (error) {
+          console.error('Error scanning:', error);
+        }
+        setIsScanning(false);
+      };
+
+      // Count connections by country
+      const countryCounts = connections.reduce((acc, conn) => {
+        acc[conn.country] = (acc[conn.country] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Handle WHOIS lookup
+      const openWhois = (ip) => {
+        shell.openExternal(`https://whois.domaintools.com/${ip}`);
+      };
+
+      return (
+        <div className={isDarkMode ? 'dark' : 'light'}>
+          <h1>{i18next.t('appTitle')}</h1>
+          
+          {/* Configuration */}
+          <div className="config">
+            <div className="form-group">
+              <label>{i18next.t('countriesFriendly')}</label>
+              <select multiple value={friendlyCountries} onChange={(e) => setFriendlyCountries(Array.from(e.target.selectedOptions, opt => opt.value))}>
+                {countries.map(country => <option key={country} value={country}>{country}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>{i18next.t('countriesSuspect')}</label>
+              <select multiple value={suspectCountries} onChange={(e) => setSuspectCountries(Array.from(e.target.selectedOptions, opt => opt.value))}>
+                {countries.map(country => <option key={country} value={country}>{country}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>{i18next.t('bannedIPs')}</label>
+              <input
+                type="text"
+                value={bannedIPs.join(',')}
+                onChange={(e) => setBannedIPs(e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip))}
+              />
+            </div>
+            <div className="form-group">
+              <label>{i18next.t('suspectProviders')}</label>
+              <input
+                type="text"
+                value={suspectProviders.join(',')}
+                onChange={(e) => setSuspectProviders(e.target.value.split(',').map(p => p.trim()).filter(p => p))}
+              />
+            </div>
+            <div className="form-group">
+              <label>{i18next.t('interval')}</label>
+              <input
+                type="number"
+                value={intervalMin}
+                onChange={(e) => setIntervalMin(Math.max(0, parseInt(e.target.value)))}
+              />
+            </div>
+            <div className="form-group">
+              <label>Language</label>
+              <select value={language} onChange={(e) => { setLanguage(e.target.value); i18next.changeLanguage(e.target.value); }}>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="el">Ελληνικά</option>
+                <option value="ru">Русский</option>
+                <option value="zh">中文</option>
+                <option value="ko">한국어</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>{i18next.t('darkMode')}</label>
+              <input type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} />
+            </div>
+          </div>
+
+          {/* Scan Button */}
+          <button onClick={scanConnections} disabled={isScanning}>
+            {isScanning ? <span className="spinner"></span> : i18next.t('scan')}
+          </button>
+
+          {/* Connections Table */}
+          <div style={{ marginTop: '20px' }}>
+            <h2>{i18next.t('connectionsByCountry')}</h2>
+            {Object.keys(countryCounts).length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Country</th>
+                    <th>Connections</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(countryCounts).map(([country, count]) => (
+                    <tr key={country}>
+                      <td>{country}</td>
+                      <td>{count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>{i18next.t('noConnections')}</p>
+            )}
+          </div>
+
+          {/* Connections List */}
+          <div style={{ marginTop: '20px' }}>
+            {connections.map(conn => (
+              <div key={conn.ip} className={`card ${conn.isSuspect ? 'suspect' : ''}`}>
+                <p><strong>IP:</strong> {conn.ip}</p>
+                <p><strong>Country:</strong> {conn.country}</p>
+                <p><strong>ISP:</strong> {conn.isp}</p>
+                <p><strong>Org:</strong> {conn.org}</p>
+                <p><strong>PID:</strong> {conn.pid} ({conn.processName})</p>
+                {conn.isSuspect && <p className="alert">Suspect connection!</p>}
+                <button className="whois-btn" onClick={() => openWhois(conn.ip)}>
+                  <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
