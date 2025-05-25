@@ -27,7 +27,18 @@
       "exportCSV": "Export as CSV",
       "exportSuccess": "History exported successfully to {filePath}",
       "exportError": "Failed to export history",
-      "exportCanceled": "Export canceled"
+      "exportCanceled": "Export canceled",
+      "main": "Main",
+      "settings": "Settings",
+      "connections": "Connections",
+      "scannedIPs": "Scanned IPs",
+      "scanDetails": "Scan Details",
+      "country": "Country",
+      "isp": "ISP",
+      "org": "Organization",
+      "process": "Process",
+      "risky": "Risky",
+      "language": "Language"
     }
   },
   "fr": {
@@ -58,7 +69,18 @@
       "exportCSV": "Exporter en CSV",
       "exportSuccess": "Historique exporté avec succès vers {filePath}",
       "exportError": "Échec de l'exportation de l'historique",
-      "exportCanceled": "Exportation annulée"
+      "exportCanceled": "Exportation annulée",
+      "main": "Principal",
+      "settings": "Paramètres",
+      "connections": "Connexions",
+      "scannedIPs": "IPs scannées",
+      "scanDetails": "Détails du scan",
+      "country": "Pays",
+      "isp": "FAI",
+      "org": "Organisation",
+      "process": "Processus",
+      "risky": "Risqué",
+      "language": "Langue"
     }
   },
   "it": {
@@ -89,7 +111,18 @@
       "exportCSV": "Esporta come CSV",
       "exportSuccess": "Cronologia esportata con successo in {filePath}",
       "exportError": "Errore nell'esportazione della cronologia",
-      "exportCanceled": "Esportazione annullata"
+      "exportCanceled": "Esportazione annullata",
+      "main": "Principale",
+      "settings": "Impostazioni",
+      "connections": "Connessioni",
+      "scannedIPs": "IP Scansionati",
+      "scanDetails": "Dettagli Scansione",
+      "country": "Paese",
+      "isp": "ISP",
+      "org": "Organizzazione",
+      "process": "Processo",
+      "risky": "Rischioso",
+      "language": "Lingua"
     }
   },
   "de": {
@@ -120,7 +153,18 @@
       "exportCSV": "Als CSV exportieren",
       "exportSuccess": "Verlauf erfolgreich nach {filePath} exportiert",
       "exportError": "Fehler beim Exportieren des Verlaufs",
-      "exportCanceled": "Export abgebrochen"
+      "exportCanceled": "Export abgebrochen",
+      "main": "Hauptseite",
+      "settings": "Einstellungen",
+      "connections": "Verbindungen",
+      "scannedIPs": "Gescannte IPs",
+      "scanDetails": "Scan-Details",
+      "country": "Land",
+      "isp": "ISP",
+      "org": "Organisation",
+      "process": "Prozess",
+      "risky": "Riskant",
+      "language": "Sprache"
     }
   },
   "es": {
@@ -151,7 +195,18 @@
       "exportCSV": "Exportar como CSV",
       "exportSuccess": "Historial exportado con éxito a {filePath}",
       "exportError": "Error al exportar el historial",
-      "exportCanceled": "Exportación cancelada"
+      "exportCanceled": "Exportación cancelada",
+      "main": "Principal",
+      "settings": "Configuración",
+      "connections": "Conexiones",
+      "scannedIPs": "IPs Escaneadas",
+      "scanDetails": "Detalles del Escaneo",
+      "country": "País",
+      "isp": "ISP",
+      "org": "Organización",
+      "process": "Proceso",
+      "risky": "Arriesgado",
+      "language": "Idioma"
     }
   },
   "el": {
@@ -182,7 +237,18 @@
       "exportCSV": "Εξαγωγή ως CSV",
       "exportSuccess": "Το ιστορικό εξήχθη επιτυχώς στο {filePath}",
       "exportError": "Αποτυχία εξαγωγής ιστορικού",
-      "exportCanceled": "Η εξαγωγή ακυρώθηκε"
+      "exportCanceled": "Η εξαγωγή ακυρώθηκε",
+      "main": "Κύρια",
+      "settings": "Ρυθμίσεις",
+      "connections": "Συνδέσεις",
+      "scannedIPs": "Σαρωμένες IPs",
+      "scanDetails": "Λεπτομέρειες Σάρωσης",
+      "country": "Χώρα",
+      "isp": "Πάροχος Υπηρεσιών Διαδικτύου",
+      "org": "Οργανισμός",
+      "process": "Διεργασία",
+      "risky": "Επικίνδυνο",
+      "language": "Γλώσσα"
     }
   },
   "ru": {
@@ -213,7 +279,18 @@
       "exportCSV": "Экспортировать как CSV",
       "exportSuccess": "История успешно экспортирована в {filePath}",
       "exportError": "Ошибка при экспорте истории",
-      "exportCanceled": "Экспорт отменён"
+      "exportCanceled": "Экспорт отменён",
+      "main": "Главная",
+      "settings": "Настройки",
+      "connections": "Соединения",
+      "scannedIPs": "Отсканированные IP",
+      "scanDetails": "Детали Сканирования",
+      "country": "Страна",
+      "isp": "Провайдер",
+      "org": "Организация",
+      "process": "Процесс",
+      "risky": "Рискованный",
+      "language": "Язык"
     }
   },
   "zh": {
@@ -244,7 +321,18 @@
       "exportCSV": "导出为CSV",
       "exportSuccess": "历史记录成功导出到 {filePath}",
       "exportError": "导出历史记录失败",
-      "exportCanceled": "导出已取消"
+      "exportCanceled": "导出已取消",
+      "main": "主要",
+      "settings": "设置",
+      "connections": "连接",
+      "scannedIPs": "已扫描的IP",
+      "scanDetails": "扫描详情",
+      "country": "国家",
+      "isp": "互联网服务提供商",
+      "org": "组织",
+      "process": "进程",
+      "risky": "有风险",
+      "language": "语言"
     }
   },
   "ko": {
@@ -275,7 +363,18 @@
       "exportCSV": "CSV로 내보내기",
       "exportSuccess": "기록이 {filePath}에 성공적으로 내보내졌습니다",
       "exportError": "기록 내보내기 실패",
-      "exportCanceled": "내보내기 취소됨"
+      "exportCanceled": "내보내기 취소됨",
+      "main": "메인",
+      "settings": "설정",
+      "connections": "연결",
+      "scannedIPs": "스캔된 IP",
+      "scanDetails": "스캔 세부 정보",
+      "country": "국가",
+      "isp": "인터넷 서비스 제공자",
+      "org": "조직",
+      "process": "프로세스",
+      "risky": "위험",
+      "language": "언어"
     }
   }
 }

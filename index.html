@@ -43,6 +43,7 @@
       const [history, setHistory] = useState([]);
       const [selectedScan, setSelectedScan] = useState(null);
       const [i18nLoaded, setI18nLoaded] = useState(false);
+      const [i18nKey, setI18nKey] = useState(0);
 
       const addMessage = (text, type = 'error') => {
         setMessages(prev => [...prev, { text, type, id: Date.now() }]);
@@ -93,7 +94,18 @@
                     exportCSV: 'Export as CSV',
                     exportSuccess: 'History exported successfully to {filePath}',
                     exportError: 'Failed to export history',
-                    exportCanceled: 'Export canceled'
+                    exportCanceled: 'Export canceled',
+                    main: 'Main',
+                    settings: 'Settings',
+                    connections: 'Connections',
+                    scannedIPs: 'Scanned IPs',
+                    scanDetails: 'Scan Details',
+                    country: 'Country',
+                    isp: 'ISP',
+                    org: 'Organization',
+                    process: 'Process',
+                    risky: 'Risky',
+                    language: 'Language'
                   }
                 }
               }
@@ -109,6 +121,16 @@
           i18next.changeLanguage(language);
         }
       }, [language, i18nLoaded]);
+
+      useEffect(() => {
+        const handleLanguageChange = () => {
+          setI18nKey(prev => prev + 1);
+        };
+        i18next.on('languageChanged', handleLanguageChange);
+        return () => {
+          i18next.off('languageChanged', handleLanguageChange);
+        };
+      }, []);
 
       useEffect(() => {
         async function loadConfig() {
@@ -334,12 +356,12 @@
             <thead>
               <tr>
                 <th>IP</th>
-                <th>Country</th>
-                <th>ISP</th>
-                <th>Org</th>
+                <th>{i18next.t('country')}</th>
+                <th>{i18next.t('isp')}</th>
+                <th>{i18next.t('org')}</th>
                 <th>PID</th>
-                <th>Process</th>
-                <th>Risky</th>
+                <th>{i18next.t('process')}</th>
+                <th>{i18next.t('risky')}</th>
                 <th>WHOIS</th>
               </tr>
             </thead>
@@ -368,7 +390,7 @@
       }
 
       return (
-        <div className={isDarkMode ? 'dark' : 'light'}>
+        <div className={isDarkMode ? 'dark' : 'light'} key={i18nKey}>
           <h1>{i18next.t('appTitle')}</h1>
           {messages.length > 0 && (
             <div className="messages">
@@ -382,13 +404,13 @@
           
           <div className="tabs">
             <div className={`tab ${activeTab === 'main' ? 'active' : ''}`} onClick={() => setActiveTab('main')}>
-              Main
+              {i18next.t('main')}
             </div>
             <div className={`tab ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
               {i18next.t('history')}
             </div>
             <div className={`tab ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-              Settings
+              {i18next.t('settings')}
             </div>
           </div>
 
@@ -426,8 +448,8 @@
                   <table>
                     <thead>
                       <tr>
-                        <th>Country</th>
-                        <th>Connections</th>
+                        <th>{i18next.t('country')}</th>
+                        <th>{i18next.t('connections')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -444,7 +466,7 @@
                 )}
               </div>
               <div style={{ marginTop: '1.25rem' }}>
-                <h2>Scanned IPs</h2>
+                <h2>{i18next.t('scannedIPs')}</h2>
                 {renderConnectionsTable(connections)}
               </div>
             </div>
@@ -492,7 +514,7 @@
               </div>
               {selectedScan && (
                 <div style={{ marginTop: '1.25rem' }}>
-                  <h2>Scan Details ({new Date(selectedScan.timestamp).toLocaleString()})</h2>
+                  <h2>{i18next.t('scanDetails')} ({new Date(selectedScan.timestamp).toLocaleString()})</h2>
                   {renderConnectionsTable(selectedScan.connections)}
                 </div>
               )}
@@ -502,7 +524,7 @@
           {activeTab === 'settings' && (
             <div className="config">
               <div className="form-group">
-                <label>Language</label>
+                <label>{i18next.t('language')}</label>
                 <select value={language} onChange={(e) => setLanguage(e.target.value)}>
                   <option value="en">English</option>
                   <option value="fr">Français</option>
