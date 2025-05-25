@@ -36,14 +36,17 @@
       const [periodicScan, setPeriodicScan] = useState(true);
       const [activeTab, setActiveTab] = useState('main');
       const [configLoaded, setConfigLoaded] = useState(false);
-      const [errorMessage, setErrorMessage] = useState('');
-      const [exportMessage, setExportMessage] = useState('');
+      const [messages, setMessages] = useState([]);
       const [scanProgress, setScanProgress] = useState({ current: 0, total: 0 });
       const [ipError, setIpError] = useState('');
       const [providerError, setProviderError] = useState('');
       const [history, setHistory] = useState([]);
       const [selectedScan, setSelectedScan] = useState(null);
       const [i18nLoaded, setI18nLoaded] = useState(false);
+
+      const addMessage = (text, type = 'error') => {
+        setMessages(prev => [...prev, { text, type, id: Date.now() }]);
+      };
 
       useEffect(() => {
         async function initI18n() {
@@ -58,7 +61,7 @@
             setI18nLoaded(true);
           } catch (error) {
             console.error('Failed to load translations:', error);
-            setErrorMessage('Failed to load translations. Using fallback language.');
+            addMessage('Failed to load translations. Using fallback language.', 'error');
             await i18next.init({
               lng: 'en',
               resources: {
@@ -125,7 +128,7 @@
             }
           } catch (error) {
             console.error('Failed to load config:', error);
-            setErrorMessage('Failed to load configuration.');
+            addMessage('Failed to load configuration.', 'error');
           }
         }
         loadConfig();
@@ -152,7 +155,7 @@
             });
           } catch (error) {
             console.error('Failed to save config:', error);
-            setErrorMessage('Failed to save configuration.');
+            addMessage('Failed to save configuration.', 'error');
           }
         }
         saveConfig();
@@ -166,18 +169,13 @@
       }, [periodicScan, intervalMin]);
 
       useEffect(() => {
-        if (errorMessage) {
-          const timer = setTimeout(() => setErrorMessage(''), 10000);
+        if (messages.length > 0) {
+          const timer = setTimeout(() => {
+            setMessages(prev => prev.slice(1));
+          }, 5000);
           return () => clearTimeout(timer);
         }
-      }, [errorMessage]);
-
-      useEffect(() => {
-        if (exportMessage) {
-          const timer = setTimeout(() => setExportMessage(''), 5000);
-          return () => clearTimeout(timer);
-        }
-      }, [exportMessage]);
+      }, [messages]);
 
       useEffect(() => {
         async function loadHistory() {
@@ -186,7 +184,7 @@
             setHistory(historyData || []);
           } catch (error) {
             console.error('Failed to load history:', error);
-            setErrorMessage('Failed to load scan history.');
+            addMessage('Failed to load scan history.', 'error');
           }
         }
         loadHistory();
@@ -226,10 +224,10 @@
       const handleExport = async (format) => {
         try {
           const result = await ipcRenderer.invoke('export-history', format);
-          setExportMessage(i18next.t(result.success ? 'exportSuccess' : result.message === 'Export canceled' ? 'exportCanceled' : 'exportError', { filePath: result.message.includes('exported to') ? result.message.split('exported to ')[1] : '' }));
+          addMessage(i18next.t(result.success ? 'exportSuccess' : result.message === 'Export canceled' ? 'exportCanceled' : 'exportError', { filePath: result.message.includes('exported to') ? result.message.split('exported to ')[1] : '' }), result.success ? 'success' : 'error');
         } catch (error) {
           console.error('Failed to export history:', error);
-          setExportMessage(i18next.t('exportError'));
+          addMessage(i18next.t('exportError'), 'error');
         }
       };
 
@@ -240,13 +238,12 @@
           setSelectedScan(null);
         } catch (error) {
           console.error('Failed to clear history:', error);
-          setErrorMessage('Failed to clear history.');
+          addMessage('Failed to clear history.', 'error');
         }
       };
 
       const scanConnections = async () => {
         setIsScanning(true);
-        setErrorMessage('');
         setScanProgress({ current: 0, total: 0 });
         try {
           const netstatOutput = await ipcRenderer.invoke('run-netstat');
@@ -289,7 +286,7 @@
               }
             } catch (error) {
               console.error(`Error checking IP ${ip}:`, error);
-              setErrorMessage(i18next.t('apiError'));
+              addMessage(i18next.t('apiError'), 'error');
             }
             requestCount++;
             setScanProgress(prev => ({ ...prev, current: prev.current + 1 }));
@@ -313,11 +310,11 @@
             setHistory(updatedHistory || []);
           } catch (error) {
             console.error('Failed to save history:', error);
-            setErrorMessage('Failed to save scan history.');
+            addMessage('Failed to save scan history.', 'error');
           }
         } catch (error) {
           console.error('Error checking:', error);
-          setErrorMessage('Failed to run scan. Check network or system permissions.');
+          addMessage('Failed to run scan. Check network or system permissions.', 'error');
         }
         setIsScanning(false);
         setScanProgress({ current: 0, total: 0 });
@@ -373,6 +370,15 @@
       return (
         <div className={isDarkMode ? 'dark' : 'light'}>
           <h1>{i18next.t('appTitle')}</h1>
+          {messages.length > 0 && (
+            <div className="messages">
+              {messages.map(msg => (
+                <div key={msg.id} className={msg.type === 'error' ? 'alert' : 'success-message'}>
+                  {msg.text}
+                </div>
+              ))}
+            </div>
+          )}
           
           <div className="tabs">
             <div className={`tab ${activeTab === 'main' ? 'active' : ''}`} onClick={() => setActiveTab('main')}>
@@ -388,7 +394,6 @@
 
           {activeTab === 'main' && (
             <div>
-              {errorMessage && <div className="alert">{errorMessage}</div>}
               <button onClick={scanConnections} disabled={isScanning}>
                 {isScanning ? <span className="spinner"></span> : i18next.t('check')}
               </button>
@@ -447,8 +452,6 @@
 
           {activeTab === 'history' && (
             <div>
-              {errorMessage && <div className="alert">{errorMessage}</div>}
-              {exportMessage && <div className={exportMessage.includes('successfully') ? 'success-message' : 'alert'}>{exportMessage}</div>}
               <button className="clear" onClick={handleClearHistory}>
                 {i18next.t('clearHistory')}
               </button>

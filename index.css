@@ -19,7 +19,34 @@ body.dark {
 }
 h1 { 
   font-size: 1.5rem; 
-  margin-bottom: 1.25rem; 
+  margin-bottom: 0.625rem; 
+}
+.messages {
+  margin-bottom: 0.625rem;
+}
+.alert { 
+  color: #d32f2f; 
+  font-weight: bold; 
+  padding: 0.625rem; 
+  background: #ffebee; 
+  border-radius: 0.25rem; 
+  margin-bottom: 0.3125rem; 
+}
+.dark .alert { 
+  background: #d32f2f; 
+  color: #fff; 
+}
+.success-message {
+  color: #388e3c;
+  font-weight: bold;
+  padding: 0.625rem;
+  background: #e8f5e9;
+  border-radius: 0.25rem;
+  margin-bottom: 0.3125rem;
+}
+.dark .success-message {
+  background: #66bb6a;
+  color: #fff;
 }
 .tabs { 
   display: flex; 
@@ -142,30 +169,6 @@ tr.history-row:hover {
 }
 .dark tr.history-row:hover { 
   background: #37474f; 
-}
-.alert { 
-  color: #d32f2f; 
-  font-weight: bold; 
-  padding: 0.625rem; 
-  background: #ffebee; 
-  border-radius: 0.25rem; 
-  margin-bottom: 0.625rem; 
-}
-.dark .alert { 
-  background: #d32f2f; 
-  color: #fff; 
-}
-.success-message {
-  color: #388e3c;
-  font-weight: bold;
-  padding: 0.625rem;
-  background: #e8f5e9;
-  border-radius: 0.25rem;
-  margin-bottom: 0.625rem;
-}
-.dark .success-message {
-  background: #66bb6a;
-  color: #fff;
 }
 .error-message { 
   color: #d32f2f; 
