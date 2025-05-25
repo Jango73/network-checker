@@ -53,6 +53,10 @@ ipcMain.handle('get-process-name', async () => {
       } else {
         const processes = {};
         const lines = stdout.split('\n').filter(line => line.trim());
+        if (lines.length === 0) {
+          console.warn('Tasklist returned empty output');
+          resolve(processes);
+        }
         for (const line of lines) {
           const [name, pid] = line.split('","').map(s => s.replace(/^"|"$/g, ''));
           if (pid && !isNaN(pid)) processes[pid] = name;

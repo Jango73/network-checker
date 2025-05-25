@@ -124,6 +124,44 @@
     .alert { 
       color: #d32f2f; 
       font-weight: bold; 
+      padding: 0.625rem; 
+      background: #ffebee; 
+      border-radius: 0.25rem; 
+      margin-bottom: 0.625rem; 
+    }
+    .dark .alert { 
+      background: #d32f2f; 
+      color: #fff; 
+    }
+    .error-message { 
+      color: #d32f2f; 
+      font-size: 0.875rem; 
+      margin-top: 0.25rem; 
+    }
+    .progress-container { 
+      margin: 0.625rem 0; 
+    }
+    .progress-bar { 
+      width: 100%; 
+      height: 1.25rem; 
+      background: #f0f0f0; 
+      border-radius: 0.25rem; 
+      overflow: hidden; 
+    }
+    .dark .progress-bar { 
+      background: #444; 
+    }
+    .progress-fill { 
+      height: 100%; 
+      background: #1976d2; 
+      transition: width 0.3s; 
+    }
+    .dark .progress-fill { 
+      background: #90caf9; 
+    }
+    .progress-text { 
+      margin-top: 0.3125rem; 
+      font-size: 0.875rem; 
     }
     .spinner { 
       display: inline-block; 
@@ -153,15 +191,15 @@
     i18next.init({
       lng: 'en',
       resources: {
-        en: { translation: { appTitle: 'Network Connection Checker', check: 'Check Now', interval: 'Check Interval (min)', periodic: 'Enable Periodic Checks', countriesFriendly: 'Friendly Countries', countriesRisky: 'Risky Countries', bannedIPs: 'Banned IPs', riskyProviders: 'Risky Providers', connectionsByCountry: 'Connections by Country', darkMode: 'Dark Mode', loading: 'Checking...', noConnections: 'No active connections found.', riskyConnection: 'Risky connection!' } },
-        fr: { translation: { appTitle: 'Vérificateur de Connexions Réseau', check: 'Vérifier Maintenant', interval: 'Intervalle de Vérification (min)', periodic: 'Activer les Vérifications Périodiques', countriesFriendly: 'Pays Amis', countriesRisky: 'Pays Risqués', bannedIPs: 'IPs Bannies', riskyProviders: 'Fournisseurs Risqués', connectionsByCountry: 'Connexions par Pays', darkMode: 'Mode Sombre', loading: 'Vérification en cours...', noConnections: 'Aucune connexion active trouvée.', riskyConnection: 'Connexion risquée !' } },
-        it: { translation: { appTitle: 'Controllore Connessioni di Rete', check: 'Controlla Ora', interval: 'Intervallo di Controllo (min)', periodic: 'Abilita Controlli Periodici', countriesFriendly: 'Paesi Amici', countriesRisky: 'Paesi Rischiosi', bannedIPs: 'IP Bloccati', riskyProviders: 'Fornitori Rischiosi', connectionsByCountry: 'Connessioni per Paese', darkMode: 'Modalità Scura', loading: 'Controllo in corso...', noConnections: 'Nessuna connessione attiva trovata.', riskyConnection: 'Connessione rischiosa!' } },
-        de: { translation: { appTitle: 'Netzwerkverbindungsprüfer', check: 'Jetzt Prüfen', interval: 'Prüfintervall (min)', periodic: 'Periodische Prüfungen Aktivieren', countriesFriendly: 'Freundliche Länder', countriesRisky: 'Riskante Länder', bannedIPs: 'Gesperrte IPs', riskyProviders: 'Riskante Anbieter', connectionsByCountry: 'Verbindungen nach Land', darkMode: 'Dunkler Modus', loading: 'Prüfe...', noConnections: 'Keine aktiven Verbindungen gefunden.', riskyConnection: 'Riskante Verbindung!' } },
-        es: { translation: { appTitle: 'Verificador de Conexiones de Red', check: 'Verificar Ahora', interval: 'Intervalo de Verificación (min)', periodic: 'Activar Verificaciones Periódicas', countriesFriendly: 'Países Amigos', countriesRisky: 'Países Riesgosos', bannedIPs: 'IPs Prohibidas', riskyProviders: 'Proveedores Riesgosos', connectionsByCountry: 'Conexiones por País', darkMode: 'Modo Oscuro', loading: 'Verificando...', noConnections: 'No se encontraron conexiones activas.', riskyConnection: '¡Conexión arriesgada!' } },
-        el: { translation: { appTitle: 'Έλεγχος Συνδέσεων Δικτύου', check: 'Έλεγχος Τώρα', interval: 'Διάστημα Ελέγχου (min)', periodic: 'Ενεργοποίηση Περιοδικών Ελέγχων', countriesFriendly: 'Φιλικές Χώρες', countriesRisky: 'Επικίνδυνες Χώρες', bannedIPs: 'Απαγορευμένες IPs', riskyProviders: 'Επικίνδυνοι Πάροχοι', connectionsByCountry: 'Συνδέσεις ανά Χώρα', darkMode: 'Σκοτεινή Λειτουργία', loading: 'Έλεγχος σε εξέλιξη...', noConnections: 'Δεν βρέθηκαν ενεργές συνδέσεις.', riskyConnection: 'Επικίνδυνη σύνδεση!' } },
-        ru: { translation: { appTitle: 'Проверка сетевых соединений', check: 'Проверить сейчас', interval: 'Интервал проверки (мин)', periodic: 'Включить периодические проверки', countriesFriendly: 'Дружественные страны', countriesRisky: 'Рискованные страны', bannedIPs: 'Заблокированные IP', riskyProviders: 'Рискованные провайдеры', connectionsByCountry: 'Соединения по странам', darkMode: 'Тёмный режим', loading: 'Проверка...', noConnections: 'Активные соединения не найдены.', riskyConnection: 'Рискованное соединение!' } },
-        zh: { translation: { appTitle: '网络连接检查器', check: '立即检查', interval: '检查间隔（分钟）', periodic: '启用定期检查', countriesFriendly: '友好国家', countriesRisky: '风险国家', bannedIPs: '禁止的IP', riskyProviders: '风险提供商', connectionsByCountry: '按国家分类的连接', darkMode: '暗模式', loading: '正在检查...', noConnections: '未找到活动连接。', riskyConnection: '风险连接！' } },
-        ko: { translation: { appTitle: '네트워크 연결 확인기', check: '지금 확인', interval: '확인 간격 (분)', periodic: '주기적 확인 활성화', countriesFriendly: '친화적 국가', countriesRisky: '위험한 국가', bannedIPs: '차단된 IP', riskyProviders: '위험한 제공업체', connectionsByCountry: '국가별 연결', darkMode: '다크 모드', loading: '확인 중...', noConnections: '활성 연결이 없습니다.', riskyConnection: '위험한 연결!' } },
+        en: { translation: { appTitle: 'Network Connection Checker', check: 'Check Now', interval: 'Check Interval (min)', periodic: 'Enable Periodic Checks', countriesFriendly: 'Friendly Countries', countriesRisky: 'Risky Countries', bannedIPs: 'Banned IPs', riskyProviders: 'Risky Providers', connectionsByCountry: 'Connections by Country', darkMode: 'Dark Mode', loading: 'Checking...', noConnections: 'No active connections found.', riskyConnection: 'Risky connection!', invalidIP: 'Invalid IP address', invalidProvider: 'Provider name must be at least 3 characters', apiError: 'API error: Too many requests or connection issue. Try again later.' } },
+        fr: { translation: { appTitle: 'Vérificateur de Connexions Réseau', check: 'Vérifier Maintenant', interval: 'Intervalle de Vérification (min)', periodic: 'Activer les Vérifications Périodiques', countriesFriendly: 'Pays Amis', countriesRisky: 'Pays Risqués', bannedIPs: 'IPs Bannies', riskyProviders: 'Fournisseurs Risqués', connectionsByCountry: 'Connexions par Pays', darkMode: 'Mode Sombre', loading: 'Vérification en cours...', noConnections: 'Aucune connexion active trouvée.', riskyConnection: 'Connexion risquée !', invalidIP: 'Adresse IP invalide', invalidProvider: 'Le nom du fournisseur doit avoir au moins 3 caractères', apiError: 'Erreur API : Trop de requêtes ou problème de connexion. Réessayez plus tard.' } },
+        it: { translation: { appTitle: 'Controllore Connessioni di Rete', check: 'Controlla Ora', interval: 'Intervallo di Controllo (min)', periodic: 'Abilita Controlli Periodici', countriesFriendly: 'Paesi Amici', countriesRisky: 'Paesi Rischiosi', bannedIPs: 'IP Bloccati', riskyProviders: 'Fornitori Rischiosi', connectionsByCountry: 'Connessioni per Paese', darkMode: 'Modalità Scura', loading: 'Controllo in corso...', noConnections: 'Nessuna connessione attiva trovata.', riskyConnection: 'Connessione rischiosa!', invalidIP: 'Indirizzo IP non valido', invalidProvider: 'Il nome del provider deve avere almeno 3 caratteri', apiError: 'Errore API: Troppe richieste o problema di connessione. Riprova più tardi.' } },
+        de: { translation: { appTitle: 'Netzwerkverbindungsprüfer', check: 'Jetzt Prüfen', interval: 'Prüfintervall (min)', periodic: 'Periodische Prüfungen Aktivieren', countriesFriendly: 'Freundliche Länder', countriesRisky: 'Riskante Länder', bannedIPs: 'Gesperrte IPs', riskyProviders: 'Riskante Anbieter', connectionsByCountry: 'Verbindungen nach Land', darkMode: 'Dunkler Modus', loading: 'Prüfe...', noConnections: 'Keine aktiven Verbindungen gefunden.', riskyConnection: 'Riskante Verbindung!', invalidIP: 'Ungültige IP-Adresse', invalidProvider: 'Anbietername muss mindestens 3 Zeichen lang sein', apiError: 'API-Fehler: Zu viele Anfragen oder Verbindungsproblem. Versuchen Sie es später erneut.' } },
+        es: { translation: { appTitle: 'Verificador de Conexiones de Red', check: 'Verificar Ahora', interval: 'Intervalo de Verificación (min)', periodic: 'Activar Verificaciones Periódicas', countriesFriendly: 'Países Amigos', countriesRisky: 'Países Riesgosos', bannedIPs: 'IPs Prohibidas', riskyProviders: 'Proveedores Riesgosos', connectionsByCountry: 'Conexiones por País', darkMode: 'Modo Oscuro', loading: 'Verificando...', noConnections: 'No se encontraron conexiones activas.', riskyConnection: '¡Conexión arriesgada!', invalidIP: 'Dirección IP inválida', invalidProvider: 'El nombre del proveedor debe tener al menos 3 caracteres', apiError: 'Error de API: Demasiadas solicitudes o problema de conexión. Intenta de nuevo más tarde.' } },
+        el: { translation: { appTitle: 'Έλεγχος Συνδέσεων Δικτύου', check: 'Έλεγχος Τώρα', interval: 'Διάστημα Ελέγχου (min)', periodic: 'Ενεργοποίηση Περιοδικών Ελέγχων', countriesFriendly: 'Φιλικές Χώρες', countriesRisky: 'Επικίνδυνες Χώρες', bannedIPs: 'Απαγορευμένες IPs', riskyProviders: 'Επικίνδυνοι Πάροχοι', connectionsByCountry: 'Συνδέσεις ανά Χώρα', darkMode: 'Σκοτεινή Λειτουργία', loading: 'Έλεγχος σε εξέλιξη...', noConnections: 'Δεν βρέθηκαν ενεργές συνδέσεις.', riskyConnection: 'Επικίνδυνη σύνδεση!', invalidIP: 'Μη έγκυρη διεύθυνση IP', invalidProvider: 'Το όνομα του παρόχου πρέπει να έχει τουλάχιστον 3 χαρακτήρες', apiError: 'Σφάλμα API: Πάρα πολλά αιτήματα ή πρόβλημα σύνδεσης. Δοκιμάστε ξανά αργότερα.' } },
+        ru: { translation: { appTitle: 'Проверка сетевых соединений', check: 'Проверить сейчас', interval: 'Интервал проверки (мин)', periodic: 'Включить периодические проверки', countriesFriendly: 'Дружественные страны', countriesRisky: 'Рискованные страны', bannedIPs: 'Заблокированные IP', riskyProviders: 'Рискованные провайдеры', connectionsByCountry: 'Соединения по странам', darkMode: 'Тёмный режим', loading: 'Проверка...', noConnections: 'Активные соединения не найдены.', riskyConnection: 'Рискованное соединение!', invalidIP: 'Недопустимый IP-адрес', invalidProvider: 'Имя провайдера должно содержать не менее 3 символов', apiError: 'Ошибка API: Слишком много запросов или проблема с соединением. Попробуйте позже.' } },
+        zh: { translation: { appTitle: '网络连接检查器', check: '立即检查', interval: '检查间隔（分钟）', periodic: '启用定期检查', countriesFriendly: '友好国家', countriesRisky: '风险国家', bannedIPs: '禁止的IP', riskyProviders: '风险提供商', connectionsByCountry: '按国家分类的连接', darkMode: '暗模式', loading: '正在检查...', noConnections: '未找到活动连接。', riskyConnection: '风险连接！', invalidIP: '无效的IP地址', invalidProvider: '提供商名称必须至少3个字符', apiError: 'API错误：请求过多或连接问题。请稍后再试。' } },
+        ko: { translation: { appTitle: '네트워크 연결 확인기', check: '지금 확인', interval: '확인 간격 (분)', periodic: '주기적 확인 활성화', countriesFriendly: '친화적 국가', countriesRisky: '위험한 국가', bannedIPs: '차단된 IP', riskyProviders: '위험한 제공업체', connectionsByCountry: '국가별 연결', darkMode: '다크 모드', loading: '확인 중...', noConnections: '활성 연결이 없습니다.', riskyConnection: '위험한 연결!', invalidIP: '잘못된 IP 주소', invalidProvider: '제공업체 이름은 최소 3자 이상이어야 합니다', apiError: 'API 오류: 요청이 너무 많거나 연결 문제입니다. 나중에 다시 시도하세요.' } },
       }
     });
 
@@ -178,6 +216,10 @@
       const [periodicScan, setPeriodicScan] = useState(true);
       const [activeTab, setActiveTab] = useState('main');
       const [configLoaded, setConfigLoaded] = useState(false);
+      const [errorMessage, setErrorMessage] = useState('');
+      const [scanProgress, setScanProgress] = useState({ current: 0, total: 0 });
+      const [ipError, setIpError] = useState('');
+      const [providerError, setProviderError] = useState('');
 
       useEffect(() => {
         async function loadConfig() {
@@ -197,6 +239,7 @@
             }
           } catch (error) {
             console.error('Failed to load config:', error);
+            setErrorMessage('Failed to load configuration.');
           }
         }
         loadConfig();
@@ -215,6 +258,7 @@
             });
           } catch (error) {
             console.error('Failed to save config:', error);
+            setErrorMessage('Failed to save configuration.');
           }
         }
         saveConfig();
@@ -227,8 +271,48 @@
         }
       }, [periodicScan, intervalMin]);
 
+      useEffect(() => {
+        if (errorMessage) {
+          const timer = setTimeout(() => setErrorMessage(''), 10000);
+          return () => clearTimeout(timer);
+        }
+      }, [errorMessage]);
+
+      const validateIP = (ip) => {
+        const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+        return ipRegex.test(ip) && ip.split('.').every(num => parseInt(num) >= 0 && parseInt(num) <= 255);
+      };
+
+      const validateProvider = (provider) => {
+        return provider.length >= 3;
+      };
+
+      const handleBannedIPsChange = (e) => {
+        const newIPs = e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
+        const invalidIP = newIPs.find(ip => !validateIP(ip));
+        if (invalidIP) {
+          setIpError(i18next.t('invalidIP'));
+        } else {
+          setIpError('');
+          setBannedIPs(newIPs);
+        }
+      };
+
+      const handleRiskyProvidersChange = (e) => {
+        const newProviders = e.target.value.split(',').map(p => p.trim()).filter(p => p);
+        const invalidProvider = newProviders.find(p => !validateProvider(p));
+        if (invalidProvider) {
+          setProviderError(i18next.t('invalidProvider'));
+        } else {
+          setProviderError('');
+          setRiskyProviders(newProviders);
+        }
+      };
+
       const scanConnections = async () => {
         setIsScanning(true);
+        setErrorMessage('');
+        setScanProgress({ current: 0, total: 0 });
         try {
           const netstatOutput = await ipcRenderer.invoke('run-netstat');
           const lines = netstatOutput.split('\n').filter(line => line.includes('ESTABLISHED'));
@@ -242,6 +326,7 @@
           const connections = [];
           let requestCount = 0;
           let hasPlayedSound = false;
+          setScanProgress({ current: 0, total: ipSet.size });
 
           for (const ip of ipSet) {
             try {
@@ -269,8 +354,10 @@
               }
             } catch (error) {
               console.error(`Error checking IP ${ip}:`, error);
+              setErrorMessage(i18next.t('apiError'));
             }
             requestCount++;
+            setScanProgress(prev => ({ ...prev, current: prev.current + 1 }));
             if (requestCount >= 45) {
               await new Promise(resolve => setTimeout(resolve, 60000));
               requestCount = 0;
@@ -280,8 +367,10 @@
           setConnections(connections);
         } catch (error) {
           console.error('Error checking:', error);
+          setErrorMessage('Failed to run scan. Check network or system permissions.');
         }
         setIsScanning(false);
+        setScanProgress({ current: 0, total: 0 });
       };
 
       const countryCounts = connections.reduce((acc, conn) => {
@@ -304,9 +393,23 @@
 
           {activeTab === 'main' && (
             <div>
+              {errorMessage && <div className="alert">{errorMessage}</div>}
               <button onClick={scanConnections} disabled={isScanning}>
                 {isScanning ? <span className="spinner"></span> : i18next.t('check')}
               </button>
+              {isScanning && scanProgress.total > 0 && (
+                <div className="progress-container">
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${(scanProgress.current / scanProgress.total) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="progress-text">
+                    Scanning {scanProgress.current}/{scanProgress.total} IPs ({Math.round((scanProgress.current / scanProgress.total) * 100)}%)
+                  </div>
+                </div>
+              )}
               <div className="form-group" style={{ marginTop: '0.625rem' }}>
                 <label>
                   <input
@@ -413,16 +516,18 @@
                 <input
                   type="text"
                   value={bannedIPs.join(',')}
-                  onChange={(e) => setBannedIPs(e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip))}
+                  onChange={handleBannedIPsChange}
                 />
+                {ipError && <div className="error-message">{ipError}</div>}
               </div>
               <div className="form-group">
                 <label>{i18next.t('riskyProviders')}</label>
                 <input
                   type="text"
                   value={riskyProviders.join(',')}
-                  onChange={(e) => setRiskyProviders(e.target.value.split(',').map(p => p.trim()).filter(p => p))}
+                  onChange={handleRiskyProvidersChange}
                 />
+                {providerError && <div className="error-message">{providerError}</div>}
               </div>
               <div className="form-group">
                 <label>{i18next.t('countriesFriendly')}</label>
