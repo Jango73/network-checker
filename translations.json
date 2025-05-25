@@ -38,7 +38,10 @@
       "org": "Organization",
       "process": "Process",
       "risky": "Risky",
-      "language": "Language"
+      "language": "Language",
+      "resetSettings": "Reset to Defaults",
+      "resetSuccess": "Settings reset to defaults successfully",
+      "resetError": "Failed to reset settings"
     }
   },
   "fr": {
@@ -80,7 +83,10 @@
       "org": "Organisation",
       "process": "Processus",
       "risky": "Risqué",
-      "language": "Langue"
+      "language": "Langue",
+      "resetSettings": "Réinitialiser les Paramètres",
+      "resetSuccess": "Paramètres réinitialisés avec succès",
+      "resetError": "Échec de la réinitialisation des paramètres"
     }
   },
   "it": {
@@ -122,7 +128,10 @@
       "org": "Organizzazione",
       "process": "Processo",
       "risky": "Rischioso",
-      "language": "Lingua"
+      "language": "Lingua",
+      "resetSettings": "Ripristina Impostazioni",
+      "resetSuccess": "Impostazioni ripristinate con successo",
+      "resetError": "Errore nel ripristino delle impostazioni"
     }
   },
   "de": {
@@ -164,7 +173,10 @@
       "org": "Organisation",
       "process": "Prozess",
       "risky": "Riskant",
-      "language": "Sprache"
+      "language": "Sprache",
+      "resetSettings": "Einstellungen zurücksetzen",
+      "resetSuccess": "Einstellungen erfolgreich zurückgesetzt",
+      "resetError": "Fehler beim Zurücksetzen der Einstellungen"
     }
   },
   "es": {
@@ -206,7 +218,10 @@
       "org": "Organización",
       "process": "Proceso",
       "risky": "Arriesgado",
-      "language": "Idioma"
+      "language": "Idioma",
+      "resetSettings": "Restablecer Configuración",
+      "resetSuccess": "Configuración restablecida con éxito",
+      "resetError": "Error al restablecer la configuración"
     }
   },
   "el": {
@@ -248,19 +263,22 @@
       "org": "Οργανισμός",
       "process": "Διεργασία",
       "risky": "Επικίνδυνο",
-      "language": "Γλώσσα"
+      "language": "Γλώσσα",
+      "resetSettings": "Επαναφορά Ρυθμίσεων",
+      "resetSuccess": "Οι ρυθμίσεις επανήλθαν επιτυχώς",
+      "resetError": "Αποτυχία επαναφοράς των ρυθμίσεων"
     }
   },
   "ru": {
     "translation": {
       "appTitle": "Проверка сетевых соединений",
       "check": "Проверить сейчас",
-      "interval": "Интервал проверки (мин)",
+      "interval": "Интервал проверки (min)",
       "periodic": "Включить периодические проверки",
       "countriesFriendly": "Дружественные страны",
       "countriesRisky": "Рискованные страны",
       "bannedIPs": "Заблокированные IP",
-      "riskyProviders": "Рискованные провайдеры",
+      "riskyProviders": "Рисковые провайдеры",
       "connectionsByCountry": "Соединения по странам",
       "darkMode": "Тёмный режим",
       "loading": "Проверка...",
@@ -274,7 +292,7 @@
       "maxHistorySize": "Максимальный Размер Истории (МБ)",
       "scanDate": "Дата Сканирования",
       "totalConnections": "Всего Соединений",
-      "riskyConnections": "Рискованные Соединения",
+      "riskyConnections": "Рисковые Соединения",
       "exportJSON": "Экспортировать как JSON",
       "exportCSV": "Экспортировать как CSV",
       "exportSuccess": "История успешно экспортирована в {filePath}",
@@ -290,7 +308,10 @@
       "org": "Организация",
       "process": "Процесс",
       "risky": "Рискованный",
-      "language": "Язык"
+      "language": "Язык",
+      "resetSettings": "Сбросить Настройки",
+      "resetSuccess": "Настройки успешно сброшены",
+      "resetError": "Ошибка при сбросе настроек"
     }
   },
   "zh": {
@@ -332,7 +353,10 @@
       "org": "组织",
       "process": "进程",
       "risky": "有风险",
-      "language": "语言"
+      "language": "语言",
+      "resetSettings": "重置设置",
+      "resetSuccess": "设置已成功重置",
+      "resetError": "重置设置失败"
     }
   },
   "ko": {
@@ -374,7 +398,10 @@
       "org": "조직",
       "process": "프로세스",
       "risky": "위험",
-      "language": "언어"
+      "language": "언어",
+      "resetSettings": "설정 초기화",
+      "resetSuccess": "설정이 성공적으로 초기화되었습니다",
+      "resetError": "설정 초기화 실패"
     }
   }
 }

@@ -105,7 +105,10 @@
                     org: 'Organization',
                     process: 'Process',
                     risky: 'Risky',
-                    language: 'Language'
+                    language: 'Language',
+                    resetSettings: 'Reset to Defaults',
+                    resetSuccess: 'Settings reset to defaults successfully',
+                    resetError: 'Failed to reset settings'
                   }
                 }
               }
@@ -261,6 +264,35 @@
         } catch (error) {
           console.error('Failed to clear history:', error);
           addMessage('Failed to clear history.', 'error');
+        }
+      };
+
+      const handleResetSettings = async () => {
+        try {
+          setFriendlyCountries(['France', 'United States']);
+          setRiskyCountries(['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana']);
+          setBannedIPs([]);
+          setRiskyProviders(['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream']);
+          setIntervalMin(30);
+          setMaxHistorySize(10);
+          setIsDarkMode(false);
+          setLanguage('en');
+          setPeriodicScan(true);
+          await ipcRenderer.invoke('save-config', {
+            friendlyCountries: ['France', 'United States'],
+            riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana'],
+            bannedIPs: [],
+            riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
+            intervalMin: 30,
+            maxHistorySize: 10,
+            isDarkMode: false,
+            language: 'en',
+            periodicScan: true
+          });
+          addMessage(i18next.t('resetSuccess'), 'success');
+        } catch (error) {
+          console.error('Failed to reset settings:', error);
+          addMessage(i18next.t('resetError'), 'error');
         }
       };
 
@@ -587,6 +619,9 @@
                   {countries.map(country => <option key={country} value={country}>{country}</option>)}
                 </select>
               </div>
+              <button className="reset" onClick={handleResetSettings}>
+                {i18next.t('resetSettings')}
+              </button>
             </div>
           )}
         </div>

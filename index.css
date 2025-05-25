@@ -66,10 +66,10 @@ h1 {
   font-weight: bold; 
 }
 .dark .tab.active { 
-  border-bottom-color: #90caf9; 
+  border-bottom-color: #90caf9;
 }
 .config { 
-  margin-bottom: 1.25rem; 
+  margin-bottom: 1.25rem;
 }
 .form-group { 
   margin-bottom: 0.9375rem; 
@@ -119,21 +119,34 @@ button:hover:not(:disabled) {
   background: #64b5f6; 
 }
 button.clear { 
-  background: #d32f2f; 
+  background: #d32f2f;
 }
 .dark button.clear { 
+  background-color: #ef5350;
+}
+button.clear:hover { 
+  background-color: #b71c1c;
+}
+.dark button.reset:hover:not(:disabled) { 
+  background-color: #d81b60;
+}
+button.reset { 
+  background: #d32f2f; 
+  margin-top: 0.625rem;
+}
+.dark button.reset { 
   background: #ef5350; 
 }
-button.clear:hover:not(:disabled) { 
+button.reset:hover:not(:disabled) { 
   background: #b71c1c; 
 }
-.dark button.clear:hover:not(:disabled) { 
+.dark button.reset:hover:not(.disabled:disabled) { 
   background: #d81b60; 
 }
 button.export-json, button.export-csv { 
   background: #388e3c; 
 }
-.dark button.export-json, .dark button.export-csv { 
+.dark .export button.export-json, .dark button.exports-csv { 
   background: #66bb6a; 
 }
 button.export-json:hover:not(:disabled), button.export-csv:hover:not(:disabled) { 
