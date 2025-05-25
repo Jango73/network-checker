@@ -22,18 +22,30 @@
 
     const countries = ['Algeria', 'Australia', 'Austria', 'Bangladesh', 'Belarus', 'Belgium', 'Canada', 'China', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Ghana', 'Greece', 'Honduras', 'India', 'Iran', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kenya', 'Morocco', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Panama', 'Russia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'Ukraine', 'United Kingdom', 'United States', 'Venezuela'].sort();
 
+    const DEFAULT_CONFIG = {
+      friendlyCountries: ['France', 'United States'],
+      riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana'],
+      bannedIPs: [],
+      riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
+      intervalMin: 30,
+      maxHistorySize: 10,
+      isDarkMode: false,
+      language: 'en',
+      periodicScan: true
+    };
+
     const App = () => {
       const [connections, setConnections] = useState([]);
-      const [friendlyCountries, setFriendlyCountries] = useState(['France', 'United States']);
-      const [riskyCountries, setRiskyCountries] = useState(['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana']);
-      const [bannedIPs, setBannedIPs] = useState([]);
-      const [riskyProviders, setRiskyProviders] = useState(['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream']);
-      const [intervalMin, setIntervalMin] = useState(30);
-      const [maxHistorySize, setMaxHistorySize] = useState(10);
-      const [isDarkMode, setIsDarkMode] = useState(false);
+      const [friendlyCountries, setFriendlyCountries] = useState(DEFAULT_CONFIG.friendlyCountries);
+      const [riskyCountries, setRiskyCountries] = useState(DEFAULT_CONFIG.riskyCountries);
+      const [bannedIPs, setBannedIPs] = useState(DEFAULT_CONFIG.bannedIPs);
+      const [riskyProviders, setRiskyProviders] = useState(DEFAULT_CONFIG.riskyProviders);
+      const [intervalMin, setIntervalMin] = useState(DEFAULT_CONFIG.intervalMin);
+      const [maxHistorySize, setMaxHistorySize] = useState(DEFAULT_CONFIG.maxHistorySize);
+      const [isDarkMode, setIsDarkMode] = useState(DEFAULT_CONFIG.isDarkMode);
       const [isScanning, setIsScanning] = useState(false);
-      const [language, setLanguage] = useState('en');
-      const [periodicScan, setPeriodicScan] = useState(true);
+      const [language, setLanguage] = useState(DEFAULT_CONFIG.language);
+      const [periodicScan, setPeriodicScan] = useState(DEFAULT_CONFIG.periodicScan);
       const [activeTab, setActiveTab] = useState('main');
       const [configLoaded, setConfigLoaded] = useState(false);
       const [messages, setMessages] = useState([]);
@@ -140,14 +152,14 @@
           try {
             const config = await ipcRenderer.invoke('load-config');
             if (config) {
-              setFriendlyCountries(config.friendlyCountries || ['France', 'United States']);
-              setRiskyCountries(config.riskyCountries || ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana']);
-              setBannedIPs(config.bannedIPs || []);
-              setRiskyProviders(config.riskyProviders || ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream']);
-              setIntervalMin(config.intervalMin || 30);
-              setMaxHistorySize(config.maxHistorySize || 10);
+              setFriendlyCountries(config.friendlyCountries || DEFAULT_CONFIG.friendlyCountries);
+              setRiskyCountries(config.riskyCountries || DEFAULT_CONFIG.riskyCountries);
+              setBannedIPs(config.bannedIPs || DEFAULT_CONFIG.bannedIPs);
+              setRiskyProviders(config.riskyProviders || DEFAULT_CONFIG.riskyProviders);
+              setIntervalMin(config.intervalMin || DEFAULT_CONFIG.intervalMin);
+              setMaxHistorySize(config.maxHistorySize || DEFAULT_CONFIG.maxHistorySize);
               setIsDarkMode(!!config.isDarkMode);
-              setLanguage(config.language || 'en');
+              setLanguage(config.language || DEFAULT_CONFIG.language);
               setPeriodicScan(config.periodicScan !== false);
               setConfigLoaded(true);
             }
@@ -269,26 +281,16 @@
 
       const handleResetSettings = async () => {
         try {
-          setFriendlyCountries(['France', 'United States']);
-          setRiskyCountries(['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana']);
-          setBannedIPs([]);
-          setRiskyProviders(['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream']);
-          setIntervalMin(30);
-          setMaxHistorySize(10);
-          setIsDarkMode(false);
-          setLanguage('en');
-          setPeriodicScan(true);
-          await ipcRenderer.invoke('save-config', {
-            friendlyCountries: ['France', 'United States'],
-            riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana'],
-            bannedIPs: [],
-            riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
-            intervalMin: 30,
-            maxHistorySize: 10,
-            isDarkMode: false,
-            language: 'en',
-            periodicScan: true
-          });
+          setFriendlyCountries(DEFAULT_CONFIG.friendlyCountries);
+          setRiskyCountries(DEFAULT_CONFIG.riskyCountries);
+          setBannedIPs(DEFAULT_CONFIG.bannedIPs);
+          setRiskyProviders(DEFAULT_CONFIG.riskyProviders);
+          setIntervalMin(DEFAULT_CONFIG.intervalMin);
+          setMaxHistorySize(DEFAULT_CONFIG.maxHistorySize);
+          setIsDarkMode(DEFAULT_CONFIG.isDarkMode);
+          setLanguage(DEFAULT_CONFIG.language);
+          setPeriodicScan(DEFAULT_CONFIG.periodicScan);
+          await ipcRenderer.invoke('save-config', DEFAULT_CONFIG);
           addMessage(i18next.t('resetSuccess'), 'success');
         } catch (error) {
           console.error('Failed to reset settings:', error);
