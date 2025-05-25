@@ -4,199 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Network Connection Checker</title>
+  <link rel="stylesheet" href="index.css">
   <script src="./lib/react.production.min.js"></script>
   <script src="./lib/react-dom.production.min.js"></script>
   <script src="./lib/babel.min.js"></script>
   <script src="./lib/i18next.min.js"></script>
   <script src="./lib/axios.min.js"></script>
-  <style>
-    body { 
-      margin: 0; 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-      transition: background 0.2s, color 0.2s;
-    }
-    body.light { 
-      background: #fff !important; 
-      color: #000; 
-    }
-    body.dark { 
-      background: #1e1e1e !important; 
-      color: #fff; 
-    }
-    #root { 
-      display: flex; 
-      flex-direction: column; 
-      min-height: 100vh; 
-      padding: 1.25rem; 
-    }
-    h1 { 
-      font-size: 1.5rem; 
-      margin-bottom: 1.25rem; 
-    }
-    .tabs { 
-      display: flex; 
-      border-bottom: 1px solid #ccc; 
-      margin-bottom: 1.25rem; 
-    }
-    .dark .tabs { 
-      border-bottom-color: #555; 
-    }
-    .tab { 
-      padding: 0.625rem 1.25rem; 
-      cursor: pointer; 
-      border-bottom: 2px solid transparent; 
-    }
-    .tab.active { 
-      border-bottom: 2px solid #1976d2; 
-      font-weight: bold; 
-    }
-    .dark .tab.active { 
-      border-bottom-color: #90caf9; 
-    }
-    .config { 
-      margin-bottom: 1.25rem; 
-    }
-    .form-group { 
-      margin-bottom: 0.9375rem; 
-    }
-    label { 
-      display: block; 
-      margin-bottom: 0.3125rem; 
-      font-weight: bold; 
-    }
-    select, input[type="text"], input[type="number"] { 
-      width: 100%; 
-      padding: 0.5rem; 
-      border: 1px solid #ccc; 
-      border-radius: 0.25rem; 
-      box-sizing: border-box; 
-      background: #fff; 
-      color: #000; 
-    }
-    .dark select, .dark input[type="text"], .dark input[type="number"] { 
-      background: #333; 
-      color: #fff; 
-      border-color: #555; 
-    }
-    select[multiple] { 
-      height: 12.5rem; 
-    }
-    button { 
-      padding: 0.625rem 1.25rem; 
-      background: #1976d2; 
-      color: #fff; 
-      border: none; 
-      border-radius: 0.25rem; 
-      cursor: pointer; 
-    }
-    .dark button { 
-      background: #90caf9; 
-      color: #000; 
-    }
-    button:disabled { 
-      background: #aaa; 
-    }
-    button:hover:not(:disabled) { 
-      background: #1565c0; 
-    }
-    .dark button:hover:not(:disabled) { 
-      background: #64b5f6; 
-    }
-    button.clear { 
-      background: #d32f2f; 
-    }
-    .dark button.clear { 
-      background: #ef5350; 
-    }
-    button.clear:hover:not(:disabled) { 
-      background: #b71c1c; 
-    }
-    .dark button.clear:hover:not(:disabled) { 
-      background: #d81b60; 
-    }
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 0.625rem; 
-    }
-    th, td { 
-      border: 1px solid #ddd; 
-      padding: 0.5rem; 
-      text-align: left; 
-    }
-    .dark th, .dark td { 
-      border-color: #555; 
-    }
-    tr.risky { 
-      background: #ffccbc; 
-    }
-    .dark tr.risky { 
-      background: #ff8a65; 
-    }
-    tr.history-row { 
-      cursor: pointer; 
-    }
-    tr.history-row:hover { 
-      background: #e0f7fa; 
-    }
-    .dark tr.history-row:hover { 
-      background: #37474f; 
-    }
-    .alert { 
-      color: #d32f2f; 
-      font-weight: bold; 
-      padding: 0.625rem; 
-      background: #ffebee; 
-      border-radius: 0.25rem; 
-      margin-bottom: 0.625rem; 
-    }
-    .dark .alert { 
-      background: #d32f2f; 
-      color: #fff; 
-    }
-    .error-message { 
-      color: #d32f2f; 
-      font-size: 0.875rem; 
-      margin-top: 0.25rem; 
-    }
-    .progress-container { 
-      margin: 0.625rem 0; 
-    }
-    .progress-bar { 
-      width: 100%; 
-      height: 1.25rem; 
-      background: #f0f0f0; 
-      border-radius: 0.25rem; 
-      overflow: hidden; 
-    }
-    .dark .progress-bar { 
-      background: #444; 
-    }
-    .progress-fill { 
-      height: 100%; 
-      background: #1976d2; 
-      transition: width 0.3s; 
-    }
-    .dark .progress-fill { 
-      background: #90caf9; 
-    }
-    .progress-text { 
-      margin-top: 0.3125rem; 
-      font-size: 0.875rem; 
-    }
-    .spinner { 
-      display: inline-block; 
-      width: 1.5rem; 
-      height: 1.5rem; 
-      border: 3px solid #fff; 
-      border-top-color: #1976d2; 
-      border-radius: 50%; 
-      animation: spin 1s linear infinite; 
-    }
-    @keyframes spin { 
-      to { transform: rotate(360deg); } 
-    }
-  </style>
 </head>
 <body class="light">
   <div id="root"></div>
@@ -208,246 +21,6 @@
     const { ipcRenderer } = window.electron;
 
     const countries = ['Algeria', 'Australia', 'Austria', 'Bangladesh', 'Belarus', 'Belgium', 'Canada', 'China', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Ghana', 'Greece', 'Honduras', 'India', 'Iran', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kenya', 'Morocco', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Panama', 'Russia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Thailand', 'Ukraine', 'United Kingdom', 'United States', 'Venezuela'].sort();
-
-    i18next.init({
-      lng: 'en',
-      resources: {
-        en: { 
-          translation: { 
-            appTitle: 'Network Connection Checker', 
-            check: 'Check Now', 
-            interval: 'Check Interval (min)', 
-            periodic: 'Enable Periodic Checks', 
-            countriesFriendly: 'Friendly Countries', 
-            countriesRisky: 'Risky Countries', 
-            bannedIPs: 'Banned IPs', 
-            riskyProviders: 'Risky Providers', 
-            connectionsByCountry: 'Connections by Country', 
-            darkMode: 'Dark Mode', 
-            loading: 'Checking...', 
-            noConnections: 'No active connections found.', 
-            riskyConnection: 'Risky connection!', 
-            invalidIP: 'Invalid IP address', 
-            invalidProvider: 'Provider name must be at least 3 characters', 
-            apiError: 'API error: Too many requests or connection issue. Try again later.',
-            history: 'History',
-            clearHistory: 'Clear History',
-            maxHistorySize: 'Max History Size (MB)',
-            scanDate: 'Scan Date',
-            totalConnections: 'Total Connections',
-            riskyConnections: 'Risky Connections'
-          } 
-        },
-        fr: { 
-          translation: { 
-            appTitle: 'Vérificateur de Connexions Réseau', 
-            check: 'Vérifier Maintenant', 
-            interval: 'Intervalle de Vérification (min)', 
-            periodic: 'Activer les Vérifications Périodiques', 
-            countriesFriendly: 'Pays Amis', 
-            countriesRisky: 'Pays Risqués', 
-            bannedIPs: 'IPs Bannies', 
-            riskyProviders: 'Fournisseurs Risqués', 
-            connectionsByCountry: 'Connexions par Pays', 
-            darkMode: 'Mode Sombre', 
-            loading: 'Vérification en cours...', 
-            noConnections: 'Aucune connexion active trouvée.', 
-            riskyConnection: 'Connexion risquée !', 
-            invalidIP: 'Adresse IP invalide', 
-            invalidProvider: 'Le nom du fournisseur doit avoir au moins 3 caractères', 
-            apiError: 'Erreur API : Trop de requêtes ou problème de connexion. Réessayez plus tard.',
-            history: 'Historique',
-            clearHistory: 'Effacer l’historique',
-            maxHistorySize: 'Taille maximale de l’historique (Mo)',
-            scanDate: 'Date du scan',
-            totalConnections: 'Connexions totales',
-            riskyConnections: 'Connexions risquées'
-          } 
-        },
-        it: { 
-          translation: { 
-            appTitle: 'Controllore Connessioni di Rete', 
-            check: 'Controlla Ora', 
-            interval: 'Intervallo di Controllo (min)', 
-            periodic: 'Abilita Controlli Periodici', 
-            countriesFriendly: 'Paesi Amici', 
-            countriesRisky: 'Paesi Rischiosi', 
-            bannedIPs: 'IP Bloccati', 
-            riskyProviders: 'Fornitori Rischiosi', 
-            connectionsByCountry: 'Connessioni per Paese', 
-            darkMode: 'Modalità Scura', 
-            loading: 'Controllo in corso...', 
-            noConnections: 'Nessuna connessione attiva trovata.', 
-            riskyConnection: 'Connessione rischiosa!', 
-            invalidIP: 'Indirizzo IP non valido', 
-            invalidProvider: 'Il nome del provider deve avere almeno 3 caratteri', 
-            apiError: 'Errore API: Troppe richieste o problema di connessione. Riprova più tardi.',
-            history: 'Cronologia',
-            clearHistory: 'Cancella Cronologia',
-            maxHistorySize: 'Dimensione Massima Cronologia (MB)',
-            scanDate: 'Data Scansione',
-            totalConnections: 'Connessioni Totali',
-            riskyConnections: 'Connessioni Rischio'
-          } 
-        },
-        de: { 
-          translation: { 
-            appTitle: 'Netzwerkverbindungsprüfer', 
-            check: 'Jetzt Prüfen', 
-            interval: 'Prüfintervall (min)', 
-            periodic: 'Periodische Prüfungen Aktivieren', 
-            countriesFriendly: 'Freundliche Länder', 
-            countriesRisky: 'Riskante Länder', 
-            bannedIPs: 'Gesperrte IPs', 
-            riskyProviders: 'Riskante Anbieter', 
-            connectionsByCountry: 'Verbindungen nach Land', 
-            darkMode: 'Dunkler Modus', 
-            loading: 'Prüfe...', 
-            noConnections: 'Keine aktiven Verbindungen gefunden.', 
-            riskyConnection: 'Riskante Verbindung!', 
-            invalidIP: 'Ungültige IP-Adresse', 
-            invalidProvider: 'Anbietername muss mindestens 3 Zeichen lang sein', 
-            apiError: 'API-Fehler: Zu viele Anfragen oder Verbindungsproblem. Versuchen Sie es später erneut.',
-            history: 'Verlauf',
-            clearHistory: 'Verlauf Löschen',
-            maxHistorySize: 'Maximale Verlaufsgröße (MB)',
-            scanDate: 'Scan-Datum',
-            totalConnections: 'Gesamtverbindungen',
-            riskyConnections: 'Riskante Verbindungen'
-          } 
-        },
-        es: { 
-          translation: { 
-            appTitle: 'Verificador de Conexiones de Red', 
-            check: 'Verificar Ahora', 
-            interval: 'Intervalo de Verificación (min)', 
-            periodic: 'Activar Verificaciones Periódicas', 
-            countriesFriendly: 'Países Amigos', 
-            countriesRisky: 'Países Riesgosos', 
-            bannedIPs: 'IPs Prohibidas', 
-            riskyProviders: 'Proveedores Riesgosos', 
-            connectionsByCountry: 'Conexiones por País', 
-            darkMode: 'Modo Oscuro', 
-            loading: 'Verificando...', 
-            noConnections: 'No se encontraron conexiones activas.', 
-            riskyConnection: '¡Conexión arriesgada!', 
-            invalidIP: 'Dirección IP inválida', 
-            invalidProvider: 'El nombre del proveedor debe tener al menos 3 caracteres', 
-            apiError: 'Error de API: Demasiadas solicitudes o problema de conexión. Intenta de nuevo más tarde.',
-            history: 'Historial',
-            clearHistory: 'Borrar Historial',
-            maxHistorySize: 'Tamaño Máximo del Historial (MB)',
-            scanDate: 'Fecha de Escaneo',
-            totalConnections: 'Conexiones Totales',
-            riskyConnections: 'Conexiones Arriesgadas'
-          } 
-        },
-        el: { 
-          translation: { 
-            appTitle: 'Έλεγχος Συνδέσεων Δικτύου', 
-            check: 'Έλεγχος Τώρα', 
-            interval: 'Διάστημα Ελέγχου (min)', 
-            periodic: 'Ενεργοποίηση Περιοδικών Ελέγχων', 
-            countriesFriendly: 'Φιλικές Χώρες', 
-            countriesRisky: 'Επικίνδυνες Χώρες', 
-            bannedIPs: 'Απαγορευμένες IPs', 
-            riskyProviders: 'Επικίνδυνοι Πάροχοι', 
-            connectionsByCountry: 'Συνδέσεις ανά Χώρα', 
-            darkMode: 'Σκοτεινή Λειτουργία', 
-            loading: 'Έλεγχος σε εξέλιξη...', 
-            noConnections: 'Δεν βρέθηκαν ενεργές συνδέσεις.', 
-            riskyConnection: 'Επικίνδυνη σύνδεση!', 
-            invalidIP: 'Μη έγκυρη διεύθυνση IP', 
-            invalidProvider: 'Το όνομα του παρόχου πρέπει να έχει τουλάχιστον 3 χαρακτήρες', 
-            apiError: 'Σφάλμα API: Πάρα πολλά αιτήματα ή πρόβλημα σύνδεσης. Δοκιμάστε ξανά αργότερα.',
-            history: 'Ιστορικό',
-            clearHistory: 'Εκκαθάριση Ιστορικού',
-            maxHistorySize: 'Μέγιστο Μέγεθος Ιστορικού (MB)',
-            scanDate: 'Ημερομηνία Σάρωσης',
-            totalConnections: 'Συνολικές Συνδέσεις',
-            riskyConnections: 'Επικίνδυνες Συνδέσεις'
-          } 
-        },
-        ru: { 
-          translation: { 
-            appTitle: 'Проверка сетевых соединений', 
-            check: 'Проверить сейчас', 
-            interval: 'Интервал проверки (мин)', 
-            periodic: 'Включить периодические проверки', 
-            countriesFriendly: 'Дружественные страны', 
-            countriesRisky: 'Рискованные страны', 
-            bannedIPs: 'Заблокированные IP', 
-            riskyProviders: 'Рискованные провайдеры', 
-            connectionsByCountry: 'Соединения по странам', 
-            darkMode: 'Тёмный режим', 
-            loading: 'Проверка...', 
-            noConnections: 'Активные соединения не найдены.', 
-            riskyConnection: 'Рискованное соединение!', 
-            invalidIP: 'Недопустимый IP-адрес', 
-            invalidProvider: 'Имя провайдера должно содержать не менее 3 символов', 
-            apiError: 'Ошибка API: Слишком много запросов или проблема с соединением. Попробуйте позже.',
-            history: 'История',
-            clearHistory: 'Очистить Историю',
-            maxHistorySize: 'Максимальный Размер Истории (МБ)',
-            scanDate: 'Дата Сканирования',
-            totalConnections: 'Всего Соединений',
-            riskyConnections: 'Рискованные Соединения'
-          } 
-        },
-        zh: { 
-          translation: { 
-            appTitle: '网络连接检查器', 
-            check: '立即检查', 
-            interval: '检查间隔（分钟）', 
-            periodic: '启用定期检查', 
-            countriesFriendly: '友好国家', 
-            countriesRisky: '风险国家', 
-            bannedIPs: '禁止的IP', 
-            riskyProviders: '风险提供商', 
-            connectionsByCountry: '按国家分类的连接', 
-            darkMode: '暗模式', 
-            loading: '正在检查...', 
-            noConnections: '未找到活动连接。', 
-            riskyConnection: '风险连接！', 
-            invalidIP: '无效的IP地址', 
-            invalidProvider: '提供商名称必须至少3个字符', 
-            apiError: 'API错误：请求过多或连接问题。请稍后再试。',
-            history: '历史记录',
-            clearHistory: '清除历史记录',
-            maxHistorySize: '最大历史记录大小（MB）',
-            scanDate: '扫描日期',
-            totalConnections: '总连接数',
-            riskyConnections: '风险连接数'
-          } 
-        },
-        ko: { 
-          translation: { 
-            appTitle: '네트워크 연결 확인기', 
-            check: '지금 확인', 
-            interval: '확인 간격 (분)', 
-            periodic: '주기적 확인 활성화', 
-            countriesFriendly: '친화적 국가', 
-            countriesRisky: '위험한 국가', 
-            bannedIPs: '차단된 IP', 
-            riskyProviders: '위험한 제공업체', 
-            connectionsByCountry: '국가별 연결', 
-            darkMode: '다크 모드', 
-            loading: '확인 중...', 
-            noConnections: '활성 연결이 없습니다.', 
-            riskyConnection: '위험한 연결!', 
-            invalidIP: '잘못된 IP 주소', 
-            invalidProvider: '제공업체 이름은 최소 3자 이상이어야 합니다', 
-            apiError: 'API 오류: 요청이 너무 많거나 연결 문제입니다. 나중에 다시 시도하세요.',
-            history: '기록',
-            clearHistory: '기록 지우기',
-            maxHistorySize: '최대 기록 크기 (MB)',
-            scanDate: '스캔 날짜',
-            totalConnections: '총 연결 수',
-            riskyConnections: '위험한 연결 수'
-          } 
-        },
-      }
-    });
 
     const App = () => {
       const [connections, setConnections] = useState([]);
@@ -469,6 +42,64 @@
       const [providerError, setProviderError] = useState('');
       const [history, setHistory] = useState([]);
       const [selectedScan, setSelectedScan] = useState(null);
+      const [i18nLoaded, setI18nLoaded] = useState(false);
+
+      useEffect(() => {
+        async function initI18n() {
+          try {
+            const response = await fetch('translations.json');
+            if (!response.ok) throw new Error('Failed to load translations');
+            const translations = await response.json();
+            await i18next.init({
+              lng: language,
+              resources: translations,
+            });
+            setI18nLoaded(true);
+          } catch (error) {
+            console.error('Failed to load translations:', error);
+            setErrorMessage('Failed to load translations. Using fallback language.');
+            await i18next.init({
+              lng: 'en',
+              resources: {
+                en: {
+                  translation: {
+                    appTitle: 'Network Connection Checker',
+                    check: 'Check Now',
+                    interval: 'Check Interval (min)',
+                    periodic: 'Enable Periodic Checks',
+                    countriesFriendly: 'Friendly Countries',
+                    countriesRisky: 'Risky Countries',
+                    bannedIPs: 'Banned IPs',
+                    riskyProviders: 'Risky Providers',
+                    connectionsByCountry: 'Connections by Country',
+                    darkMode: 'Dark Mode',
+                    loading: 'Checking...',
+                    noConnections: 'No active connections found.',
+                    riskyConnection: 'Risky connection!',
+                    invalidIP: 'Invalid IP address',
+                    invalidProvider: 'Provider name must be at least 3 characters',
+                    apiError: 'API error: Too many requests or connection issue. Try again later.',
+                    history: 'History',
+                    clearHistory: 'Clear History',
+                    maxHistorySize: 'Max History Size (MB)',
+                    scanDate: 'Scan Date',
+                    totalConnections: 'Total Connections',
+                    riskyConnections: 'Risky Connections'
+                  }
+                }
+              }
+            });
+            setI18nLoaded(true);
+          }
+        }
+        initI18n();
+      }, []);
+
+      useEffect(() => {
+        if (i18nLoaded && language !== i18next.language) {
+          i18next.changeLanguage(language);
+        }
+      }, [language, i18nLoaded]);
 
       useEffect(() => {
         async function loadConfig() {
@@ -484,7 +115,6 @@
               setIsDarkMode(!!config.isDarkMode);
               setLanguage(config.language || 'en');
               setPeriodicScan(config.periodicScan !== false);
-              i18next.changeLanguage(config.language || 'en');
               setConfigLoaded(true);
             }
           } catch (error) {
@@ -713,6 +343,10 @@
         );
       };
 
+      if (!i18nLoaded) {
+        return <div>Loading translations...</div>;
+      }
+
       return (
         <div className={isDarkMode ? 'dark' : 'light'}>
           <h1>{i18next.t('appTitle')}</h1>
@@ -836,7 +470,7 @@
             <div className="config">
               <div className="form-group">
                 <label>Language</label>
-                <select value={language} onChange={(e) => { setLanguage(e.target.value); i18next.changeLanguage(e.target.value); }}>
+                <select value={language} onChange={(e) => setLanguage(e.target.value)}>
                   <option value="en">English</option>
                   <option value="fr">Français</option>
                   <option value="it">Italiano</option>
