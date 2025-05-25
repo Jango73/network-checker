@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs').promises;
@@ -18,6 +18,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  console.log('App is ready, creating window...');
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -166,5 +167,52 @@ ipcMain.handle('clear-history', async () => {
   } catch (error) {
     console.error('Error clearing history:', error);
     return false;
+  }
+});
+
+ipcMain.handle('export-history', async (event, format = 'json') => {
+  console.log('Registering export-history handler with format:', format);
+  try {
+    const historyData = await fs.readFile('history.json', 'utf8');
+    let history = [];
+    if (historyData.trim()) {
+      history = JSON.parse(historyData);
+    }
+
+    const fileName = `network-history-${new Date().toISOString().split('T')[0]}`;
+    const saveOptions = {
+      title: 'Export History',
+      defaultPath: path.join(app.getPath('downloads'), fileName),
+      filters: [
+        { name: format === 'csv' ? 'CSV Files' : 'JSON Files', extensions: [format] }
+      ]
+    };
+
+    const { canceled, filePath } = await dialog.showSaveDialog(saveOptions);
+    if (canceled || !filePath) {
+      console.log('Export canceled by user');
+      return { success: false, message: 'Export canceled' };
+    }
+
+    if (format === 'json') {
+      await fs.writeFile(filePath, JSON.stringify(history, null, 2));
+    } else if (format === 'csv') {
+      const headers = ['scanDate,totalConnections,riskyConnections,ip,country,isp,org,pid,processName,isRisky'];
+      const csvRows = history.flatMap(scan =>
+        scan.connections.map(conn =>
+          `${scan.timestamp},${scan.totalConnections},${scan.riskyConnections},${conn.ip},${conn.country},${conn.isp},${conn.org},${conn.pid},${conn.processName},${conn.isRisky}`
+        )
+      );
+      const csvContent = [headers, ...csvRows].join('\n');
+      await fs.writeFile(filePath, csvContent);
+    } else {
+      throw new Error('Unsupported format');
+    }
+
+    console.log(`History exported to ${filePath} as ${format}`);
+    return { success: true, message: `History exported to ${filePath}` };
+  } catch (error) {
+    console.error('Error exporting history:', error);
+    return { success: false, message: error.message };
   }
 });

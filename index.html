@@ -37,6 +37,7 @@
       const [activeTab, setActiveTab] = useState('main');
       const [configLoaded, setConfigLoaded] = useState(false);
       const [errorMessage, setErrorMessage] = useState('');
+      const [exportMessage, setExportMessage] = useState('');
       const [scanProgress, setScanProgress] = useState({ current: 0, total: 0 });
       const [ipError, setIpError] = useState('');
       const [providerError, setProviderError] = useState('');
@@ -84,7 +85,12 @@
                     maxHistorySize: 'Max History Size (MB)',
                     scanDate: 'Scan Date',
                     totalConnections: 'Total Connections',
-                    riskyConnections: 'Risky Connections'
+                    riskyConnections: 'Risky Connections',
+                    exportJSON: 'Export as JSON',
+                    exportCSV: 'Export as CSV',
+                    exportSuccess: 'History exported successfully to {filePath}',
+                    exportError: 'Failed to export history',
+                    exportCanceled: 'Export canceled'
                   }
                 }
               }
@@ -167,6 +173,13 @@
       }, [errorMessage]);
 
       useEffect(() => {
+        if (exportMessage) {
+          const timer = setTimeout(() => setExportMessage(''), 5000);
+          return () => clearTimeout(timer);
+        }
+      }, [exportMessage]);
+
+      useEffect(() => {
         async function loadHistory() {
           try {
             const historyData = await ipcRenderer.invoke('load-history');
@@ -207,6 +220,27 @@
         } else {
           setProviderError('');
           setRiskyProviders(newProviders);
+        }
+      };
+
+      const handleExport = async (format) => {
+        try {
+          const result = await ipcRenderer.invoke('export-history', format);
+          setExportMessage(i18next.t(result.success ? 'exportSuccess' : result.message === 'Export canceled' ? 'exportCanceled' : 'exportError', { filePath: result.message.includes('exported to') ? result.message.split('exported to ')[1] : '' }));
+        } catch (error) {
+          console.error('Failed to export history:', error);
+          setExportMessage(i18next.t('exportError'));
+        }
+      };
+
+      const handleClearHistory = async () => {
+        try {
+          await ipcRenderer.invoke('clear-history');
+          setHistory([]);
+          setSelectedScan(null);
+        } catch (error) {
+          console.error('Failed to clear history:', error);
+          setErrorMessage('Failed to clear history.');
         }
       };
 
@@ -287,17 +321,6 @@
         }
         setIsScanning(false);
         setScanProgress({ current: 0, total: 0 });
-      };
-
-      const handleClearHistory = async () => {
-        try {
-          await ipcRenderer.invoke('clear-history');
-          setHistory([]);
-          setSelectedScan(null);
-        } catch (error) {
-          console.error('Failed to clear history:', error);
-          setErrorMessage('Failed to clear history.');
-        }
       };
 
       const countryCounts = connections.reduce((acc, conn) => {
@@ -425,8 +448,15 @@
           {activeTab === 'history' && (
             <div>
               {errorMessage && <div className="alert">{errorMessage}</div>}
+              {exportMessage && <div className={exportMessage.includes('successfully') ? 'success-message' : 'alert'}>{exportMessage}</div>}
               <button className="clear" onClick={handleClearHistory}>
                 {i18next.t('clearHistory')}
+              </button>
+              <button className="export-json" onClick={() => handleExport('json')}>
+                {i18next.t('exportJSON')}
+              </button>
+              <button className="export-csv" onClick={() => handleExport('csv')}>
+                {i18next.t('exportCSV')}
               </button>
               <div style={{ marginTop: '1.25rem' }}>
                 <h2>{i18next.t('history')}</h2>

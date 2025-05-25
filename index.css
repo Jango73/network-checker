@@ -76,6 +76,7 @@ button {
   border: none; 
   border-radius: 0.25rem; 
   cursor: pointer; 
+  margin-right: 0.625rem;
 }
 .dark button { 
   background: #90caf9; 
@@ -101,6 +102,18 @@ button.clear:hover:not(:disabled) {
 }
 .dark button.clear:hover:not(:disabled) { 
   background: #d81b60; 
+}
+button.export-json, button.export-csv { 
+  background: #388e3c; 
+}
+.dark button.export-json, .dark button.export-csv { 
+  background: #66bb6a; 
+}
+button.export-json:hover:not(:disabled), button.export-csv:hover:not(:disabled) { 
+  background: #2e7d32; 
+}
+.dark button.export-json:hover:not(:disabled), .dark button.export-csv:hover:not(:disabled) { 
+  background: #4caf50; 
 }
 table { 
   width: 100%; 
@@ -141,6 +154,18 @@ tr.history-row:hover {
 .dark .alert { 
   background: #d32f2f; 
   color: #fff; 
+}
+.success-message {
+  color: #388e3c;
+  font-weight: bold;
+  padding: 0.625rem;
+  background: #e8f5e9;
+  border-radius: 0.25rem;
+  margin-bottom: 0.625rem;
+}
+.dark .success-message {
+  background: #66bb6a;
+  color: #fff;
 }
 .error-message { 
   color: #d32f2f; 
