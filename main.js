@@ -64,19 +64,41 @@ ipcMain.handle('get-process-name', async () => {
 });
 
 ipcMain.handle('load-config', async () => {
+  const defaultConfig = {
+    friendlyCountries: ['France', 'United States'],
+    riskyCountries: ['Ukraine', 'Nigeria'],
+    bannedIPs: [],
+    riskyProviders: ['DigitalOcean', 'Hetzner'],
+    intervalMin: 30,
+    isDarkMode: false,
+    language: 'en',
+    periodicScan: true
+  };
   try {
     const data = await fs.readFile('config.json', 'utf8');
-    return JSON.parse(data);
+    if (!data.trim()) {
+      console.log('Empty config file, writing default');
+      await fs.writeFile('config.json', JSON.stringify(defaultConfig, null, 2));
+      return defaultConfig;
+    }
+    const parsed = JSON.parse(data);
+    console.log('Loaded config:', parsed);
+    return { ...defaultConfig, ...parsed };
   } catch (error) {
     console.error('Error loading config:', error);
-    return null;
+    console.log('Writing default config');
+    await fs.writeFile('config.json', JSON.stringify(defaultConfig, null, 2));
+    return defaultConfig;
   }
 });
 
 ipcMain.handle('save-config', async (event, config) => {
   try {
+    console.log('Saving config:', config);
     await fs.writeFile('config.json', JSON.stringify(config, null, 2));
+    return true;
   } catch (error) {
     console.error('Error saving config:', error);
+    return false;
   }
 });
