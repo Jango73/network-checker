@@ -241,6 +241,7 @@
 
           const connections = [];
           let requestCount = 0;
+          let hasPlayedSound = false;
 
           for (const ip of ipSet) {
             try {
@@ -261,8 +262,9 @@
                   pid: isNaN(pid) ? 'Unknown' : pid,
                   processName
                 });
-                if (isRisky) {
+                if (isRisky && !hasPlayedSound) {
                   new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
+                  hasPlayedSound = true;
                 }
               }
             } catch (error) {
