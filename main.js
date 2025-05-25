@@ -66,9 +66,9 @@ ipcMain.handle('get-process-name', async () => {
 ipcMain.handle('load-config', async () => {
   const defaultConfig = {
     friendlyCountries: ['France', 'United States'],
-    riskyCountries: ['Ukraine', 'Nigeria'],
+    riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana'],
     bannedIPs: [],
-    riskyProviders: ['DigitalOcean', 'Hetzner'],
+    riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
     intervalMin: 30,
     isDarkMode: false,
     language: 'en',
