@@ -74,6 +74,7 @@ ipcMain.handle('load-config', async () => {
     bannedIPs: [],
     riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
     intervalMin: 30,
+    maxHistorySize: 10,
     isDarkMode: false,
     language: 'en',
     periodicScan: true
@@ -103,6 +104,67 @@ ipcMain.handle('save-config', async (event, config) => {
     return true;
   } catch (error) {
     console.error('Error saving config:', error);
+    return false;
+  }
+});
+
+ipcMain.handle('load-history', async () => {
+  try {
+    const data = await fs.readFile('history.json', 'utf8');
+    if (!data.trim()) {
+      console.log('Empty history file');
+      return [];
+    }
+    const parsed = JSON.parse(data);
+    console.log('Loaded history:', parsed.length, 'scans');
+    return parsed;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('History file does not exist, creating empty');
+      await fs.writeFile('history.json', JSON.stringify([]));
+      return [];
+    }
+    console.error('Error loading history:', error);
+    return [];
+  }
+});
+
+ipcMain.handle('save-history', async (event, scanData, maxHistorySize) => {
+  try {
+    let history = [];
+    try {
+      const data = await fs.readFile('history.json', 'utf8');
+      if (data.trim()) {
+        history = JSON.parse(data);
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+
+    history.unshift(scanData);
+
+    let fileSize = Buffer.byteLength(JSON.stringify(history, null, 2), 'utf8') / (1024 * 1024);
+    while (fileSize > maxHistorySize && history.length > 1) {
+      history.pop();
+      fileSize = Buffer.byteLength(JSON.stringify(history, null, 2), 'utf8') / (1024 * 1024);
+    }
+
+    await fs.writeFile('history.json', JSON.stringify(history, null, 2));
+    console.log('Saved history:', history.length, 'scans, size:', fileSize.toFixed(2), 'MB');
+    return true;
+  } catch (error) {
+    console.error('Error saving history:', error);
+    return false;
+  }
+});
+
+ipcMain.handle('clear-history', async () => {
+  try {
+    await fs.writeFile('history.json', JSON.stringify([]));
+    console.log('Cleared history');
+    return true;
+  } catch (error) {
+    console.error('Error clearing history:', error);
     return false;
   }
 });
