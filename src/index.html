@@ -14,65 +14,21 @@
 <body class="light">
   <div id="root"></div>
   <script type="text/babel" src="Map.js"></script>
+  <script type="text/babel" src="config.js"></script>
+  <script type="text/babel" src="utils.js"></script>
+  <script type="text/babel" src="Tabs.js"></script>
   <script type="text/babel">
+    console.log('Starting index.html script');
     window.$RefreshReg$ = () => {};
     window.$RefreshSig$ = () => () => {};
 
     const { useState, useEffect } = React;
     const { ipcRenderer } = window.electron;
-
-    const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,7}:$|^([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}$|^([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}$|^([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}$|^([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})$|^:((:[0-9a-fA-F]{1,4}){1,7}|:)$/;
-
-    const countries = ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Democratic Republic of the Congo', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'].sort();
-
-    const DEFAULT_CONFIG = {
-      riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Kenya', 'South Africa', 'Ghana'],
-      bannedIPs: [],
-      riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
-      intervalMin: 30,
-      maxHistorySize: 10,
-      isDarkMode: false,
-      language: 'en',
-      periodicScan: true
-    };
-
-    const processLocations = {
-      'msedge.exe': [
-        /^C:\\Program Files\\Microsoft\\Edge\\Application\\/i,
-        /^C:\\Program Files \(x86\)\\Microsoft\\Edge\\Application\\/i
-      ],
-      'firefox.exe': [
-        /^C:\\Program Files\\Mozilla Firefox\\/i,
-        /^C:\\Program Files \(x86\)\\Mozilla Firefox\\/i
-      ],
-      'chrome.exe': [
-        /^C:\\Program Files\\Google\\Chrome\\Application\\/i,
-        /^C:\\Program Files \(x86\)\\Google\\Chrome\\Application\\/i
-      ],
-      'svchost.exe': [
-        /^C:\\Windows\\System32\\/i
-      ],
-      'explorer.exe': [
-        /^C:\\Windows\\/i
-      ],
-      'SDXHelper.exe': [
-        /^C:\\Program Files\\Microsoft Office\\root\\Office\d+\\/i,
-        /^C:\\Program Files \(x86\)\\Microsoft Office\\root\\Office\d+\\/i,
-        /^C:\\Program Files\\WindowsApps\\Microsoft\.Office\.Desktop_.*\\Office\d+\\/i
-      ]
-    };
-
-    const systemProcesses = [
-      'svchost.exe',
-      'lsass.exe',
-      'csrss.exe',
-      'smss.exe',
-      'winlogon.exe',
-      'services.exe'
-    ];
+    const { DEFAULT_CONFIG } = window.config;
+    const { scanConnections, handleBannedIPsChange, handleRiskyProvidersChange, handleCountryClick, handleExport, handleClearHistory, handleResetSettings } = window.utils;
 
     const App = () => {
+      console.log('App component initialized');
       const [connections, setConnections] = useState([]);
       const [riskyCountries, setRiskyCountries] = useState(DEFAULT_CONFIG.riskyCountries);
       const [bannedIPs, setBannedIPs] = useState(DEFAULT_CONFIG.bannedIPs);
@@ -93,13 +49,27 @@
       const [selectedScan, setSelectedScan] = useState(null);
       const [i18nLoaded, setI18nLoaded] = useState(false);
       const [i18nKey, setI18nKey] = useState(0);
+      const [tabsLoaded, setTabsLoaded] = useState(false);
 
       const addMessage = (text, type = 'error') => {
+        console.log('Adding message:', { text, type });
         setMessages(prev => [...prev, { text, type, id: Date.now() }]);
       };
 
       useEffect(() => {
+        console.log('Checking if Tabs is loaded:', window.Tabs);
+        if (window.Tabs && window.Tabs.Tabs && window.Tabs.renderConnectionsTable) {
+          console.log('Tabs components loaded successfully');
+          setTabsLoaded(true);
+        } else {
+          console.error('Tabs components not loaded');
+          addMessage('Failed to load Tabs components.', 'error');
+        }
+      }, []);
+
+      useEffect(() => {
         async function initI18n() {
+          console.log('Initializing i18n');
           try {
             const response = await fetch('../data/translations.json');
             if (!response.ok) throw new Error('Failed to load translations');
@@ -109,6 +79,7 @@
               resources: translations,
             });
             setI18nLoaded(true);
+            console.log('Translations loaded successfully');
           } catch (error) {
             console.error('Failed to load translations:', error);
             addMessage('Failed to load translations. Using fallback language.', 'error');
@@ -158,8 +129,16 @@
                     resetSuccess: 'Settings reset to defaults successfully',
                     resetError: 'Failed to reset settings',
                     noHistory: 'No scan history available',
-                    map: "Map",
-                    about: "About"
+                    map: 'Map',
+                    about: 'About',
+                    error: {
+                      no_path: 'No executable path found',
+                      suspect_path: 'Suspicious executable path',
+                      unexpected_path: 'Unexpected executable path'
+                    },
+                    warning: {
+                      suspicious_process: 'Suspicious process: {processName} at {executablePath} ({reason})'
+                    }
                   }
                 }
               }
@@ -167,27 +146,23 @@
             setI18nLoaded(true);
           }
         }
-        initI18n();
-        scanConnections();
-
-        // Test data
-        /*
-        const mockConnections = [
-          { ip: '8.8.8.8', country: 'United States', isp: 'Google', org: 'Google', city: 'Kansas City', lat: 39.0997, lon: -94.5785, isRisky: false, pid: '123', processName: 'test' },
-          { ip: '1.1.1.1', country: 'Australia', isp: 'Cloudflare', org: 'Cloudflare', city: 'Sydney', lat: -33.8688, lon: 151.2093, isRisky: true, pid: '456', processName: 'test2' }
-        ];
-        setConnections(mockConnections);
-        */
-      }, []);
+        if (tabsLoaded) {
+          initI18n();
+          console.log('Triggering initial scan');
+          scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next).then(setHistory);
+        }
+      }, [tabsLoaded]);
 
       useEffect(() => {
         if (i18nLoaded && language !== i18next.language) {
+          console.log('Changing language to:', language);
           i18next.changeLanguage(language);
         }
       }, [language, i18nLoaded]);
 
       useEffect(() => {
         const handleLanguageChange = () => {
+          console.log('Language changed, updating i18nKey');
           setI18nKey(prev => prev + 1);
         };
         i18next.on('languageChanged', handleLanguageChange);
@@ -198,6 +173,7 @@
 
       useEffect(() => {
         async function loadConfig() {
+          console.log('Loading config');
           try {
             const config = await ipcRenderer.invoke('load-config');
             if (config) {
@@ -210,33 +186,39 @@
               setLanguage(config.language || DEFAULT_CONFIG.language);
               setPeriodicScan(config.periodicScan !== false);
               setConfigLoaded(true);
+              console.log('Config loaded successfully');
             }
           } catch (error) {
             console.error('Failed to load config:', error);
             addMessage('Failed to load configuration.', 'error');
           }
         }
-        loadConfig();
-      }, []);
+        if (tabsLoaded) {
+          loadConfig();
+        }
+      }, [tabsLoaded]);
 
       useEffect(() => {
         document.body.className = isDarkMode ? 'dark' : 'light';
+        console.log('Updated body className:', document.body.className);
       }, [isDarkMode]);
 
       useEffect(() => {
         if (!configLoaded) return;
         async function saveConfig() {
+          console.log('Saving config');
           try {
             await ipcRenderer.invoke('save-config', {
-              riskyCountries, 
-              bannedIPs, 
-              riskyProviders, 
-              intervalMin, 
+              riskyCountries,
+              bannedIPs,
+              riskyProviders,
+              intervalMin,
               maxHistorySize,
-              isDarkMode, 
-              language, 
+              isDarkMode,
+              language,
               periodicScan
             });
+            console.log('Config saved successfully');
           } catch (error) {
             console.error('Failed to save config:', error);
             addMessage('Failed to save configuration.', 'error');
@@ -247,13 +229,17 @@
 
       useEffect(() => {
         if (periodicScan && intervalMin > 0) {
-          const interval = setInterval(() => scanConnections(), intervalMin * 60 * 1000);
+          console.log('Setting up periodic scan with interval:', intervalMin);
+          const interval = setInterval(() => {
+            scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next).then(setHistory);
+          }, intervalMin * 60 * 1000);
           return () => clearInterval(interval);
         }
-      }, [periodicScan, intervalMin]);
+      }, [periodicScan, intervalMin, bannedIPs, riskyCountries, riskyProviders, maxHistorySize]);
 
       useEffect(() => {
         if (messages.length > 0) {
+          console.log('Setting message timeout');
           const timer = setTimeout(() => {
             setMessages(prev => prev.slice(1));
           }, 5000);
@@ -263,590 +249,114 @@
 
       useEffect(() => {
         async function loadHistory() {
+          console.log('Loading history');
           try {
             const historyData = await ipcRenderer.invoke('load-history');
             setHistory(historyData || []);
+            console.log('History loaded successfully');
           } catch (error) {
             console.error('Failed to load history:', error);
             addMessage('Failed to load scan history.', 'error');
           }
         }
-        loadHistory();
-      }, []);
-
-      const validateIP = (ip) => {
-        const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-        return ipRegex.test(ip) && ip.split('.').every(num => parseInt(num) >= 0 && parseInt(num) <= 255);
-      };
-
-      const validateProvider = (provider) => {
-        return provider.length >= 3;
-      };
-
-      const handleBannedIPsChange = (e) => {
-        const newIPs = e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
-        const invalidIP = newIPs.find(ip => !validateIP(ip));
-        if (invalidIP) {
-          setIpError(i18next.t('invalidIP'));
-        } else {
-          setIpError('');
-          setBannedIPs(newIPs);
+        if (tabsLoaded) {
+          loadHistory();
         }
-      };
+      }, [tabsLoaded]);
 
-      const handleRiskyProvidersChange = (e) => {
-        const newProviders = e.target.value.split(',').map(p => p.trim()).filter(p => p);
-        const invalidProvider = newProviders.find(p => !validateProvider(p));
-        if (invalidProvider) {
-          setProviderError(i18next.t('invalidProvider'));
-        } else {
-          setProviderError('');
-          setRiskyProviders(newProviders);
-        }
-      };
-
-      const handleCountryClick = (country) => {
-        setRiskyCountries(prev => 
-          prev.includes(country) 
-            ? prev.filter(c => c !== country)
-            : [...prev, country]
-        );
-      };
-
-      const handleExport = async (format) => {
-        try {
-          const result = await ipcRenderer.invoke('export-history', format);
-          addMessage(i18next.t(result.success ? 'exportSuccess' : result.message === 'Export canceled' ? 'exportCanceled' : 'exportError', { filePath: result.message.includes('exported to') ? result.message.split('exported to ')[1] : '' }), result.success ? 'success' : 'error');
-        } catch (error) {
-          console.error('Failed to export history:', error);
-          addMessage(i18next.t('exportError'), 'error');
-        }
-      };
-
-      const handleClearHistory = async () => {
-        try {
-          await ipcRenderer.invoke('clear-history');
-          setHistory([]);
-          setSelectedScan(null);
-        } catch (error) {
-          console.error('Failed to clear history:', error);
-          addMessage('Failed to clear history.', 'error');
-        }
-      };
-
-      const handleResetSettings = async () => {
-        try {
-          setRiskyCountries(DEFAULT_CONFIG.riskyCountries);
-          setBannedIPs(DEFAULT_CONFIG.bannedIPs);
-          setRiskyProviders(DEFAULT_CONFIG.riskyProviders);
-          setIntervalMin(DEFAULT_CONFIG.intervalMin);
-          setMaxHistorySize(DEFAULT_CONFIG.maxHistorySize);
-          setIsDarkMode(DEFAULT_CONFIG.isDarkMode);
-          setLanguage(DEFAULT_CONFIG.language);
-          setPeriodicScan(DEFAULT_CONFIG.periodicScan);
-          await ipcRenderer.invoke('save-config', {
-            riskyCountries: DEFAULT_CONFIG.riskyCountries,
-            bannedIPs: DEFAULT_CONFIG.bannedIPs,
-            riskyProviders: DEFAULT_CONFIG.riskyProviders,
-            intervalMin: DEFAULT_CONFIG.intervalMin,
-            maxHistorySize: DEFAULT_CONFIG.maxHistorySize,
-            isDarkMode: DEFAULT_CONFIG.isDarkMode,
-            language: DEFAULT_CONFIG.language,
-            periodicScan: DEFAULT_CONFIG.periodicScan
-          });
-          addMessage(i18next.t('resetSuccess'), 'success');
-        } catch (error) {
-          console.error('Failed to reset settings:', error);
-          addMessage(i18next.t('resetError'), 'error');
-        }
-      };
-
-      const pathRecurrence = {};
-
-      const evaluateProcessLocation = (processName, executablePath) => {
-        const lowerProcessName = processName.toLowerCase();
-        console.log(`Evaluating ${processName} at ${executablePath}`);
-
-        // Cas spécial pour les processus système sans chemin
-        if (!executablePath && systemProcesses.includes(lowerProcessName)) {
-          console.log(`System process ${processName} with no path, assuming legitimate`);
-          return {
-            score: 100,
-            isSuspicious: false,
-            reason: ''
-          };
-        }
-
-        if (!executablePath) {
-          console.warn(`No path for ${processName}, marking as suspicious`);
-          return {
-            score: 0,
-            isSuspicious: true,
-            reason: i18next.t('error.no_path')
-          };
-        }
-
-        let score = 0;
-        const normalizedPath = executablePath.replace(/\//g, '\\').toLowerCase();
-        const parentDir = normalizedPath.substring(0, normalizedPath.lastIndexOf('\\') + 1);
-        console.log(`Normalized path: ${normalizedPath}, Parent dir: ${parentDir}`);
-
-        if (processLocations[lowerProcessName]) {
-          const isValidPath = processLocations[lowerProcessName].some(regex => {
-            const matches = regex.test(parentDir);
-            console.log(`Testing regex ${regex} against ${parentDir}: ${matches}`);
-            return matches;
-          });
-          if (isValidPath) {
-            score += 100;
-            console.log(`Valid path detected for ${processName}`);
-          } else if (['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(lowerProcessName)) {
-            score -= 20;
-            console.log(`Generic process name ${processName} in unexpected path`);
-          }
-        } else {
-          console.log(`No location rules for ${processName}`);
-        }
-
-        const suspectFolders = [
-          /\\Temp\\/i,
-          /\\AppData\\Local\\/i,
-          /\\AppData\\Roaming\\/i,
-          /\\Users\\[^\\]+\\Downloads\\/i
-        ];
-
-        if (suspectFolders.some(regex => regex.test(normalizedPath))) {
-          score -= 50;
-          console.log(`Suspicious folder detected in ${normalizedPath}`);
-        }
-
-        const pathKey = `${lowerProcessName}:${normalizedPath}`;
-        pathRecurrence[pathKey] = (pathRecurrence[pathKey] || 0) + 1;
-        if (pathRecurrence[pathKey] > 3) {
-          score += 10;
-          console.log(`Recurrence bonus for ${pathKey}`);
-        }
-
-        const isSuspicious = score < 50;
-        const reason = isSuspicious
-          ? score < 0
-            ? i18next.t('error.suspect_path')
-            : i18next.t('error.unexpected_path')
-          : '';
-        console.log(`Evaluation for ${processName}: score=${score}, isSuspicious=${isSuspicious}, reason=${reason}`);
-
-        return { score, isSuspicious, reason };
-      };
-
-      const scanConnections = async () => {
-        setIsScanning(true);
-        setScanProgress({ current: 0, total: 0 });
-        try {
-          const netstatOutput = await ipcRenderer.invoke('run-netstat');
-          const lines = netstatOutput.split('\n').filter(line => line.includes('ESTABLISHED'));
-
-          const ipSet = new Set(lines.map(line => {
-            const parts = line.trim().split(/\s+/);
-            let ip = parts[2];
-            if (!ip) return null;
-            if (ip.startsWith('[')) {
-              const match = ip.match(/^\[(.*?)\](?::\d+)?$/);
-              return match ? match[1] : null;
-            } else {
-              return ip.split(':')[0];
-            }
-          }).filter(ip => {
-            return ip && (ipv4Regex.test(ip) || ipv6Regex.test(ip)) &&
-              !/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|127\.|::1|0\.0\.0\.0)/.test(ip);
-          }));
-
-          const processMap = await ipcRenderer.invoke('get-process-name');
-
-          const connections = [];
-          let requestCount = 0;
-          let hasPlayedSound = false;
-          setScanProgress({ current: 0, total: ipSet.size });
-
-          for (const ip of ipSet) {
-            try {
-              const response = await axios.get(`http://ip-api.com/json/${ip}`);
-              console.log(`API response for IP ${ip}:`, response.data);
-              if (response.data.status === 'success') {
-                const { country, isp, org, city, lat, lon } = response.data;
-                console.log(`Coordinates for ${city}: lat=${lat}, lon=${lon}`);
-                const isRisky = bannedIPs.includes(ip) || riskyCountries.includes(country) || riskyProviders.some(p => isp.includes(p) || org.includes(p));
-                const line = lines.find(l => l.includes(ip));
-                const parts = line.trim().split(/\s+/);
-                const pid = parts[parts.length - 1];
-                const processName = processMap[pid] || 'Unknown';
-
-                let executablePath = null;
-                let isSuspicious = false;
-                let suspicionReason = '';
-
-                if (pid && !isNaN(pid)) {
-                  try {
-                    executablePath = await ipcRenderer.invoke('get-process-path', pid);
-                    const evaluation = evaluateProcessLocation(processName, executablePath);
-                    isSuspicious = evaluation.isSuspicious;
-                    suspicionReason = evaluation.reason;
-                    if (isSuspicious) {
-                      console.warn(`Suspicious process detected: ${processName} at ${executablePath}, reason: ${suspicionReason}`);
-                      addMessage(i18next.t('warning.suspicious_process', { processName, executablePath, reason: suspicionReason }), 'warning');
-                    }
-                  } catch (error) {
-                    console.error(`Error fetching path for PID ${pid}:`, error);
-                  }
-                }
-
-                connections.push({
-                  ip,
-                  country,
-                  isp,
-                  org,
-                  city,
-                  lat,
-                  lon,
-                  isRisky,
-                  pid: isNaN(pid) ? 'Unknown' : pid,
-                  processName,
-                  executablePath,
-                  isSuspicious,
-                  suspicionReason
-                });
-
-                if ((isRisky || isSuspicious) && !hasPlayedSound) {
-                  new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
-                  hasPlayedSound = true;
-                }
-              } else {
-                console.warn(`Geoloc failed for ${ip}: ${response.data.message}`);
-                addMessage(`Geoloc failed for ${ip}`, 'error');
-              }
-            } catch (error) {
-              console.error(`Error checking IP ${ip}:`, error);
-              addMessage(`Error checking IP ${ip}:`, 'error');
-            }
-            requestCount++;
-            setScanProgress(prev => ({ ...prev, current: prev.current + 1 }));
-            if (requestCount >= 45) {
-              await new Promise(resolve => setTimeout(resolve, 60000));
-              requestCount = 0;
-            }
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-          setConnections(connections);
-
-          const scanData = {
-            timestamp: new Date().toISOString(),
-            connections,
-            totalConnections: connections.length,
-            riskyConnections: connections.filter(c => c.isRisky || c.isSuspicious).length
-          };
-          try {
-            await ipcRenderer.invoke('save-history', scanData, maxHistorySize);
-            const updatedHistory = await ipcRenderer.invoke('load-history');
-            setHistory(updatedHistory || []);
-          } catch (error) {
-            console.error('Failed to save history:', error);
-            addMessage('Failed to save scan history.', 'error');
-          }
-        } catch (error) {
-          console.error('Error checking:', error);
-          addMessage('Failed to run scan. Check network or system permissions.', 'error');
-        }
-        setIsScanning(false);
-        setScanProgress({ current: 0, total: 0 });
-      };
-
-      const countryCounts = connections.reduce((acc, conn) => {
-        acc[conn.country] = (acc[conn.country] || 0) + 1;
-        return acc;
-      }, {});
-
-      const renderConnectionsTable = (conns) => {
-        if (!conns || conns.length === 0) {
-          return <p>{i18next.t('noConnections')}</p>;
-        }
-        return (
-          <table>
-            <thead>
-              <tr>
-                <th>IP</th>
-                <th>{i18next.t('country')}</th>
-                <th>{i18next.t('isp')}</th>
-                <th>{i18next.t('org')}</th>
-                <th>PID</th>
-                <th>{i18next.t('process')}</th>
-                <th>{i18next.t('risky')}</th>
-                <th>WHOIS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {conns.map(conn => (
-                <tr key={conn.ip} className={conn.isRisky ? 'risky' : ''}>
-                  <td>{conn.ip}</td>
-                  <td>{conn.country}</td>
-                  <td>{conn.isp}</td>
-                  <td>{conn.org}</td>
-                  <td>{conn.pid}</td>
-                  <td>{conn.processName}</td>
-                  <td>{conn.isRisky ? i18next.t('riskyConnection') : '-'}</td>
-                  <td>
-                    <a href={`https://whois.domaintools.com/${conn.ip}`} target="_blank">WHOIS</a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        );
-      };
-
-      if (!i18nLoaded) {
-        return <div>Loading translations...</div>;
+      if (!i18nLoaded || !tabsLoaded) {
+        console.log('Rendering loading state');
+        return <div>Loading...</div>;
       }
 
+      console.log('Rendering App UI', { activeTab });
       return (
         <div className={isDarkMode ? 'dark' : 'light'} key={i18nKey}>
           <h1>{i18next.t('appTitle')}</h1>
           {messages.length > 0 && (
             <div className="messages">
               {messages.map(msg => (
-                <div key={msg.id} className={msg.type === 'error' ? 'alert' : 'success-message'}>
+                <div key={msg.id} className={msg.type === 'error' ? 'error' : 'message'}>
                   {msg.text}
                 </div>
               ))}
             </div>
           )}
-          
-          <div className="tabs">
-            <div className={`tab ${activeTab === 'main' ? 'active' : ''}`} onClick={() => setActiveTab('main')}>
-              {i18next.t('main')}
-            </div>
-            <div className={`tab ${activeTab === 'map' ? 'active' : ''}`} onClick={() => setActiveTab('map')}>
-              {i18next.t('map')}
-            </div>
-            <div className={`tab ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
-              {i18next.t('history')}
-            </div>
-            <div className={`tab ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-              {i18next.t('settings')}
-            </div>
-            <div className={`tab ${activeTab === 'about' ? 'active' : ''}`} onClick={() => setActiveTab('about')}>
-              {i18next.t('about')}
-            </div>
-          </div>
-
+          <window.Tabs.Tabs activeTab={activeTab} setActiveTab={setActiveTab} i18next={i18next} />
           {activeTab === 'main' && (
-            <div>
-              <button onClick={scanConnections} disabled={isScanning}>
-                {isScanning ? <span className="spinner"></span> : i18next.t('check')}
-              </button>
-              {isScanning && scanProgress.total > 0 && (
-                <div className="progress-container">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(scanProgress.current / scanProgress.total) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="progress-text">
-                    Scanning {scanProgress.current}/{scanProgress.total} IPs ({Math.round((scanProgress.current / scanProgress.total) * 100)}%)
-                  </div>
-                </div>
-              )}
-              <div className="form-group" style={{ marginTop: '0.625rem' }}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={periodicScan}
-                    onChange={() => setPeriodicScan(!periodicScan)}
-                  />
-                  {i18next.t('periodic')}
-                </label>
-              </div>
-              <div style={{ marginTop: '1.25rem' }}>
-                <h2>{i18next.t('connectionsByCountry')}</h2>
-                {Object.keys(countryCounts).length > 0 ? (
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>{i18next.t('country')}</th>
-                        <th>{i18next.t('connections')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(countryCounts).map(([country, count]) => (
-                        <tr key={country}>
-                          <td>{country}</td>
-                          <td>{count}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p>{i18next.t('noConnections')}</p>
-                )}
-              </div>
-              <div style={{ marginTop: '1.25rem' }}>
-                <h2>{i18next.t('scannedIPs')}</h2>
-                {renderConnectionsTable(connections)}
-              </div>
-            </div>
+            <window.Tabs.MainContent
+              connections={connections}
+              isScanning={isScanning}
+              scanConnections={() => scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next).then(setHistory)}
+              periodicScan={periodicScan}
+              setPeriodicScan={setPeriodicScan}
+              scanProgress={scanProgress}
+              i18next={i18next}
+            />
           )}
-
           {activeTab === 'map' && (
-            <div>
-              <h2>{i18next.t('map')}</h2>
-              <NetworkMap connections={connections} isDarkMode={isDarkMode} />
-            </div>
+            <window.Tabs.MapContent
+              connections={connections}
+              isDarkMode={isDarkMode}
+              i18next={i18next}
+            />
           )}
-
           {activeTab === 'history' && (
-            <div>
-              <button className="clear" onClick={handleClearHistory}>
-                {i18next.t('clearHistory')}
-              </button>
-              <button className="export-json" onClick={() => handleExport('json')}>
-                {i18next.t('exportJSON')}
-              </button>
-              <button className="export-csv" onClick={() => handleExport('csv')}>
-                {i18next.t('exportCSV')}
-              </button>
-              <div style={{ marginTop: '1.25rem' }}>
-                <h2>{i18next.t('history')}</h2>
-                {history.length > 0 ? (
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>{i18next.t('scanDate')}</th>
-                        <th>{i18next.t('totalConnections')}</th>
-                        <th>{i18next.t('riskyConnections')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {history.map((scan, index) => (
-                        <tr 
-                          key={scan.timestamp} 
-                          className="history-row"
-                          onClick={() => setSelectedScan(selectedScan?.timestamp === scan.timestamp ? null : scan)}
-                        >
-                          <td>{new Date(scan.timestamp).toLocaleString()}</td>
-                          <td>{scan.totalConnections}</td>
-                          <td>{scan.riskyConnections}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p>{i18next.t('noHistory')}</p>
-                )}
-              </div>
-              {selectedScan && (
-                <div style={{ marginTop: '1.25rem' }}>
-                  <h2>{i18next.t('scanDetails')} ({new Date(selectedScan.timestamp).toLocaleString()})</h2>
-                  {renderConnectionsTable(selectedScan.connections)}
-                </div>
-              )}
-            </div>
+            <window.Tabs.HistoryContent
+              history={history}
+              selectedScan={selectedScan}
+              setSelectedScan={setSelectedScan}
+              handleExport={format => handleExport(format, addMessage, i18next)}
+              handleClearHistory={() => handleClearHistory(setHistory, setSelectedScan, addMessage, i18next)}
+              i18next={i18next}
+            />
           )}
-
           {activeTab === 'settings' && (
-            <div className="config">
-              <div className="form-group">
-                <label>{i18next.t('language')}</label>
-                <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                  <option value="en">English</option>
-                  <option value="fr">Français</option>
-                  <option value="it">Italiano</option>
-                  <option value="de">Deutsch</option>
-                  <option value="es">Español</option>
-                  <option value="el">Ελληνικά</option>
-                  <option value="ru">Русский</option>
-                  <option value="zh">中文</option>
-                  <option value="ko">한국어</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>{i18next.t('darkMode')}</label>
-                <input type="checkbox" checked={isDarkMode} onChange={() => setIsDarkMode(!isDarkMode)} />
-              </div>
-              <div className="form-group">
-                <label>{i18next.t('interval')}</label>
-                <input
-                  type="number"
-                  value={intervalMin}
-                  onChange={(e) => setIntervalMin(Math.max(0, parseInt(e.target.value)))}
-                />
-              </div>
-              <div className="form-group">
-                <label>{i18next.t('maxHistorySize')}</label>
-                <input
-                  type="number"
-                  value={maxHistorySize}
-                  onChange={(e) => setMaxHistorySize(Math.max(1, parseInt(e.target.value)))}
-                />
-              </div>
-              <div className="form-group">
-                <label>{i18next.t('bannedIPs')}</label>
-                <input
-                  type="text"
-                  value={bannedIPs.join(',')}
-                  onChange={handleBannedIPsChange}
-                />
-                {ipError && <div className="error-message">{ipError}</div>}
-              </div>
-              <div className="form-group">
-                <label>{i18next.t('riskyProviders')}</label>
-                <input
-                  type="text"
-                  value={riskyProviders.join(',')}
-                  onChange={handleRiskyProvidersChange}
-                />
-                {providerError && <div className="error-message">{providerError}</div>}
-              </div>
-              <div className="form-group">
-                <label>{i18next.t('countriesRisky')}</label>
-                <select multiple value={riskyCountries}>
-                  {countries.map(country => (
-                    <option 
-                      key={country} 
-                      value={country}
-                      onClick={() => handleCountryClick(country)}
-                    >
-                      {country}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button className="reset" onClick={handleResetSettings}>
-                {i18next.t('resetSettings')}
-              </button>
-            </div>
+            <window.Tabs.SettingsContent
+              language={language}
+              setLanguage={setLanguage}
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+              intervalMin={intervalMin}
+              setIntervalMin={setIntervalMin}
+              maxHistorySize={maxHistorySize}
+              setMaxHistorySize={setMaxHistorySize}
+              bannedIPs={bannedIPs}
+              handleBannedIPsChange={e => handleBannedIPsChange(e, setBannedIPs, setIpError, i18next)}
+              ipError={ipError}
+              riskyProviders={riskyProviders}
+              handleRiskyProvidersChange={e => handleRiskyProvidersChange(e, setRiskyProviders, setProviderError, i18next)}
+              providerError={providerError}
+              riskyCountries={riskyCountries}
+              handleCountryClick={country => handleCountryClick(country, riskyCountries, setRiskyCountries)}
+              handleResetSettings={() => handleResetSettings(setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next)}
+              i18next={i18next}
+            />
           )}
-
           {activeTab === 'about' && (
-            <div className="form-group">
-              <h2>{i18next.t('about')}</h2>
-              <p>
-                This application is licensed under the &nbsp;
-                <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">
-                  GNU General Public License v3.0 (GPLv3).
-                </a>.
-              </p>
-              <p>
-                Map (unmodified): "Mercator Projection" by Daniel R. Strebe, licensed under Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0).&nbsp;
-                <a href="https://commons.wikimedia.org/wiki/File:Mercator_projection_Square.JPG" target="_blank" rel="noopener noreferrer">
-                  Source: Wikimedia Commons
-                </a>.
-              </p>
-            </div>
+            <window.Tabs.AboutContent i18next={i18next} />
           )}
         </div>
       );
     };
 
-    ReactDOM.render(<App />, document.getElementById('root'));
+    console.log('Attempting to render App');
+    try {
+      if (window.React && window.ReactDOM && document.getElementById('root')) {
+        console.log('React, ReactDOM, and root element found, rendering');
+        ReactDOM.render(<App />, document.getElementById('root'));
+      } else {
+        console.error('Cannot render: Missing dependencies or root element', {
+          React: !!window.React,
+          ReactDOM: !!window.ReactDOM,
+          root: !!document.getElementById('root')
+        });
+        document.getElementById('root').innerHTML = '<p>Error: Failed to load application.</p>';
+      }
+    } catch (error) {
+      console.error('Failed to render App:', error);
+      document.getElementById('root').innerHTML = '<p>Error: Failed to load application.</p>';
+    }
   </script>
 </body>
 </html>
