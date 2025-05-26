@@ -90,7 +90,19 @@
       "resetError": "Échec de la réinitialisation des paramètres",
       "noHistory": "Aucun historique de scan disponible",
       "map": "Carte",
-      "about": "A propos"
+      "about": "A propos",
+      "scanMode": "Mode de balayage",
+      "liveMode": "Mode en direct",
+      "testMode": "Mode de test",
+      "error": {
+        "no_path": "Aucun chemin exécutable trouvé",
+        "suspect_path": "Chemin exécutable suspect",
+        "unexpected_path": "Chemin exécutable inattendu"
+      },
+      "warning": {
+        "suspicious_process": "Processus suspect : {processName} à {executablePath} ({reason})",
+        "risky_connection": "Connexion risquée détectée pour l'IP {ip}"
+      }
     }
   },
   "it": {
@@ -137,7 +149,19 @@
       "resetError": "Errore nel ripristino delle impostazioni",
       "noHistory": "Nessuna cronologia di scansione disponibile",
       "map": "Mappa",
-      "about": "Informazioni"
+      "about": "Informazioni",
+      "scanMode": "Modalità di scansione",
+      "liveMode": "Modalità dal vivo",
+      "testMode": "Modalità di test",
+      "error": {
+        "no_path": "Nessun percorso eseguibile trovato",
+        "suspect_path": "Percorso eseguibile sospetto",
+        "unexpected_path": "Percorso eseguibile inaspettato"
+      },
+      "warning": {
+        "suspicious_process": "Processo sospetto: {processName} a {executablePath} ({reason})",
+        "risky_connection": "Connessione rischiosa rilevata per l'IP {ip}"
+      }
     }
   },
   "de": {
@@ -184,7 +208,19 @@
       "resetError": "Fehler beim Zurücksetzen der Einstellungen",
       "noHistory": "Kein Scan-Verlauf verfügbar",
       "map": "Karte",
-      "about": "Über"
+      "about": "Über",
+      "scanMode": "Scan-Modus",
+      "liveMode": "Live-Modus",
+      "testMode": "Test-Modus",
+      "error": {
+        "no_path": "Kein ausführbarer Pfad gefunden",
+        "suspect_path": "Verdächtiger ausführbarer Pfad",
+        "unexpected_path": "Unerwarteter ausführbarer Pfad"
+      },
+      "warning": {
+        "suspicious_process": "Verdächtiger Prozess: {processName} unter {executablePath} ({reason})",
+        "risky_connection": "Riskante Verbindung für IP {ip} erkannt"
+      }
     }
   },
   "es": {
@@ -231,7 +267,19 @@
       "resetError": "Error al restablecer la configuración",
       "noHistory": "No hay historial de escaneo disponible",
       "map": "Mapa",
-      "about": "Acerca de"
+      "about": "Acerca de",
+      "scanMode": "Modo de escaneo",
+      "liveMode": "Modo en vivo",
+      "testMode": "Modo de prueba",
+      "error": {
+        "no_path": "No se encontró ninguna ruta ejecutable",
+        "suspect_path": "Ruta ejecutable sospechosa",
+        "unexpected_path": "Ruta ejecutable inesperada"
+      },
+      "warning": {
+        "suspicious_process": "Proceso sospechoso: {processName} en {executablePath} ({reason})",
+        "risky_connection": "Conexión arriesgada detectada para la IP {ip}"
+      }
     }
   },
   "el": {
@@ -278,7 +326,19 @@
       "resetError": "Αποτυχία επαναφοράς των ρυθμίσεων",
       "noHistory": "Δεν υπάρχει διαθέσιμο ιστορικό σάρωσης",
       "map": "Χάρτης",
-      "about": "Σχετικά"
+      "about": "Σχετικά",
+      "scanMode": "Λειτουργία σάρωσης",
+      "liveMode": "Ζωντανή λειτουργία",
+      "testMode": "Λειτουργία δοκιμής",
+      "error": {
+        "no_path": "Δεν βρέθηκε εκτελέσιμη διαδρομή",
+        "suspect_path": "Ύποπτη εκτελέσιμη διαδρομή",
+        "unexpected_path": "Απροσδόκητη εκτελέσιμη διαδρομή"
+      },
+      "warning": {
+        "suspicious_process": "Ύποπτη διαδικασία: {processName} στη {executablePath} ({reason})",
+        "risky_connection": "Ανιχνεύθηκε επικίνδυνη σύνδεση για την IP {ip}"
+      }
     }
   },
   "ru": {
@@ -325,7 +385,19 @@
       "resetError": "Ошибка при сбросе настроек",
       "noHistory": "История сканирования отсутствует",
       "map": "Карта",
-      "about": "О программе"
+      "about": "О программе",
+      "scanMode": "Режим сканирования",
+      "liveMode": "Режим реального времени",
+      "testMode": "Тестовый режим",
+      "error": {
+        "no_path": "Исполняемый путь не найден",
+        "suspect_path": "Подозрительный исполняемый путь",
+        "unexpected_path": "Непредвиденный исполняемый путь"
+      },
+      "warning": {
+        "suspicious_process": "Подозрительный процесс: {processName} по адресу {executablePath} ({reason})",
+        "risky_connection": "Обнаружено рискованное соединение для IP {ip}"
+      }
     }
   },
   "zh": {
@@ -372,7 +444,19 @@
       "resetError": "重置设置失败",
       "noHistory": "无扫描历史记录",
       "map": "地图",
-      "about": "关于"
+      "about": "关于",
+      "scanMode": "扫描模式",
+      "liveMode": "实时模式",
+      "testMode": "测试模式",
+      "error": {
+        "no_path": "未找到可执行路径",
+        "suspect_path": "可疑的可执行路径",
+        "unexpected_path": "意外的可执行路径"
+      },
+      "warning": {
+        "suspicious_process": "可疑进程：{processName} 位于 {executablePath} ({reason})",
+        "risky_connection": "检测到 IP {ip} 的风险连接"
+      }
     }
   },
   "ko": {
@@ -419,7 +503,19 @@
       "resetError": "설정 초기화 실패",
       "noHistory": "스캔 기록이 없습니다",
       "map": "지도",
-      "about": "정보"
-   }
+      "about": "정보",
+      "scanMode": "스캔 모드",
+      "liveMode": "라이브 모드",
+      "testMode": "테스트 모드",
+      "error": {
+        "no_path": "실행 가능한 경로를 찾을 수 없음",
+        "suspect_path": "의심스러운 실행 경로",
+        "unexpected_path": "예상치 못한 실행 경로"
+      },
+      "warning": {
+        "suspicious_process": "의심스러운 프로세스: {processName} at {executablePath} ({reason})",
+        "risky_connection": "IP {ip}에 대한 위험한 연결 감지"
+      }
+    }
   }
 }
