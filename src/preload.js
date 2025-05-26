@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('electron', {
       const validChannels = [
         'run-netstat',
         'get-process-name',
+        'get-process-path',
         'load-config',
         'save-config',
         'load-history',

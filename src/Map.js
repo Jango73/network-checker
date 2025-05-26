@@ -103,12 +103,18 @@ const NetworkMap = ({ connections, isDarkMode }) => {
         {clusters.length > 0 ? (
           clusters.map((cluster, i) => {
             const label = cluster.connections
-              .map(c => `IP: ${c.ip}\nISP: ${c.isp}\nCountry: ${c.country}\nCity: ${c.city || 'N/A'}`)
+              .map(c => {
+                let msg = `IP: ${c.ip}\nCountry: ${c.country}\nCity: ${c.city || 'N/A'}`;
+                if (c.isSuspicious) {
+                  msg += `\nAlert: Suspect process (${c.suspicionReason})`;
+                }
+                return msg;
+              })
               .join('\n\n');
             return (
               <div
                 key={i}
-                className={`pin ${cluster.isRisky ? 'risky' : 'safe'}`}
+                className={`pin ${cluster.isRisky || cluster.isSuspicious ? 'risky' : 'safe'}`}
                 style={{ left: `${cluster.x}%`, top: `${cluster.y}%` }}
               >
                 {cluster.connections.length > 1 && (
@@ -124,6 +130,7 @@ const NetworkMap = ({ connections, isDarkMode }) => {
       </div>
     </div>
   );
+
 };
 
 // Make the component globally available

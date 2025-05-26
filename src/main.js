@@ -68,6 +68,41 @@ ipcMain.handle('get-process-name', async () => {
   });
 });
 
+ipcMain.handle('get-process-path', async (event, pid) => {
+  console.log(`Fetching path for PID ${pid}...`);
+  return new Promise((resolve, reject) => {
+    exec(`wmic process where ProcessId=${pid} get ExecutablePath`, (error, stdout) => {
+      if (error) {
+        console.error(`WMIC error for PID ${pid}:`, error);
+      }
+      const lines = stdout.trim().split('\n').filter(line => line.trim());
+      if (lines.length >= 2 && lines[1].trim()) {
+        const executablePath = lines[1].trim();
+        console.log(`WMIC path for PID ${pid}: ${executablePath}`);
+        resolve(executablePath);
+        return;
+      }
+      console.warn(`WMIC returned no path for PID ${pid}, trying PowerShell...`);
+      
+      exec(`powershell -Command "Get-Process -Id ${pid} | Select-Object -ExpandProperty Path"`, (psError, psStdout) => {
+        if (psError) {
+          console.error(`PowerShell error for PID ${pid}:`, psError);
+          reject(psError);
+          return;
+        }
+        const psPath = psStdout.trim();
+        if (psPath) {
+          console.log(`PowerShell path for PID ${pid}: ${psPath}`);
+          resolve(psPath);
+        } else {
+          console.warn(`No path found for PID ${pid}`);
+          resolve(null);
+        }
+      });
+    });
+  });
+});
+
 ipcMain.handle('load-config', async () => {
   const defaultConfig = {
     friendlyCountries: ['France', 'United States'],

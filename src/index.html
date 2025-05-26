@@ -37,6 +37,41 @@
       periodicScan: true
     };
 
+    const processLocations = {
+      'msedge.exe': [
+        /^C:\\Program Files\\Microsoft\\Edge\\Application\\/i,
+        /^C:\\Program Files \(x86\)\\Microsoft\\Edge\\Application\\/i
+      ],
+      'firefox.exe': [
+        /^C:\\Program Files\\Mozilla Firefox\\/i,
+        /^C:\\Program Files \(x86\)\\Mozilla Firefox\\/i
+      ],
+      'chrome.exe': [
+        /^C:\\Program Files\\Google\\Chrome\\Application\\/i,
+        /^C:\\Program Files \(x86\)\\Google\\Chrome\\Application\\/i
+      ],
+      'svchost.exe': [
+        /^C:\\Windows\\System32\\/i
+      ],
+      'explorer.exe': [
+        /^C:\\Windows\\/i
+      ],
+      'SDXHelper.exe': [
+        /^C:\\Program Files\\Microsoft Office\\root\\Office\d+\\/i,
+        /^C:\\Program Files \(x86\)\\Microsoft Office\\root\\Office\d+\\/i,
+        /^C:\\Program Files\\WindowsApps\\Microsoft\.Office\.Desktop_.*\\Office\d+\\/i
+      ]
+    };
+
+    const systemProcesses = [
+      'svchost.exe',
+      'lsass.exe',
+      'csrss.exe',
+      'smss.exe',
+      'winlogon.exe',
+      'services.exe'
+    ];
+
     const App = () => {
       const [connections, setConnections] = useState([]);
       const [riskyCountries, setRiskyCountries] = useState(DEFAULT_CONFIG.riskyCountries);
@@ -326,6 +361,83 @@
         }
       };
 
+      const pathRecurrence = {};
+
+      const evaluateProcessLocation = (processName, executablePath) => {
+        const lowerProcessName = processName.toLowerCase();
+        console.log(`Evaluating ${processName} at ${executablePath}`);
+
+        // Cas spécial pour les processus système sans chemin
+        if (!executablePath && systemProcesses.includes(lowerProcessName)) {
+          console.log(`System process ${processName} with no path, assuming legitimate`);
+          return {
+            score: 100,
+            isSuspicious: false,
+            reason: ''
+          };
+        }
+
+        if (!executablePath) {
+          console.warn(`No path for ${processName}, marking as suspicious`);
+          return {
+            score: 0,
+            isSuspicious: true,
+            reason: i18next.t('error.no_path')
+          };
+        }
+
+        let score = 0;
+        const normalizedPath = executablePath.replace(/\//g, '\\').toLowerCase();
+        const parentDir = normalizedPath.substring(0, normalizedPath.lastIndexOf('\\') + 1);
+        console.log(`Normalized path: ${normalizedPath}, Parent dir: ${parentDir}`);
+
+        if (processLocations[lowerProcessName]) {
+          const isValidPath = processLocations[lowerProcessName].some(regex => {
+            const matches = regex.test(parentDir);
+            console.log(`Testing regex ${regex} against ${parentDir}: ${matches}`);
+            return matches;
+          });
+          if (isValidPath) {
+            score += 100;
+            console.log(`Valid path detected for ${processName}`);
+          } else if (['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(lowerProcessName)) {
+            score -= 20;
+            console.log(`Generic process name ${processName} in unexpected path`);
+          }
+        } else {
+          console.log(`No location rules for ${processName}`);
+        }
+
+        const suspectFolders = [
+          /\\Temp\\/i,
+          /\\AppData\\Local\\/i,
+          /\\AppData\\Roaming\\/i,
+          /\\Users\\[^\\]+\\Downloads\\/i
+        ];
+
+        if (suspectFolders.some(regex => regex.test(normalizedPath))) {
+          score -= 50;
+          console.log(`Suspicious folder detected in ${normalizedPath}`);
+        }
+
+        const pathKey = `${lowerProcessName}:${normalizedPath}`;
+        pathRecurrence[pathKey] = (pathRecurrence[pathKey] || 0) + 1;
+        if (pathRecurrence[pathKey] > 3) {
+          score += 10;
+          console.log(`Recurrence bonus for ${pathKey}`);
+        }
+
+        const isSuspicious = score < 50;
+        const reason = isSuspicious
+          ? score < 0
+            ? i18next.t('error.suspect_path')
+            : i18next.t('error.unexpected_path')
+          : '';
+        console.log(`Evaluation for ${processName}: score=${score}, isSuspicious=${isSuspicious}, reason=${reason}`);
+
+        return { score, isSuspicious, reason };
+      };
+
       const scanConnections = async () => {
         setIsScanning(true);
         setScanProgress({ current: 0, total: 0 });
@@ -367,6 +479,26 @@
                 const parts = line.trim().split(/\s+/);
                 const pid = parts[parts.length - 1];
                 const processName = processMap[pid] || 'Unknown';
+
+                let executablePath = null;
+                let isSuspicious = false;
+                let suspicionReason = '';
+
+                if (pid && !isNaN(pid)) {
+                  try {
+                    executablePath = await ipcRenderer.invoke('get-process-path', pid);
+                    const evaluation = evaluateProcessLocation(processName, executablePath);
+                    isSuspicious = evaluation.isSuspicious;
+                    suspicionReason = evaluation.reason;
+                    if (isSuspicious) {
+                      console.warn(`Suspicious process detected: ${processName} at ${executablePath}, reason: ${suspicionReason}`);
+                      addMessage(i18next.t('warning.suspicious_process', { processName, executablePath, reason: suspicionReason }), 'warning');
+                    }
+                  } catch (error) {
+                    console.error(`Error fetching path for PID ${pid}:`, error);
+                  }
+                }
+
                 connections.push({
                   ip,
                   country,
@@ -377,9 +509,13 @@
                   lon,
                   isRisky,
                   pid: isNaN(pid) ? 'Unknown' : pid,
-                  processName
+                  processName,
+                  executablePath,
+                  isSuspicious,
+                  suspicionReason
                 });
-                if (isRisky && !hasPlayedSound) {
+
+                if ((isRisky || isSuspicious) && !hasPlayedSound) {
                   new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
                   hasPlayedSound = true;
                 }
@@ -405,7 +541,7 @@
             timestamp: new Date().toISOString(),
             connections,
             totalConnections: connections.length,
-            riskyConnections: connections.filter(c => c.isRisky).length
+            riskyConnections: connections.filter(c => c.isRisky || c.isSuspicious).length
           };
           try {
             await ipcRenderer.invoke('save-history', scanData, maxHistorySize);
