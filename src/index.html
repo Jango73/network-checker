@@ -39,6 +39,7 @@
       const [isScanning, setIsScanning] = useState(false);
       const [language, setLanguage] = useState(DEFAULT_CONFIG.language);
       const [periodicScan, setPeriodicScan] = useState(DEFAULT_CONFIG.periodicScan);
+      const [scanMode, setScanMode] = useState(DEFAULT_CONFIG.scanMode);
       const [activeTab, setActiveTab] = useState('main');
       const [configLoaded, setConfigLoaded] = useState(false);
       const [messages, setMessages] = useState([]);
@@ -131,13 +132,17 @@
                     noHistory: 'No scan history available',
                     map: 'Map',
                     about: 'About',
+                    scanMode: 'Scan Mode',
+                    liveMode: 'Live Mode',
+                    testMode: 'Test Mode',
                     error: {
                       no_path: 'No executable path found',
                       suspect_path: 'Suspicious executable path',
                       unexpected_path: 'Unexpected executable path'
                     },
                     warning: {
-                      suspicious_process: 'Suspicious process: {processName} at {executablePath} ({reason})'
+                      suspicious_process: 'Suspicious process: {processName} at {executablePath} ({reason})',
+                      risky_connection: 'Risky connection detected for IP {ip}'
                     }
                   }
                 }
@@ -148,8 +153,6 @@
         }
         if (tabsLoaded) {
           initI18n();
-          console.log('Triggering initial scan');
-          scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next).then(setHistory);
         }
       }, [tabsLoaded]);
 
@@ -185,6 +188,7 @@
               setIsDarkMode(!!config.isDarkMode);
               setLanguage(config.language || DEFAULT_CONFIG.language);
               setPeriodicScan(config.periodicScan !== false);
+              setScanMode(config.scanMode || DEFAULT_CONFIG.scanMode);
               setConfigLoaded(true);
               console.log('Config loaded successfully');
             }
@@ -216,7 +220,8 @@
               maxHistorySize,
               isDarkMode,
               language,
-              periodicScan
+              periodicScan,
+              scanMode
             });
             console.log('Config saved successfully');
           } catch (error) {
@@ -225,24 +230,24 @@
           }
         }
         saveConfig();
-      }, [riskyCountries, bannedIPs, riskyProviders, intervalMin, maxHistorySize, isDarkMode, language, periodicScan, configLoaded]);
+      }, [riskyCountries, bannedIPs, riskyProviders, intervalMin, maxHistorySize, isDarkMode, language, periodicScan, scanMode, configLoaded]);
 
       useEffect(() => {
         if (periodicScan && intervalMin > 0) {
           console.log('Setting up periodic scan with interval:', intervalMin);
           const interval = setInterval(() => {
-            scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next).then(setHistory);
+            scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode).then(setHistory);
           }, intervalMin * 60 * 1000);
           return () => clearInterval(interval);
         }
-      }, [periodicScan, intervalMin, bannedIPs, riskyCountries, riskyProviders, maxHistorySize]);
+      }, [periodicScan, intervalMin, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, scanMode]);
 
       useEffect(() => {
         if (messages.length > 0) {
           console.log('Setting message timeout');
           const timer = setTimeout(() => {
             setMessages(prev => prev.slice(1));
-          }, 5000);
+          }, 10000);
           return () => clearTimeout(timer);
         }
       }, [messages]);
@@ -287,7 +292,7 @@
             <window.Tabs.MainContent
               connections={connections}
               isScanning={isScanning}
-              scanConnections={() => scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next).then(setHistory)}
+              scanConnections={() => scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode).then(setHistory)}
               periodicScan={periodicScan}
               setPeriodicScan={setPeriodicScan}
               scanProgress={scanProgress}
@@ -329,8 +334,10 @@
               providerError={providerError}
               riskyCountries={riskyCountries}
               handleCountryClick={country => handleCountryClick(country, riskyCountries, setRiskyCountries)}
-              handleResetSettings={() => handleResetSettings(setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next)}
+              handleResetSettings={() => handleResetSettings(setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next, setScanMode)}
               i18next={i18next}
+              scanMode={scanMode}
+              setScanMode={setScanMode}
             />
           )}
           {activeTab === 'about' && (

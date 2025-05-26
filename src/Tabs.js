@@ -161,8 +161,8 @@ window.Tabs.HistoryContent = ({ history, selectedScan, setSelectedScan, handleEx
 };
 
 // Settings tab content (configuration forms)
-window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMode, intervalMin, setIntervalMin, maxHistorySize, setMaxHistorySize, bannedIPs, handleBannedIPsChange, ipError, riskyProviders, handleRiskyProvidersChange, providerError, riskyCountries, handleCountryClick, handleResetSettings, i18next }) => {
-  console.log('Rendering SettingsContent', { language, isDarkMode, intervalMin, maxHistorySize });
+window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMode, intervalMin, setIntervalMin, maxHistorySize, setMaxHistorySize, bannedIPs, handleBannedIPsChange, ipError, riskyProviders, handleRiskyProvidersChange, providerError, riskyCountries, handleCountryClick, handleResetSettings, i18next, scanMode, setScanMode }) => {
+  console.log('Rendering SettingsContent', { language, isDarkMode, intervalMin, maxHistorySize, scanMode });
   return (
     <div className="config">
       <div className="form-group">
@@ -229,6 +229,13 @@ window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMod
               {country}
             </option>
           ))}
+        </select>
+      </div>
+      <div className="form-group">
+        <label>{i18next.t('scanMode')}</label>
+        <select value={scanMode} onChange={(e) => setScanMode(e.target.value)}>
+          <option value="live">{i18next.t('liveMode')}</option>
+          <option value="test">{i18next.t('testMode')}</option>
         </select>
       </div>
       <button className="reset" onClick={handleResetSettings}>

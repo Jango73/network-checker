@@ -8,7 +8,6 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
   const lowerProcessName = processName.toLowerCase();
   console.log(`Evaluating ${processName} at ${executablePath}`);
 
-  // Special case for system processes with no path
   if (!executablePath && window.config.systemProcesses.includes(lowerProcessName)) {
     console.log(`System process ${processName} with no path, assuming legitimate`);
     return {
@@ -80,108 +79,140 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
 };
 
 // Scans network connections
-window.utils.scanConnections = async (setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next) => {
-  console.log('Starting scanConnections');
+window.utils.scanConnections = async (setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode) => {
+  console.log(`Starting scanConnections in ${scanMode} mode`);
   setIsScanning(true);
   setScanProgress({ current: 0, total: 0 });
   try {
-    const netstatOutput = await window.electron.ipcRenderer.invoke('run-netstat');
-    const lines = netstatOutput.split('\n').filter(line => line.includes('ESTABLISHED'));
-
-    const ipSet = new Set(lines.map(line => {
-      const parts = line.trim().split(/\s+/);
-      let ip = parts[2];
-      if (!ip) return null;
-      if (ip.startsWith('[')) {
-        const match = ip.match(/^\[(.*?)\](?::\d+)?$/);
-        return match ? match[1] : null;
-      } else {
-        return ip.split(':')[0];
-      }
-    }).filter(ip => {
-      return ip && (window.config.ipv4Regex.test(ip) || window.config.ipv6Regex.test(ip)) &&
-        !/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|127\.|::1|0\.0\.0\.0)/.test(ip);
-    }));
-
-    const processMap = await window.electron.ipcRenderer.invoke('get-process-name');
-
-    const connections = [];
-    let requestCount = 0;
     let hasPlayedSound = false;
-    setScanProgress({ current: 0, total: ipSet.size });
-    console.log('Scanning IPs:', ipSet.size);
-
-    for (const ip of ipSet) {
-      try {
-        const response = await axios.get(`http://ip-api.com/json/${ip}`);
-        console.log(`API response for IP ${ip}:`, response.data);
-        if (response.data.status === 'success') {
-          const { country, isp, org, city, lat, lon } = response.data;
-          console.log(`Coordinates for ${city}: lat=${lat}, lon=${lon}`);
-          const isRisky = bannedIPs.includes(ip) || riskyCountries.includes(country) || riskyProviders.some(p => isp.includes(p) || org.includes(p));
-          const line = lines.find(l => l.includes(ip));
-          const parts = line.trim().split(/\s+/);
-          const pid = parts[parts.length - 1];
-          const processName = processMap[pid] || 'Unknown';
-
-          let executablePath = null;
-          let isSuspicious = false;
-          let suspicionReason = '';
-
-          if (pid && !isNaN(pid)) {
-            try {
-              executablePath = await window.electron.ipcRenderer.invoke('get-process-path', pid);
-              const evaluation = window.utils.evaluateProcessLocation(processName, executablePath, i18next);
-              isSuspicious = evaluation.isSuspicious;
-              suspicionReason = evaluation.reason;
-              if (isSuspicious) {
-                console.warn(`Suspicious process detected: ${processName} at ${executablePath}, reason: ${suspicionReason}`);
-                addMessage(i18next.t('warning.suspicious_process', { processName, executablePath, reason: suspicionReason }), 'warning');
-              }
-            } catch (error) {
-              console.error(`Error fetching path for PID ${pid}:`, error);
-            }
+    let connections = [];
+    if (scanMode === 'test') {
+      // Test mode: use mock connections
+      setScanProgress({ current: 0, total: window.config.testConnections.length });
+      for (let i = 0; i <= window.config.testConnections.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        setScanProgress({ current: i, total: window.config.testConnections.length });
+      }
+      connections = window.config.testConnections.map(conn => ({
+        ...conn,
+        isRisky: window.config.TEST_CONFIG.bannedIPs.includes(conn.ip) ||
+          window.config.TEST_CONFIG.riskyCountries.includes(conn.country) ||
+          window.config.TEST_CONFIG.riskyProviders.some(p => conn.isp.includes(p) || conn.org.includes(p)),
+        isSuspicious: conn.isSuspicious || (conn.executablePath && window.utils.evaluateProcessLocation(conn.processName, conn.executablePath, i18next).isSuspicious),
+        suspicionReason: conn.suspicionReason || (conn.executablePath ? window.utils.evaluateProcessLocation(conn.processName, conn.executablePath, i18next).reason : '')
+      }));
+      for (const conn of connections) {
+        const ip = conn.ip;
+        if ((conn.isRisky || conn.isSuspicious) && !hasPlayedSound) {
+          new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
+          if (conn.isRisky) {
+            addMessage(i18next.t('warning.risky_connection', { ip }), 'warning');
           }
-
-          connections.push({
-            ip,
-            country,
-            isp,
-            org,
-            city,
-            lat,
-            lon,
-            isRisky,
-            pid: isNaN(pid) ? 'Unknown' : pid,
-            processName,
-            executablePath,
-            isSuspicious,
-            suspicionReason
-          });
-
-          if ((isRisky || isSuspicious) && !hasPlayedSound) {
-            new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
-            hasPlayedSound = true;
-          }
-        } else {
-          console.warn(`Geoloc failed for ${ip}: ${response.data.message}`);
-          addMessage(`Geoloc failed for ${ip}`, 'error');
+          hasPlayedSound = true;
         }
-      } catch (error) {
-        console.error(`Error checking IP ${ip}:`, error);
-        addMessage(`Error checking IP ${ip}`, 'error');
       }
-      requestCount++;
-      setScanProgress(prev => ({ ...prev, current: prev.current + 1 }));
-      if (requestCount >= 45) {
-        await new Promise(resolve => setTimeout(resolve, 60000));
-        requestCount = 0;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    console.log('Scan completed, setting connections:', connections);
-    setConnections(connections);
+      console.log('Mock scan completed, connections:', connections);
+    } else {
+      // Live mode: real scan
+      const netstatOutput = await window.electron.ipcRenderer.invoke('run-netstat');
+      const lines = netstatOutput.split('\n').filter(line => line.includes('ESTABLISHED'));
 
+      const ipSet = new Set(lines.map(line => {
+        const parts = line.trim().split(/\s+/);
+        let ip = parts[2];
+        if (!ip) return null;
+        if (ip.startsWith('[')) {
+          const match = ip.match(/^\[(.*?)\](?::\d+)?$/);
+          return match ? match[1] : null;
+        } else {
+          return ip.split(':')[0];
+        }
+      }).filter(ip => {
+        return ip && (window.config.ipv4Regex.test(ip) || window.config.ipv6Regex.test(ip)) &&
+          !/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|127\.|::1|0\.0\.0\.0)/.test(ip);
+      }));
+
+      const processMap = await window.electron.ipcRenderer.invoke('get-process-name');
+      let requestCount = 0;
+      let hasPlayedSound = false;
+      setScanProgress({ current: 0, total: ipSet.size });
+      console.log('Scanning IPs:', ipSet.size);
+
+      for (const ip of ipSet) {
+        try {
+          const response = await axios.get(`http://ip-api.com/json/${ip}`);
+          console.log(`API response for IP ${ip}:`, response.data);
+          if (response.data.status === 'success') {
+            const { country, isp, org, city, lat, lon } = response.data;
+            console.log(`Coordinates for ${city}: lat=${lat}, lon=${lon}`);
+            const isRisky = bannedIPs.includes(ip) || riskyCountries.includes(country) || riskyProviders.some(p => isp.includes(p) || org.includes(p));
+            const line = lines.find(l => l.includes(ip));
+            const parts = line.trim().split(/\s+/);
+            const pid = parts[parts.length - 1];
+            const processName = processMap[pid] || 'Unknown';
+
+            let executablePath = null;
+            let isSuspicious = false;
+            let suspicionReason = '';
+
+            if (pid && !isNaN(pid)) {
+              try {
+                executablePath = await window.electron.ipcRenderer.invoke('get-process-path', pid);
+                const evaluation = window.utils.evaluateProcessLocation(processName, executablePath, i18next);
+                isSuspicious = evaluation.isSuspicious;
+                suspicionReason = evaluation.reason;
+                if (isSuspicious) {
+                  console.warn(`Suspicious process detected: ${processName} at ${executablePath}, reason: ${suspicionReason}`);
+                  addMessage(i18next.t('warning.suspicious_process', { processName, executablePath, reason: suspicionReason }), 'warning');
+                }
+              } catch (error) {
+                console.error(`Error fetching path for PID ${pid}:`, error);
+              }
+            }
+
+            connections.push({
+              ip,
+              country,
+              isp,
+              org,
+              city,
+              lat,
+              lon,
+              isRisky,
+              pid: isNaN(pid) ? 'Unknown' : pid,
+              processName,
+              executablePath,
+              isSuspicious,
+              suspicionReason
+            });
+
+            if ((isRisky || isSuspicious) && !hasPlayedSound) {
+              new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
+              if (isRisky) {
+                addMessage(i18next.t('warning.risky_connection', { ip }), 'warning');
+              }
+              hasPlayedSound = true;
+            }
+          } else {
+            console.warn(`Geoloc failed for ${ip}: ${response.data.message}`);
+            addMessage(`Geoloc failed for ${ip}`, 'error');
+          }
+        } catch (error) {
+          console.error(`Error checking IP ${ip}:`, error);
+          addMessage(`Error checking IP ${ip}`, 'error');
+        }
+        requestCount++;
+        setScanProgress(prev => ({ ...prev, current: prev.current + 1 }));
+        if (requestCount >= 45) {
+          await new Promise(resolve => setTimeout(resolve, 60000));
+          requestCount = 0;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      console.log('Live scan completed, connections:', connections);
+    }
+
+    setConnections(connections);
     const scanData = {
       timestamp: new Date().toISOString(),
       connections,
@@ -198,8 +229,8 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
       addMessage('Failed to save scan history.', 'error');
     }
   } catch (error) {
-    console.error('Error in scanConnections:', error);
-    addMessage('Failed to run scan. Check network or system permissions.', 'error');
+    console.error(`Error in scanConnections (${scanMode} mode):`, error);
+    addMessage(`Failed to run scan in ${scanMode} mode. Check network or system permissions.`, 'error');
   } finally {
     console.log('Finalizing scan: resetting isScanning and scanProgress');
     setIsScanning(false);
@@ -275,7 +306,7 @@ window.utils.handleClearHistory = async (setHistory, setSelectedScan, addMessage
 };
 
 // Resets settings to default
-window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next) => {
+window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next, setScanMode) => {
   try {
     setRiskyCountries(window.config.DEFAULT_CONFIG.riskyCountries);
     setBannedIPs(window.config.DEFAULT_CONFIG.bannedIPs);
@@ -285,6 +316,7 @@ window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRi
     setIsDarkMode(window.config.DEFAULT_CONFIG.isDarkMode);
     setLanguage(window.config.DEFAULT_CONFIG.language);
     setPeriodicScan(window.config.DEFAULT_CONFIG.periodicScan);
+    setScanMode(window.config.DEFAULT_CONFIG.scanMode);
     await window.electron.ipcRenderer.invoke('save-config', {
       riskyCountries: window.config.DEFAULT_CONFIG.riskyCountries,
       bannedIPs: window.config.DEFAULT_CONFIG.bannedIPs,
@@ -293,7 +325,8 @@ window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRi
       maxHistorySize: window.config.DEFAULT_CONFIG.maxHistorySize,
       isDarkMode: window.config.DEFAULT_CONFIG.isDarkMode,
       language: window.config.DEFAULT_CONFIG.language,
-      periodicScan: window.config.DEFAULT_CONFIG.periodicScan
+      periodicScan: window.config.DEFAULT_CONFIG.periodicScan,
+      scanMode: window.config.DEFAULT_CONFIG.scanMode
     });
     addMessage(i18next.t('resetSuccess'), 'success');
   } catch (error) {
