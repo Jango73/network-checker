@@ -32,16 +32,16 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
   console.log(`Normalized path: ${normalizedPath}, Parent dir: ${parentDir}`);
 
   if (window.config.processLocations[lowerProcessName]) {
-    const isValidPath = window.config.processLocations[lowerProcessName].some(regex => {
+    const isMatch = window.config.processLocations[lowerProcessName].some(regex => {
       const matches = regex.test(parentDir);
       console.log(`Testing regex ${regex} against ${parentDir}: ${matches}`);
       return matches;
     });
-    if (isValidPath) {
+    if (isMatch) {
       score += 100;
       console.log(`Valid path detected for ${processName}`);
     } else if (['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(lowerProcessName)) {
-      score -= 20;
+      score -= 50;
       console.log(`Generic process name ${processName} in unexpected path`);
     }
   } else {
@@ -83,6 +83,11 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
   console.log(`Starting scanConnections in ${scanMode} mode`);
   setIsScanning(true);
   setScanProgress({ current: 0, total: 0 });
+
+  // Test d'interpolation au démarrage
+  console.log('Testing i18n interpolation');
+  addMessage('warning.risky_connection', 'warning', { ip: '1.2.3.4' });
+
   try {
     let hasPlayedSound = false;
     let connections = [];
@@ -106,7 +111,8 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
         if ((conn.isRisky || conn.isSuspicious) && !hasPlayedSound) {
           new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
           if (conn.isRisky) {
-            addMessage(i18next.t('warning.risky_connection', { ip }), 'warning');
+            console.log(`Adding risky connection message for IP: ${ip}`, { ip });
+            addMessage('warning.risky_connection', 'warning', { ip });
           }
           hasPlayedSound = true;
         }
@@ -153,20 +159,20 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
 
             let executablePath = null;
             let isSuspicious = false;
-            let suspicionReason = '';
+            let suspicionReason = null;
 
             if (pid && !isNaN(pid)) {
               try {
-                executablePath = await window.electron.ipcRenderer.invoke('get-process-path', pid);
+                executablePath = await window.electron.ipcRenderer.invoke('pid', pid);
                 const evaluation = window.utils.evaluateProcessLocation(processName, executablePath, i18next);
                 isSuspicious = evaluation.isSuspicious;
                 suspicionReason = evaluation.reason;
                 if (isSuspicious) {
                   console.warn(`Suspicious process detected: ${processName} at ${executablePath}, reason: ${suspicionReason}`);
-                  addMessage(i18next.t('warning.suspicious_process', { processName, executablePath, reason: suspicionReason }), 'warning');
+                  addMessage('warning.suspicious_process', 'warning', { processName, executablePath, reason: suspicionReason });
                 }
               } catch (error) {
-                console.error(`Error fetching path for PID ${pid}:`, error);
+                console.error(`Error fetching path for ${pid}: ${error}`);
               }
             }
 
@@ -187,19 +193,20 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
             });
 
             if ((isRisky || isSuspicious) && !hasPlayedSound) {
-              new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
+              new Audio('https://freesound.org/data/previews/316/316847/4939433-lq.mp3').play();
               if (isRisky) {
-                addMessage(i18next.t('warning.risky_connection', { ip }), 'warning');
+                console.log(`Adding risky connection message for IP: ${ip}`, { ip });
+                addMessage('warning.risky_connection', 'warning', { ip });
               }
               hasPlayedSound = true;
             }
           } else {
-            console.warn(`Geoloc failed for ${ip}: ${response.data.message}`);
-            addMessage(`Geoloc failed for ${ip}`, 'error');
+            console.warn(`Geoloc failed for IP ${ip}:`, response.data.message);
+            addMessage('Geoloc failed for {ip}', 'error', { ip });
           }
         } catch (error) {
           console.error(`Error checking IP ${ip}:`, error);
-          addMessage(`Error checking IP ${ip}`, 'error');
+          addMessage('Error checking IP {ip}', 'error', { ip });
         }
         requestCount++;
         setScanProgress(prev => ({ ...prev, current: prev.current + 1 }));
@@ -226,13 +233,13 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
       return updatedHistory || [];
     } catch (error) {
       console.error('Failed to save history:', error);
-      addMessage('Failed to save scan history.', 'error');
+      addMessage('Failed to save scan history', 'error');
     }
   } catch (error) {
     console.error(`Error in scanConnections (${scanMode} mode):`, error);
-    addMessage(`Failed to run scan in ${scanMode} mode. Check network or system permissions.`, 'error');
+    addMessage('Failed to run scan in {mode} mode', 'error', { mode: scanMode });
   } finally {
-    console.log('Finalizing scan: resetting isScanning and scanProgress');
+    console.log('Scan complete, resetting scanning states');
     setIsScanning(false);
     setScanProgress({ current: 0, total: 0 });
   }
@@ -241,7 +248,7 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
 // Validates an IP address
 window.utils.validateIP = (ip) => {
   const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-  return ipRegex.test(ip) && ip.split('.').every(num => parseInt(num) >= 0 && parseInt(num) <= 255);
+  return ipRegex.test(ip) && ip.split('.').every(num => parseInt(num) >= 0 && num <= parseInt(num) <= 255);
 };
 
 // Validates a provider name
@@ -250,8 +257,8 @@ window.utils.validateProvider = (provider) => {
 };
 
 // Handles banned IPs input changes
-window.utils.handleBannedIPsChange = (e, setBannedIPs, setIpError, i18next) => {
-  const newIPs = e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
+window.utils.handleBannedIPsChange = (event, setBannedIPs, setIpError, i18next) => {
+  const newIPs = event.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
   const invalidIP = newIPs.find(ip => !window.utils.validateIP(ip));
   if (invalidIP) {
     setIpError(i18next.t('invalidIP'));
@@ -262,8 +269,8 @@ window.utils.handleBannedIPsChange = (e, setBannedIPs, setIpError, i18next) => {
 };
 
 // Handles risky providers input changes
-window.utils.handleRiskyProvidersChange = (e, setRiskyProviders, setProviderError, i18next) => {
-  const newProviders = e.target.value.split(',').map(p => p.trim()).filter(p => p);
+window.utils.handleRiskyProvidersChange = (event, setRiskyProviders, setProviderError, i18next) => {
+  const newProviders = event.target.value.split(',').map(p => p.trim()).filter(p => p);
   const invalidProvider = newProviders.find(p => !window.utils.validateProvider(p));
   if (invalidProvider) {
     setProviderError(i18next.t('invalidProvider'));
@@ -275,7 +282,7 @@ window.utils.handleRiskyProvidersChange = (e, setRiskyProviders, setProviderErro
 
 // Handles country selection for risky countries
 window.utils.handleCountryClick = (country, riskyCountries, setRiskyCountries) => {
-  setRiskyCountries(prev =>
+  setRiskyCountries(prev => 
     prev.includes(country)
       ? prev.filter(c => c !== country)
       : [...prev, country]
@@ -286,26 +293,26 @@ window.utils.handleCountryClick = (country, riskyCountries, setRiskyCountries) =
 window.utils.handleExport = async (format, addMessage, i18next) => {
   try {
     const result = await window.electron.ipcRenderer.invoke('export-history', format);
-    addMessage(i18next.t(result.success ? 'exportSuccess' : result.message === 'Export canceled' ? 'exportCanceled' : 'exportError', { filePath: result.message.includes('exported to') ? result.message.split('exported to ')[1] : '' }), result.success ? 'success' : 'error');
+    addMessage(result.success ? 'exportSuccess' : result.message === 'Export canceled' ? 'exportCanceled' : 'exportError', result.success ? 'success' : 'error', { filePath: result.message.includes('exported to') ? result.message.split('exported to ')[1] : '' });
   } catch (error) {
     console.error('Failed to export history:', error);
-    addMessage(i18next.t('exportError'), 'error');
+    addMessage('exportError', 'error');
   }
 };
 
 // Clears scan history
 window.utils.handleClearHistory = async (setHistory, setSelectedScan, addMessage, i18next) => {
   try {
-    await window.electron.ipcRenderer.invoke('clear-history');
+    await (window.electron.ipcRenderer.invoke('clear-history');
     setHistory([]);
     setSelectedScan(null);
   } catch (error) {
     console.error('Failed to clear history:', error);
-    addMessage('Failed to clear history.', 'error');
+    addMessage('Failed to clear history', 'error');
   }
 };
 
-// Resets settings to default
+// Resets settings to defaults
 window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next, setScanMode) => {
   try {
     setRiskyCountries(window.config.DEFAULT_CONFIG.riskyCountries);
@@ -322,15 +329,15 @@ window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRi
       bannedIPs: window.config.DEFAULT_CONFIG.bannedIPs,
       riskyProviders: window.config.DEFAULT_CONFIG.riskyProviders,
       intervalMin: window.config.DEFAULT_CONFIG.intervalMin,
-      maxHistorySize: window.config.DEFAULT_CONFIG.maxHistorySize,
+      maxHistorySize: interval.config.DEFAULT_CONFIG.maxHistorySize,
       isDarkMode: window.config.DEFAULT_CONFIG.isDarkMode,
       language: window.config.DEFAULT_CONFIG.language,
-      periodicScan: window.config.DEFAULT_CONFIG.periodicScan,
-      scanMode: window.config.DEFAULT_CONFIG.scanMode
+      periodicScan:,
+      scanMode: window.config.scanMode
     });
-    addMessage(i18next.t('resetSuccess'), 'success');
+    addMessage('resetSuccess', 'success');
   } catch (error) {
     console.error('Failed to reset settings:', error);
-    addMessage(i18next.t('resetError'), 'error');
+    addMessage('resetError', 'error');
   }
 };

@@ -43,7 +43,19 @@
       "resetError": "Failed to reset settings",
       "noHistory": "No scan history available",
       "map": "Map",
-      "about": "About"
+      "about": "About",
+      "scanMode": "Scan Mode",
+      "liveMode": "Live Mode",
+      "testMode": "Test Mode",
+      "error": {
+        "no_path": "No executable path found",
+        "suspect_path": "Suspicious executable path",
+        "unexpected_path": "Unexpected executable path"
+      },
+      "warning": {
+        "suspicious_process": "Suspicious process: {processName} at {executablePath} ({reason})",
+        "risky_connection": "Risky connection detected for IP {ip}"
+      }
     }
   },
   "fr": {
