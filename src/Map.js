@@ -103,7 +103,7 @@ const NetworkMap = ({ connections, isDarkMode }) => {
         {clusters.length > 0 ? (
           clusters.map((cluster, i) => {
             const label = cluster.connections
-              .map(c => `IP: ${c.ip}\nPays: ${c.country}\nVille: ${c.city || 'N/A'}`)
+              .map(c => `IP: ${c.ip}\nISP: ${c.isp}\nCountry: ${c.country}\nCity: ${c.city || 'N/A'}`)
               .join('\n\n');
             return (
               <div
