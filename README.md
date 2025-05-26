@@ -1,4 +1,4 @@
-# Network Connection Checker (WIPà
+# Network Connection Checker (WIP)
 
 ## What’s This About? (For Everyone)
 
