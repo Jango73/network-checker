@@ -225,3 +225,77 @@ tr.history-row:hover {
 @keyframes spin { 
   to { transform: rotate(360deg); } 
 }
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.map-container.dark {
+  background: black;
+}
+.map-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.pin-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  border: 1px solid white;
+}
+.pin.risky {
+  background: red;
+  animation: pulse 1.5s infinite;
+}
+.pin.safe {
+  background: green;
+}
+.pin-count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+}
+.tooltip {
+  visibility: hidden;
+  background: #333;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  position: absolute;
+  z-index: 1;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: pre-wrap;
+  font-size: 12px;
+}
+.pin:hover .tooltip {
+  visibility: visible;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}

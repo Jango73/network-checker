@@ -8,13 +8,13 @@ function createWindow() {
     width: 1024,
     height: 768,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, '../src/preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
 
-  win.loadFile('index.html');
+  win.loadFile('src/index.html');
 }
 
 app.whenReady().then(() => {

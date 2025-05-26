@@ -35,9 +35,9 @@ The **Network Connection Checker** is an Electron-based desktop app for real-tim
 - **Key Files**:
   - `index.html`: Hosts the React UI and core logic (scanning, config, history).
   - `index.css`: Styles the UI, with dark mode support.
-  - `main.js`: Electron entry point, manages the window and IPC calls.
-  - `preload.js`: Secures communication between renderer and main processes.
-  - `translations.json`: Stores translations for i18n.
+  - `src/main.js`: Electron entry point, manages the window and IPC calls.
+  - `src/preload.js`: Secures communication between renderer and main processes.
+  - `data/translations.json`: Stores translations for i18n.
 - **Dependencies**:
   - Electron for the desktop app.
   - React and ReactDOM for the UI.

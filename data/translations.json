@@ -41,7 +41,8 @@
       "resetSettings": "Reset to Defaults",
       "resetSuccess": "Settings reset to defaults successfully",
       "resetError": "Failed to reset settings",
-      "noHistory": "No scan history available"
+      "noHistory": "No scan history available",
+      "map": "Map"
     }
   },
   "fr": {
@@ -86,7 +87,8 @@
       "resetSettings": "Réinitialiser les Paramètres",
       "resetSuccess": "Paramètres réinitialisés avec succès",
       "resetError": "Échec de la réinitialisation des paramètres",
-      "noHistory": "Aucun historique de scan disponible"
+      "noHistory": "Aucun historique de scan disponible",
+      "map": "Carte"
     }
   },
   "it": {
@@ -131,7 +133,8 @@
       "resetSettings": "Ripristina Impostazioni",
       "resetSuccess": "Impostazioni ripristinate con successo",
       "resetError": "Errore nel ripristino delle impostazioni",
-      "noHistory": "Nessuna cronologia di scansione disponibile"
+      "noHistory": "Nessuna cronologia di scansione disponibile",
+      "map": "Mappa"
     }
   },
   "de": {
@@ -176,7 +179,8 @@
       "resetSettings": "Einstellungen zurücksetzen",
       "resetSuccess": "Einstellungen erfolgreich zurückgesetzt",
       "resetError": "Fehler beim Zurücksetzen der Einstellungen",
-      "noHistory": "Kein Scan-Verlauf verfügbar"
+      "noHistory": "Kein Scan-Verlauf verfügbar",
+      "map": "Karte"
     }
   },
   "es": {
@@ -221,7 +225,8 @@
       "resetSettings": "Restablecer Configuración",
       "resetSuccess": "Configuración restablecida con éxito",
       "resetError": "Error al restablecer la configuración",
-      "noHistory": "No hay historial de escaneo disponible"
+      "noHistory": "No hay historial de escaneo disponible",
+      "map": "Mapa"
     }
   },
   "el": {
@@ -266,7 +271,8 @@
       "resetSettings": "Επαναφορά Ρυθμίσεων",
       "resetSuccess": "Οι ρυθμίσεις επανήλθαν επιτυχώς",
       "resetError": "Αποτυχία επαναφοράς των ρυθμίσεων",
-      "noHistory": "Δεν υπάρχει διαθέσιμο ιστορικό σάρωσης"
+      "noHistory": "Δεν υπάρχει διαθέσιμο ιστορικό σάρωσης",
+      "map": "Χάρτης"
     }
   },
   "ru": {
@@ -311,7 +317,8 @@
       "resetSettings": "Сбросить Настройки",
       "resetSuccess": "Настройки успешно сброшены",
       "resetError": "Ошибка при сбросе настроек",
-      "noHistory": "История сканирования отсутствует"
+      "noHistory": "История сканирования отсутствует",
+      "map": "Карта"
     }
   },
   "zh": {
@@ -356,7 +363,8 @@
       "resetSettings": "重置设置",
       "resetSuccess": "设置已成功重置",
       "resetError": "重置设置失败",
-      "noHistory": "无扫描历史记录"
+      "noHistory": "无扫描历史记录",
+      "map": "地图"
     }
   },
   "ko": {
@@ -401,7 +409,8 @@
       "resetSettings": "설정 초기화",
       "resetSuccess": "설정이 성공적으로 초기화되었습니다",
       "resetError": "설정 초기화 실패",
-      "noHistory": "스캔 기록이 없습니다"
+      "noHistory": "스캔 기록이 없습니다",
+      "map": "지도"
     }
   }
 }

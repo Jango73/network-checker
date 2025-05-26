@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Network Connection Checker</title>
   <link rel="stylesheet" href="index.css">
-  <script src="./lib/react.production.min.js"></script>
-  <script src="./lib/react-dom.production.min.js"></script>
-  <script src="./lib/babel.min.js"></script>
-  <script src="./lib/i18next.min.js"></script>
-  <script src="./lib/axios.min.js"></script>
+  <script src="../lib/react.production.min.js"></script>
+  <script src="../lib/react-dom.production.min.js"></script>
+  <script src="../lib/babel.min.js"></script>
+  <script src="../lib/i18next.min.js"></script>
+  <script src="../lib/axios.min.js"></script>
 </head>
 <body class="light">
   <div id="root"></div>
+  <script type="text/babel" src="Map.js"></script>
   <script type="text/babel">
     window.$RefreshReg$ = () => {};
     window.$RefreshSig$ = () => () => {};
@@ -62,7 +63,7 @@
       useEffect(() => {
         async function initI18n() {
           try {
-            const response = await fetch('translations.json');
+            const response = await fetch('../data/translations.json');
             if (!response.ok) throw new Error('Failed to load translations');
             const translations = await response.json();
             await i18next.init({
@@ -127,6 +128,16 @@
           }
         }
         initI18n();
+        scanConnections();
+
+        // Test data
+        /*
+        const mockConnections = [
+          { ip: '8.8.8.8', country: 'United States', isp: 'Google', org: 'Google', city: 'Kansas City', lat: 39.0997, lon: -94.5785, isRisky: false, pid: '123', processName: 'test' },
+          { ip: '1.1.1.1', country: 'Australia', isp: 'Cloudflare', org: 'Cloudflare', city: 'Sydney', lat: -33.8688, lon: 151.2093, isRisky: true, pid: '456', processName: 'test2' }
+        ];
+        setConnections(mockConnections);
+        */
       }, []);
 
       useEffect(() => {
@@ -331,8 +342,10 @@
           for (const ip of ipSet) {
             try {
               const response = await axios.get(`http://ip-api.com/json/${ip}`);
+              console.log(`API response for IP ${ip}:`, response.data);
               if (response.data.status === 'success') {
-                const { country, isp, org } = response.data;
+                const { country, isp, org, city, lat, lon } = response.data;
+                console.log(`Coordinates for ${city}: lat=${lat}, lon=${lon}`);
                 const isRisky = bannedIPs.includes(ip) || riskyCountries.includes(country) || riskyProviders.some(p => isp.includes(p) || org.includes(p));
                 const line = lines.find(l => l.includes(ip));
                 const parts = line.trim().split(/\s+/);
@@ -343,6 +356,9 @@
                   country,
                   isp,
                   org,
+                  city,
+                  lat,
+                  lon,
                   isRisky,
                   pid: isNaN(pid) ? 'Unknown' : pid,
                   processName
@@ -452,6 +468,9 @@
             <div className={`tab ${activeTab === 'main' ? 'active' : ''}`} onClick={() => setActiveTab('main')}>
               {i18next.t('main')}
             </div>
+            <div className={`tab ${activeTab === 'map' ? 'active' : ''}`} onClick={() => setActiveTab('map')}>
+              {i18next.t('map')}
+            </div>
             <div className={`tab ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
               {i18next.t('history')}
             </div>
@@ -515,6 +534,13 @@
                 <h2>{i18next.t('scannedIPs')}</h2>
                 {renderConnectionsTable(connections)}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'map' && (
+            <div>
+              <h2>{i18next.t('map')}</h2>
+              <NetworkMap connections={connections} isDarkMode={isDarkMode} />
             </div>
           )}
 
