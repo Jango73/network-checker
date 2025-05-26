@@ -62,6 +62,12 @@ window.Tabs.MainContent = ({ connections, isScanning, scanConnections, periodicS
         </label>
       </div>
       <div style={{ marginTop: '1.25rem' }}>
+        <h2>{i18next.t('scannedIPs')}</h2>
+        {typeof window.Tabs.renderConnectionsTable === 'function'
+          ? window.Tabs.renderConnectionsTable(connections, i18next)
+          : <p>Error: renderConnectionsTable is not available.</p>}
+      </div>
+      <div style={{ marginTop: '1.25rem' }}>
         <h2>{i18next.t('connectionsByCountry')}</h2>
         {Object.keys(countryCounts).length > 0 ? (
           <table>
@@ -83,12 +89,6 @@ window.Tabs.MainContent = ({ connections, isScanning, scanConnections, periodicS
         ) : (
           <p>{i18next.t('noConnections')}</p>
         )}
-      </div>
-      <div style={{ marginTop: '1.25rem' }}>
-        <h2>{i18next.t('scannedIPs')}</h2>
-        {typeof window.Tabs.renderConnectionsTable === 'function'
-          ? window.Tabs.renderConnectionsTable(connections, i18next)
-          : <p>Error: renderConnectionsTable is not available.</p>}
       </div>
     </div>
   );
