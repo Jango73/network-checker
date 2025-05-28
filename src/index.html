@@ -30,7 +30,9 @@
       const [connections, setConnections] = useState([]);
       const [riskyCountries, setRiskyCountries] = useState(DEFAULT_CONFIG.riskyCountries);
       const [bannedIPs, setBannedIPs] = useState(DEFAULT_CONFIG.bannedIPs);
+      const [trustedIPs, setTrustedIPs] = useState(DEFAULT_CONFIG.trustedIPs);
       const [riskyProviders, setRiskyProviders] = useState(DEFAULT_CONFIG.riskyProviders);
+      const [trustedProcesses, setTrustedProcesses] = useState(DEFAULT_CONFIG.trustedProcesses);
       const [intervalMin, setIntervalMin] = useState(DEFAULT_CONFIG.intervalMin);
       const [maxHistorySize, setMaxHistorySize] = useState(DEFAULT_CONFIG.maxHistorySize);
       const [isDarkMode, setIsDarkMode] = useState(DEFAULT_CONFIG.isDarkMode);
@@ -50,21 +52,21 @@
       const [tabsLoaded, setTabsLoaded] = useState(false);
 
       const addMessage = (key, type = 'error', interpolation = {}) => {
-          let text;
-          if (i18nLoaded && i18next.isInitialized) {
-              if (i18next.exists(key)) {
-                  text = i18next.t(key, interpolation);
-                  const hasUnresolved = /\{[^}]+\}/.test(text);
-                  if (hasUnresolved) {
-                      text = `Interpolation error: ${key}`;
-                  }
-              } else {
-                  text = `Missing translation: ${key}`;
-              }
+        let text;
+        if (i18nLoaded && i18next.isInitialized) {
+          if (i18next.exists(key)) {
+            text = i18next.t(key, interpolation);
+            const hasUnresolved = /\{[^}]+\}/.test(text);
+            if (hasUnresolved) {
+              text = `Interpolation error: ${key}`;
+            }
           } else {
-              text = interpolation.ip ? `Fallback: ${key} (${interpolation.ip})` : key;
+            text = `Missing translation: ${key}`;
           }
-          setMessages(prev => [...prev, { text, type, id: Date.now() }]);
+        } else {
+          text = interpolation.ip ? `Fallback: ${key} (${interpolation.ip})` : key;
+        }
+        setMessages(prev => [...prev, { text, type, id: Date.now() }]);
       };
 
       useEffect(() => {
@@ -134,6 +136,7 @@
                     org: 'Organization',
                     process: 'Process',
                     risky: 'Risky',
+                    suspicious: 'Suspicious',
                     language: 'Language',
                     resetSettings: 'Reset to Defaults',
                     resetSuccess: 'Settings reset to defaults successfully',
@@ -144,6 +147,10 @@
                     scanMode: 'Scan Mode',
                     liveMode: 'Live Mode',
                     testMode: 'Test Mode',
+                    mark_ip_safe: 'Mark IP as Safe',
+                    mark_process_safe: 'Mark Process as Safe',
+                    trusted_ips: 'Trusted IPs',
+                    trusted_processes: 'Trusted Processes',
                     error: {
                       no_path: 'No executable path found',
                       suspect_path: 'Suspicious executable path',
@@ -188,7 +195,9 @@
             if (config) {
               setRiskyCountries(config.riskyCountries || DEFAULT_CONFIG.riskyCountries);
               setBannedIPs(config.bannedIPs || DEFAULT_CONFIG.bannedIPs);
+              setTrustedIPs(config.trustedIPs || DEFAULT_CONFIG.trustedIPs);
               setRiskyProviders(config.riskyProviders || DEFAULT_CONFIG.riskyProviders);
+              setTrustedProcesses(config.trustedProcesses || DEFAULT_CONFIG.trustedProcesses);
               setIntervalMin(config.intervalMin || DEFAULT_CONFIG.intervalMin);
               setMaxHistorySize(config.maxHistorySize || DEFAULT_CONFIG.maxHistorySize);
               setIsDarkMode(!!config.isDarkMode);
@@ -218,7 +227,9 @@
             await ipcRenderer.invoke('save-config', {
               riskyCountries,
               bannedIPs,
+              trustedIPs,
               riskyProviders,
+              trustedProcesses,
               intervalMin,
               maxHistorySize,
               isDarkMode,
@@ -232,16 +243,29 @@
           }
         }
         saveConfig();
-      }, [riskyCountries, bannedIPs, riskyProviders, intervalMin, maxHistorySize, isDarkMode, language, periodicScan, scanMode, configLoaded]);
+      }, [riskyCountries, bannedIPs, trustedIPs, riskyProviders, trustedProcesses, intervalMin, maxHistorySize, isDarkMode, language, periodicScan, scanMode, configLoaded]);
 
       useEffect(() => {
         if (periodicScan && intervalMin > 0) {
           const interval = setInterval(() => {
-            scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode).then(setHistory);
+            scanConnections(
+              setConnections,
+              setIsScanning,
+              setScanProgress,
+              addMessage,
+              bannedIPs,
+              riskyCountries,
+              riskyProviders,
+              maxHistorySize,
+              i18next,
+              scanMode,
+              trustedIPs,
+              trustedProcesses
+            ).then(setHistory);
           }, intervalMin * 60 * 1000);
           return () => clearInterval(interval);
         }
-      }, [periodicScan, intervalMin, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, scanMode]);
+      }, [periodicScan, intervalMin, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, scanMode, trustedIPs, trustedProcesses]);
 
       useEffect(() => {
         if (messages.length > 0) {
@@ -288,7 +312,20 @@
             <window.Tabs.MainContent
               connections={connections}
               isScanning={isScanning}
-              scanConnections={() => scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode).then(setHistory)}
+              scanConnections={() => scanConnections(
+                setConnections,
+                setIsScanning,
+                setScanProgress,
+                addMessage,
+                bannedIPs,
+                riskyCountries,
+                riskyProviders,
+                maxHistorySize,
+                i18next,
+                scanMode,
+                trustedIPs,
+                trustedProcesses
+              )}
               periodicScan={periodicScan}
               setPeriodicScan={setPeriodicScan}
               scanProgress={scanProgress}
@@ -328,10 +365,28 @@
               providerError={providerError}
               riskyCountries={riskyCountries}
               handleCountryClick={country => handleCountryClick(country, riskyCountries, setRiskyCountries)}
-              handleResetSettings={() => handleResetSettings(setRiskyCountries, setBannedIPs, setRiskyProviders, setIntervalMin, setMaxHistorySize, setIsDarkMode, setLanguage, setPeriodicScan, addMessage, i18next, setScanMode)}
+              handleResetSettings={() => handleResetSettings(
+                setRiskyCountries,
+                setBannedIPs,
+                setRiskyProviders,
+                setIntervalMin,
+                setMaxHistorySize,
+                setIsDarkMode,
+                setLanguage,
+                setPeriodicScan,
+                addMessage,
+                i18next,
+                setScanMode,
+                setTrustedIPs,
+                setTrustedProcesses
+              )}
               i18next={i18next}
               scanMode={scanMode}
               setScanMode={setScanMode}
+              trustedIPs={trustedIPs}
+              setTrustedIPs={setTrustedIPs}
+              trustedProcesses={trustedProcesses}
+              setTrustedProcesses={setTrustedProcesses}
             />
           )}
           {activeTab === 'about' && (

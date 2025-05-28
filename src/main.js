@@ -96,12 +96,27 @@ ipcMain.handle('get-process-path', async (event, pid) => {
   });
 });
 
+ipcMain.handle('get-process-signature', async (event, pid) => {
+  return new Promise((resolve, reject) => {
+    exec(`powershell -Command "Get-Process -Id ${pid} | Get-AuthenticodeSignature | Select-Object -ExpandProperty Status"`, (error, stdout) => {
+      if (error) {
+        console.error(`Signature check error for PID ${pid}:`, error);
+        resolve('Unknown');
+      } else {
+        resolve(stdout.trim());
+      }
+    });
+  });
+});
+
 ipcMain.handle('load-config', async () => {
   const defaultConfig = {
     friendlyCountries: ['France', 'United States'],
     riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Ukraine', 'Kenya', 'South Africa', 'Ghana'],
     bannedIPs: [],
+    trustedIPs: [],
     riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
+    trustedProcesses: [],
     intervalMin: 30,
     maxHistorySize: 10,
     isDarkMode: false,

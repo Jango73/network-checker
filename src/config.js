@@ -31,7 +31,9 @@ window.config.countries = [
 window.config.DEFAULT_CONFIG = {
   riskyCountries: ['Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria', 'India', 'Panama', 'Thailand', 'Belarus', 'Kenya', 'South Africa', 'Ghana'],
   bannedIPs: [],
+  trustedIPs: [],
   riskyProviders: ['Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech', 'HostSailor', 'M247', 'WorldStream'],
+  trustedProcesses: [],
   intervalMin: 30,
   maxHistorySize: 10,
   isDarkMode: false,
@@ -81,7 +83,9 @@ window.config.systemProcesses = [
 window.config.TEST_CONFIG = {
   riskyCountries: ['ShadyCountry'],
   bannedIPs: ['203.0.113.1'],
+  trustedIPs: [],
   riskyProviders: ['ShadyISP'],
+  trustedProcesses: [],
   intervalMin: 30,
   maxHistorySize: 10,
   isDarkMode: false,
