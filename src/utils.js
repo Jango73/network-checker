@@ -159,7 +159,7 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
 
             if (pid && !isNaN(pid)) {
               try {
-                executablePath = await window.electron.ipcRenderer.invoke('pid', pid);
+                executablePath = await window.electron.ipcRenderer.invoke('get-process-path', pid);
                 const evaluation = window.utils.evaluateProcessLocation(processName, executablePath, i18next);
                 isSuspicious = evaluation.isSuspicious;
                 suspicionReason = evaluation.reason;

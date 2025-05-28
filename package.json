@@ -1,6 +1,8 @@
 {
   "name": "network-checker",
   "version": "1.0.0",
+  "author": "Jango73 (github.com/Jango73)",
+  "description": "Network connection checker",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
