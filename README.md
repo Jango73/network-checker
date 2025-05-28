@@ -15,7 +15,7 @@ It’s easy to use—just hit “Check Now,” and it’ll tell you if everythin
 
 ## How It Works (For Techies)
 
-The **Network Connection Checker** is an Electron-based desktop app for real-time network connection monitoring. It uses React for the UI and external APIs to analyze IP addresses.
+The **Network Checker** is an Electron-based desktop app for periodic network connection monitoring. It uses React for the UI and external APIs to analyze IP addresses.
 
 ### Technical Features:
 - **Connection Scanning**: Runs `netstat` (via Electron’s `child_process`) to list active TCP connections in the `ESTABLISHED` state.
