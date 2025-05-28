@@ -1,8 +1,8 @@
-# Network Connection Checker
+# Network Checker
 
 ## What’s This About? (For Everyone)
 
-The **Network Connection Checker** is a handy desktop app that keeps an eye on your computer’s network connections. Think of it as a watchdog that checks who your machine is “talking” to online—like websites, services, or servers—and flags anything that looks sketchy. It’s perfect for anyone who wants to stay on top of their network security without needing a PhD in tech.
+The **Network Checker** is a handy desktop app that keeps an eye on your computer’s network connections. Think of it as a watchdog that checks who your machine is “talking” to online—like websites, services, or servers—and flags anything that looks sketchy. It’s perfect for anyone who wants to stay on top of their network security without needing a PhD in tech.
 
 ### What It Does:
 - **Scans Active Connections**: Shows all the IP addresses your computer is connected to.
