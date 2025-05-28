@@ -84,10 +84,6 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
   setIsScanning(true);
   setScanProgress({ current: 0, total: 0 });
 
-  // Test d'interpolation au démarrage
-  console.log('Testing i18n interpolation');
-  addMessage('warning.risky_connection', 'warning', { ip: '1.2.3.4' });
-
   try {
     let hasPlayedSound = false;
     let connections = [];
