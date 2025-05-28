@@ -2,61 +2,71 @@
 
 ## What’s This About? (For Everyone)
 
-The **Network Checker** is a handy desktop app that keeps an eye on your computer’s network connections. Think of it as a watchdog that checks who your machine is “talking” to online—like websites, services, or servers—and flags anything that looks sketchy. It’s perfect for anyone who wants to stay on top of their network security without needing a PhD in tech.
+The **Network Checker** is a slick desktop app that keeps tabs on your computer’s network connections. It’s like having a personal security guard who checks who your machine is chatting with online—whether it’s websites, services, or servers—and flags anything shady. Perfect for anyone who wants to stay secure without diving deep into tech jargon.
 
 ### What It Does:
-- **Scans Active Connections**: Shows all the IP addresses your computer is connected to.
-- **Spots Risks**: Alerts you if a connection comes from a risky country, IP, or provider you’ve marked as suspicious.
-- **Keeps a History**: Lets you review past scans to track what’s been going on.
-- **Customizable**: You decide which countries, IPs, or providers are risky, and how often to scan.
-- **User-Friendly**: Supports 9 languages (English, French, Spanish, etc.) and has a dark mode for late-night use.
+- **Scans Active Connections**: Lists all IP addresses your computer is connected to.
+- **Spots Risks**: Alerts you if a connection hits a risky country, IP, or provider you’ve flagged.
+- **Tracks History**: Saves past scans and lets you expand details right in the table for a quick look.
+- **Customizable**: You set what’s risky (countries, IPs, providers) and how often to scan.
+- **User-Friendly**: Supports 9 languages (English, French, Spanish, etc.), dark mode, and a clean interface.
 
-It’s easy to use—just hit “Check Now,” and it’ll tell you if everything’s cool or if something’s off.
+Just click “Check Now,” and it’ll tell you if your network’s all good or if something’s fishy.
 
 ## How It Works (For Techies)
 
-The **Network Checker** is an Electron-based desktop app for periodic network connection monitoring. It uses React for the UI and external APIs to analyze IP addresses.
+The **Network Checker** is an Electron-based desktop app for monitoring network connections, built with React for a responsive UI and external APIs for IP analysis.
 
 ### Technical Features:
-- **Connection Scanning**: Runs `netstat` (via Electron’s `child_process`) to list active TCP connections in the `ESTABLISHED` state.
-- **IP Analysis**: Queries `ip-api.com` to fetch details like country, ISP, and organization for each IP.
-- **Risk Detection**: Flags connections based on user-defined lists (risky countries, banned IPs, shady providers).
-- **History**: Stores scan data in a JSON file with a configurable size limit (default: 10 MB).
-- **Export**: Supports exporting history as JSON or CSV using Electron’s file API.
+- **Connection Scanning**: Uses `netstat` (via Electron’s `child_process`) to grab active TCP connections in the `ESTABLISHED` state.
+- **IP Analysis**: Queries `ip-api.com` for details like country, ISP, organization, and geolocation (latitude/longitude).
+- **Risk Detection**: Flags connections based on user-defined lists (banned IPs, risky countries, or providers).
+- **History Management**: Stores scans in a JSON file with a configurable size limit (default: 10 MB). View details inline with expandable table rows.
+- **Export Options**: Export history as JSON or CSV using Electron’s file dialogs.
 - **User Interface**:
-  - **React**: Powers the UI with tabs (Main, History, Settings) and reactive components.
-  - **i18next**: Handles internationalization for 9 languages (en, fr, it, de, es, el, ru, zh, ko) via `translations.json`.
-  - **Dark Mode**: Toggled via CSS (`index.css`) with `light` and `dark` classes.
-- **Configuration**: Saves settings (countries, scan interval, etc.) in a JSON file using Electron’s `fs` API.
-- **Validation**: Ensures valid IPs and provider names to prevent user errors.
-- **Performance**: Caps API requests at 45 per minute to comply with `ip-api.com`’s free-tier limits, with delays if needed.
+  - **React**: Drives the UI with tabs (Main, Map, History, Settings, About) and dynamic components.
+  - **i18next**: Powers internationalization for 9 languages (en, fr, it, de, es, el, ru, zh, ko) via `translations.json`.
+  - **Dark Mode**: Toggled with CSS (`index.css`) using `light` and `dark` classes.
+- **Configuration**: Persists settings (scan interval, risky lists, etc.) in a JSON file via Electron’s `fs` API.
+- **Validation**: Checks for valid IPs and provider names to avoid user errors.
+- **Performance**: Limits API requests to 45 per minute to respect `ip-api.com`’s free-tier cap, with delays as needed.
+- **Map Visualization**: Displays connections on a world map using geolocation data (in the Map tab).
 
 ### Architecture:
 - **Key Files**:
-  - `index.html`: Hosts the React UI and core logic (scanning, config, history).
-  - `index.css`: Styles the UI, with dark mode support.
-  - `src/main.js`: Electron entry point, manages the window and IPC calls.
-  - `src/preload.js`: Secures communication between renderer and main processes.
-  - `data/translations.json`: Stores translations for i18n.
+  - `index.html`: Entry point for the React UI, orchestrates scanning, config, and history.
+  - `index.css`: Styles the app, including dark mode and table layouts.
+  - `src/main.js`: Electron main process, handles window creation and IPC.
+  - `src/preload.js`: Secures IPC communication between renderer and main processes.
+  - `src/Tabs.js`: Defines React components for each tab (Main, Map, History, Settings, About).
+  - `src/utils.js`: Contains utility functions for scanning, validation, and history/export handling.
+  - `src/config.js`: Stores default configuration and constants (e.g., risky countries, regex for IPs).
+  - `src/Map.js`: Renders the network map visualization using connection geolocation data.
+  - `data/translations.json`: Holds translations for i18n support.
 - **Dependencies**:
-  - Electron for the desktop app.
-  - React and ReactDOM for the UI.
-  - Axios for HTTP requests.
-  - i18next for language support.
-  - Babel for JSX support.
+  - Electron: Desktop app framework.
+  - React, ReactDOM: UI rendering.
+  - Axios: HTTP requests to `ip-api.com`.
+  - i18next: Language support.
+  - Babel: JSX transpilation.
 
 ### Getting Started:
-1. Clone the repo.
+1. Clone the repo: `git clone <repo-url>`.
 2. Install dependencies: `npm install`.
-3. Run the app: `npm start`.
+3. Start the app: `npm start`.
 4. (Optional) Build an executable: `npm run build`.
 
 ### Limitations:
-- `ip-api.com` free tier limits requests to 45 per minute.
-- Requires system permissions for `netstat`.
-- Currently only supports TCP connections (no UDP).
+- `ip-api.com` free tier caps requests at 45 per minute.
+- Requires system permissions to run `netstat`.
+- Only monitors TCP connections (no UDP support yet).
+- Map visualization depends on `ip-api.com` geolocation accuracy.
 
 ### Future Improvements:
-- Add a confirmation prompt before resetting settings.
-- Integrate additional IP analysis APIs.
-- Visualize connections (e.g., a world map).
+- Add confirmation prompts for resetting settings or clearing history.
+- Integrate additional IP analysis APIs for redundancy.
+- Enhance map visualization with interactive features (e.g., click to filter connections).
+- Support UDP connection monitoring.
+
+### License:
+Licensed under the GNU General Public License v3.0 (GPLv3). See `LICENSE` for details.
