@@ -53,20 +53,21 @@
       const [tabsLoaded, setTabsLoaded] = useState(false);
 
       const addMessage = (key, type = 'error', interpolation = {}) => {
-        console.log('Adding message:', { key, type, interpolation });
-        let text;
-        if (i18nLoaded && i18next.isInitialized) {
-          text = i18next.t(key, interpolation);
-          console.log(`Translated message for key "${key}": ${text}`);
-          if (text.includes('{')) {
-            console.warn(`Interpolation failed for key "${key}" with interpolation:`, interpolation);
-            text = `Translation error: ${key}`; // Fallback si l'interpolation échoue
+          let text;
+          if (i18nLoaded && i18next.isInitialized) {
+              if (i18next.exists(key)) {
+                  text = i18next.t(key, interpolation);
+                  const hasUnresolved = /\{[^}]+\}/.test(text);
+                  if (hasUnresolved) {
+                      text = `Interpolation error: ${key}`;
+                  }
+              } else {
+                  text = `Missing translation: ${key}`;
+              }
+          } else {
+              text = interpolation.ip ? `Fallback: ${key} (${interpolation.ip})` : key;
           }
-        } else {
-          console.warn(`i18next not ready for key "${key}", using fallback`);
-          text = interpolation.ip ? `Fallback: ${key} (${interpolation.ip})` : key;
-        }
-        setMessages(prev => [...prev, { text, type, id: Date.now() }]);
+          setMessages(prev => [...prev, { text, type, id: Date.now() }]);
       };
 
       useEffect(() => {
@@ -91,7 +92,7 @@
               lng: language,
               resources: translations,
               interpolation: {
-                escapeValue: false // React gère déjà l'échappement
+                escapeValue: false
               }
             });
             setI18nLoaded(true);

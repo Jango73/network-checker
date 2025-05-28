@@ -53,8 +53,8 @@
         "unexpected_path": "Unexpected executable path"
       },
       "warning": {
-        "suspicious_process": "Suspicious process: {processName} at {executablePath} ({reason})",
-        "risky_connection": "Risky connection detected for IP {ip}"
+        "suspicious_process": "Suspicious process: {{processName}} at {{executablePath}} ({{reason}})",
+        "risky_connection": "Risky connection detected for IP {{ip}}"
       }
     }
   },
@@ -112,8 +112,8 @@
         "unexpected_path": "Chemin exécutable inattendu"
       },
       "warning": {
-        "suspicious_process": "Processus suspect : {processName} à {executablePath} ({reason})",
-        "risky_connection": "Connexion risquée détectée pour l'IP {ip}"
+        "suspicious_process": "Processus suspect : {{processName}} à {{executablePath}} ({{reason}})",
+        "risky_connection": "Connexion risquée détectée pour l'IP {{ip}}"
       }
     }
   },
@@ -171,8 +171,8 @@
         "unexpected_path": "Percorso eseguibile inaspettato"
       },
       "warning": {
-        "suspicious_process": "Processo sospetto: {processName} a {executablePath} ({reason})",
-        "risky_connection": "Connessione rischiosa rilevata per l'IP {ip}"
+        "suspicious_process": "Processo sospetto: {{processName}} a {{executablePath}} ({{reason}})",
+        "risky_connection": "Connessione rischiosa rilevata per l'IP {{ip}}"
       }
     }
   },
@@ -230,7 +230,7 @@
         "unexpected_path": "Unerwarteter ausführbarer Pfad"
       },
       "warning": {
-        "suspicious_process": "Verdächtiger Prozess: {processName} unter {executablePath} ({reason})",
+        "suspicious_process": "Verdächtiger Prozess: {{processName}} unter {{executablePath}} ({{reason}})",
         "risky_connection": "Riskante Verbindung für IP {ip} erkannt"
       }
     }
@@ -289,8 +289,8 @@
         "unexpected_path": "Ruta ejecutable inesperada"
       },
       "warning": {
-        "suspicious_process": "Proceso sospechoso: {processName} en {executablePath} ({reason})",
-        "risky_connection": "Conexión arriesgada detectada para la IP {ip}"
+        "suspicious_process": "Proceso sospechoso: {{processName}} en {{executablePath}} ({{reason}})",
+        "risky_connection": "Conexión arriesgada detectada para la IP {{ip}}"
       }
     }
   },
@@ -348,8 +348,8 @@
         "unexpected_path": "Απροσδόκητη εκτελέσιμη διαδρομή"
       },
       "warning": {
-        "suspicious_process": "Ύποπτη διαδικασία: {processName} στη {executablePath} ({reason})",
-        "risky_connection": "Ανιχνεύθηκε επικίνδυνη σύνδεση για την IP {ip}"
+        "suspicious_process": "Ύποπτη διαδικασία: {{processName}} στη {{executablePath}} ({{reason}})",
+        "risky_connection": "Ανιχνεύθηκε επικίνδυνη σύνδεση για την IP {{ip}}"
       }
     }
   },
@@ -407,8 +407,8 @@
         "unexpected_path": "Непредвиденный исполняемый путь"
       },
       "warning": {
-        "suspicious_process": "Подозрительный процесс: {processName} по адресу {executablePath} ({reason})",
-        "risky_connection": "Обнаружено рискованное соединение для IP {ip}"
+        "suspicious_process": "Подозрительный процесс: {{processName}} по адресу {{executablePath}} ({{reason}})",
+        "risky_connection": "Обнаружено рискованное соединение для IP {{ip}}"
       }
     }
   },
@@ -466,8 +466,8 @@
         "unexpected_path": "意外的可执行路径"
       },
       "warning": {
-        "suspicious_process": "可疑进程：{processName} 位于 {executablePath} ({reason})",
-        "risky_connection": "检测到 IP {ip} 的风险连接"
+        "suspicious_process": "可疑进程：{{processName}} 位于 {{executablePath}} ({{reason}})",
+        "risky_connection": "检测到 IP {{ip}} 的风险连接"
       }
     }
   },
@@ -525,8 +525,8 @@
         "unexpected_path": "예상치 못한 실행 경로"
       },
       "warning": {
-        "suspicious_process": "의심스러운 프로세스: {processName} at {executablePath} ({reason})",
-        "risky_connection": "IP {ip}에 대한 위험한 연결 감지"
+        "suspicious_process": "의심스러운 프로세스: {{processName}} at {{executablePath}} ({{reason}})",
+        "risky_connection": "IP {{ip}} 에 대한 위험한 연결 감지"
       }
     }
   }
