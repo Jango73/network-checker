@@ -259,6 +259,13 @@ window.Tabs.AboutContent = ({ i18next }) => {
     <div className="form-group">
       <h2>{i18next.t('about')}</h2>
       <p>
+        Coding: Grok<br/>
+        Assembly:&nbsp;
+        <a href="https://github.com/Jango73" target="_blank" rel="noopener noreferrer">
+          Jango73
+        </a>
+      </p>
+      <p>
         This application is licensed under the
         <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">
           GNU General Public License v3.0 (GPLv3).
