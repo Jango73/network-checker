@@ -5,9 +5,6 @@ const NetworkMap = ({ connections, isDarkMode }) => {
   const imageRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0, imageWidth: 0, imageHeight: 0 });
 
-  // Log connections for debugging
-  console.log('Connections received:', connections);
-
   // Update dimensions when window resizes or image loads
   useEffect(() => {
     const updateDimensions = () => {
@@ -15,7 +12,6 @@ const NetworkMap = ({ connections, isDarkMode }) => {
         const { width, height } = mapContainerRef.current.getBoundingClientRect();
         const { width: imageWidth, height: imageHeight } = imageRef.current.getBoundingClientRect();
         setDimensions({ width, height, imageWidth, imageHeight });
-        console.log('Dimensions:', { width, height, imageWidth, imageHeight });
       }
     };
     updateDimensions();
@@ -45,7 +41,6 @@ const NetworkMap = ({ connections, isDarkMode }) => {
     const validConnections = connections.filter(
       conn => conn.lat != null && conn.lon != null && !isNaN(conn.lat) && !isNaN(conn.lon)
     );
-    console.log('Valid connections:', validConnections);
 
     validConnections.forEach((conn, i) => {
       if (processed.has(i)) return;
@@ -59,7 +54,6 @@ const NetworkMap = ({ connections, isDarkMode }) => {
       const minMercatorY = Math.log(Math.tan(Math.PI / 4 + (-85 * Math.PI) / 360));
       // Invert y to place positive latitudes (north) at y < 50%
       const y = (1 - (mercatorY - minMercatorY) / (maxMercatorY - minMercatorY)) * 100;
-      console.log(`Projected for IP ${conn.ip}: lat=${conn.lat}, lon=${conn.lon} to x=${x}%, y=${y}%`);
 
       const cluster = { x, y, connections: [conn], isRisky: conn.isRisky };
       processed.add(i);
@@ -80,7 +74,6 @@ const NetworkMap = ({ connections, isDarkMode }) => {
       clusters.push(cluster);
     });
 
-    console.log('Clusters created:', clusters);
     return clusters;
   };
 

@@ -1,9 +1,7 @@
 window.Tabs = window.Tabs || {};
-console.log('Tabs.js loaded: Initializing window.Tabs');
 
 // Navigation bar for tabs
 window.Tabs.Tabs = ({ activeTab, setActiveTab, i18next }) => {
-  console.log('Rendering Tabs component', { activeTab });
   return (
     <div className="tabs">
       <div className={`tab ${activeTab === 'main' ? 'active' : ''}`} onClick={() => setActiveTab('main')}>
@@ -27,7 +25,6 @@ window.Tabs.Tabs = ({ activeTab, setActiveTab, i18next }) => {
 
 // Main tab content (scan button, periodic checkbox, country/connections tables)
 window.Tabs.MainContent = ({ connections, isScanning, scanConnections, periodicScan, setPeriodicScan, scanProgress, i18next }) => {
-  console.log('Rendering MainContent', { connections, isScanning, scanProgress });
   const countryCounts = connections.reduce((acc, conn) => {
     acc[conn.country] = (acc[conn.country] || 0) + 1;
     return acc;
@@ -96,7 +93,6 @@ window.Tabs.MainContent = ({ connections, isScanning, scanConnections, periodicS
 
 // Map tab content (wrapper for NetworkMap)
 window.Tabs.MapContent = ({ connections, isDarkMode, i18next }) => {
-  console.log('Rendering MapContent', { connections, isDarkMode });
   return (
     <div>
       <h2>{i18next.t('map')}</h2>
@@ -107,7 +103,6 @@ window.Tabs.MapContent = ({ connections, isDarkMode, i18next }) => {
 
 // History tab content (export/clear buttons, history table, scan details)
 window.Tabs.HistoryContent = ({ history, selectedScan, setSelectedScan, handleExport, handleClearHistory, i18next }) => {
-  console.log('Rendering HistoryContent', { history, selectedScan });
   return (
     <div>
       <button className="clear" onClick={handleClearHistory}>
@@ -162,7 +157,6 @@ window.Tabs.HistoryContent = ({ history, selectedScan, setSelectedScan, handleEx
 
 // Settings tab content (configuration forms)
 window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMode, intervalMin, setIntervalMin, maxHistorySize, setMaxHistorySize, bannedIPs, handleBannedIPsChange, ipError, riskyProviders, handleRiskyProvidersChange, providerError, riskyCountries, handleCountryClick, handleResetSettings, i18next, scanMode, setScanMode }) => {
-  console.log('Rendering SettingsContent', { language, isDarkMode, intervalMin, maxHistorySize, scanMode });
   return (
     <div className="config">
       <div className="form-group">
@@ -247,7 +241,6 @@ window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMod
 
 // About tab content (static text and links)
 window.Tabs.AboutContent = ({ i18next }) => {
-  console.log('Rendering AboutContent');
   return (
     <div className="form-group">
       <h2>{i18next.t('about')}</h2>
@@ -269,7 +262,6 @@ window.Tabs.AboutContent = ({ i18next }) => {
 
 // Renders the connections table
 window.Tabs.renderConnectionsTable = (conns, i18next) => {
-  console.log('Calling renderConnectionsTable', { conns });
   if (!conns || conns.length === 0) {
     return <p>{i18next.t('noConnections')}</p>;
   }
@@ -308,5 +300,3 @@ window.Tabs.renderConnectionsTable = (conns, i18next) => {
     </table>
   );
 };
-
-console.log('Tabs.js finished loading, window.Tabs:', window.Tabs);

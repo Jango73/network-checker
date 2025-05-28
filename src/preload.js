@@ -1,7 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-console.log('Preload script loaded');
-
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     invoke: (channel, ...args) => {
@@ -16,7 +14,6 @@ contextBridge.exposeInMainWorld('electron', {
         'clear-history',
         'export-history'
       ];
-      console.log(`Renderer attempting to invoke channel: ${channel}`);
       if (validChannels.includes(channel)) {
         return ipcRenderer.invoke(channel, ...args);
       }

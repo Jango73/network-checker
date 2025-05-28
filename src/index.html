@@ -18,7 +18,6 @@
   <script type="text/babel" src="utils.js"></script>
   <script type="text/babel" src="Tabs.js"></script>
   <script type="text/babel">
-    console.log('Starting index.html script');
     window.$RefreshReg$ = () => {};
     window.$RefreshSig$ = () => () => {};
 
@@ -28,7 +27,6 @@
     const { scanConnections, handleBannedIPsChange, handleRiskyProvidersChange, handleCountryClick, handleExport, handleClearHistory, handleResetSettings } = window.utils;
 
     const App = () => {
-      console.log('App component initialized');
       const [connections, setConnections] = useState([]);
       const [riskyCountries, setRiskyCountries] = useState(DEFAULT_CONFIG.riskyCountries);
       const [bannedIPs, setBannedIPs] = useState(DEFAULT_CONFIG.bannedIPs);
@@ -71,9 +69,7 @@
       };
 
       useEffect(() => {
-        console.log('Checking if Tabs is loaded:', window.Tabs);
         if (window.Tabs && window.Tabs.Tabs && window.Tabs.renderConnectionsTable) {
-          console.log('Tabs components loaded successfully');
           setTabsLoaded(true);
         } else {
           console.error('Tabs components not loaded');
@@ -83,7 +79,6 @@
 
       useEffect(() => {
         async function initI18n() {
-          console.log('Initializing i18n');
           try {
             const response = await fetch('../data/translations.json');
             if (!response.ok) throw new Error('Failed to load translations');
@@ -96,7 +91,6 @@
               }
             });
             setI18nLoaded(true);
-            console.log('Translations loaded successfully');
           } catch (error) {
             console.error('Failed to load translations:', error);
             addMessage('Failed to load translations. Using fallback language.', 'error');
@@ -174,14 +168,12 @@
 
       useEffect(() => {
         if (i18nLoaded && language !== i18next.language) {
-          console.log('Changing language to:', language);
           i18next.changeLanguage(language);
         }
       }, [language, i18nLoaded]);
 
       useEffect(() => {
         const handleLanguageChange = () => {
-          console.log('Language changed, updating i18nKey');
           setI18nKey(prev => prev + 1);
         };
         i18next.on('languageChanged', handleLanguageChange);
@@ -192,7 +184,6 @@
 
       useEffect(() => {
         async function loadConfig() {
-          console.log('Loading config');
           try {
             const config = await ipcRenderer.invoke('load-config');
             if (config) {
@@ -206,7 +197,6 @@
               setPeriodicScan(config.periodicScan !== false);
               setScanMode(config.scanMode || DEFAULT_CONFIG.scanMode);
               setConfigLoaded(true);
-              console.log('Config loaded successfully');
             }
           } catch (error) {
             console.error('Failed to load config:', error);
@@ -220,13 +210,11 @@
 
       useEffect(() => {
         document.body.className = isDarkMode ? 'dark' : 'light';
-        console.log('Updated body className:', document.body.className);
       }, [isDarkMode]);
 
       useEffect(() => {
         if (!configLoaded) return;
         async function saveConfig() {
-          console.log('Saving config');
           try {
             await ipcRenderer.invoke('save-config', {
               riskyCountries,
@@ -239,7 +227,6 @@
               periodicScan,
               scanMode
             });
-            console.log('Config saved successfully');
           } catch (error) {
             console.error('Failed to save config:', error);
             addMessage('Failed to save configuration.', 'error');
@@ -250,7 +237,6 @@
 
       useEffect(() => {
         if (periodicScan && intervalMin > 0) {
-          console.log('Setting up periodic scan with interval:', intervalMin);
           const interval = setInterval(() => {
             scanConnections(setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode).then(setHistory);
           }, intervalMin * 60 * 1000);
@@ -260,7 +246,6 @@
 
       useEffect(() => {
         if (messages.length > 0) {
-          console.log('Setting message timeout');
           const timer = setTimeout(() => {
             setMessages(prev => prev.slice(1));
           }, 10000);
@@ -270,11 +255,9 @@
 
       useEffect(() => {
         async function loadHistory() {
-          console.log('Loading history');
           try {
             const historyData = await ipcRenderer.invoke('load-history');
             setHistory(historyData || []);
-            console.log('History loaded successfully');
           } catch (error) {
             console.error('Failed to load history:', error);
             addMessage('Failed to load scan history.', 'error');
@@ -286,11 +269,9 @@
       }, [tabsLoaded]);
 
       if (!i18nLoaded || !tabsLoaded) {
-        console.log('Rendering loading state');
         return <div>Loading...</div>;
       }
 
-      console.log('Rendering App UI', { activeTab });
       return (
         <div className={isDarkMode ? 'dark' : 'light'} key={i18nKey}>
           <h1>{i18next.t('appTitle')}</h1>
@@ -363,10 +344,8 @@
       );
     };
 
-    console.log('Attempting to render App');
     try {
       if (window.React && window.ReactDOM && document.getElementById('root')) {
-        console.log('React, ReactDOM, and root element found, rendering');
         ReactDOM.render(<App />, document.getElementById('root'));
       } else {
         console.error('Cannot render: Missing dependencies or root element', {

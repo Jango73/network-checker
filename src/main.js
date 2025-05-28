@@ -18,7 +18,6 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  console.log('App is ready, creating window...');
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -30,14 +29,12 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.handle('run-netstat', async () => {
-  console.log('Running netstat...');
   return new Promise((resolve, reject) => {
     exec('netstat -ano', (error, stdout) => {
       if (error) {
         console.error('Netstat error:', error);
         reject(error);
       } else {
-        console.log('Netstat output:', stdout);
         resolve(stdout);
       }
     });
@@ -45,7 +42,6 @@ ipcMain.handle('run-netstat', async () => {
 });
 
 ipcMain.handle('get-process-name', async () => {
-  console.log('Running tasklist...');
   return new Promise((resolve, reject) => {
     exec('tasklist /FO CSV', (error, stdout) => {
       if (error) {
@@ -69,7 +65,6 @@ ipcMain.handle('get-process-name', async () => {
 });
 
 ipcMain.handle('get-process-path', async (event, pid) => {
-  console.log(`Fetching path for PID ${pid}...`);
   return new Promise((resolve, reject) => {
     exec(`wmic process where ProcessId=${pid} get ExecutablePath`, (error, stdout) => {
       if (error) {
@@ -78,7 +73,6 @@ ipcMain.handle('get-process-path', async (event, pid) => {
       const lines = stdout.trim().split('\n').filter(line => line.trim());
       if (lines.length >= 2 && lines[1].trim()) {
         const executablePath = lines[1].trim();
-        console.log(`WMIC path for PID ${pid}: ${executablePath}`);
         resolve(executablePath);
         return;
       }
@@ -92,7 +86,6 @@ ipcMain.handle('get-process-path', async (event, pid) => {
         }
         const psPath = psStdout.trim();
         if (psPath) {
-          console.log(`PowerShell path for PID ${pid}: ${psPath}`);
           resolve(psPath);
         } else {
           console.warn(`No path found for PID ${pid}`);
@@ -118,16 +111,13 @@ ipcMain.handle('load-config', async () => {
   try {
     const data = await fs.readFile('config.json', 'utf8');
     if (!data.trim()) {
-      console.log('Empty config file, writing default');
       await fs.writeFile('config.json', JSON.stringify(defaultConfig, null, 2));
       return defaultConfig;
     }
     const parsed = JSON.parse(data);
-    console.log('Loaded config:', parsed);
     return { ...defaultConfig, ...parsed };
   } catch (error) {
     console.error('Error loading config:', error);
-    console.log('Writing default config');
     await fs.writeFile('config.json', JSON.stringify(defaultConfig, null, 2));
     return defaultConfig;
   }
@@ -135,7 +125,6 @@ ipcMain.handle('load-config', async () => {
 
 ipcMain.handle('save-config', async (event, config) => {
   try {
-    console.log('Saving config:', config);
     await fs.writeFile('config.json', JSON.stringify(config, null, 2));
     return true;
   } catch (error) {
@@ -148,15 +137,12 @@ ipcMain.handle('load-history', async () => {
   try {
     const data = await fs.readFile('history.json', 'utf8');
     if (!data.trim()) {
-      console.log('Empty history file');
       return [];
     }
     const parsed = JSON.parse(data);
-    console.log('Loaded history:', parsed.length, 'scans');
     return parsed;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      console.log('History file does not exist, creating empty');
       await fs.writeFile('history.json', JSON.stringify([]));
       return [];
     }
@@ -186,7 +172,6 @@ ipcMain.handle('save-history', async (event, scanData, maxHistorySize) => {
     }
 
     await fs.writeFile('history.json', JSON.stringify(history, null, 2));
-    console.log('Saved history:', history.length, 'scans, size:', fileSize.toFixed(2), 'MB');
     return true;
   } catch (error) {
     console.error('Error saving history:', error);
@@ -197,7 +182,6 @@ ipcMain.handle('save-history', async (event, scanData, maxHistorySize) => {
 ipcMain.handle('clear-history', async () => {
   try {
     await fs.writeFile('history.json', JSON.stringify([]));
-    console.log('Cleared history');
     return true;
   } catch (error) {
     console.error('Error clearing history:', error);
@@ -206,7 +190,6 @@ ipcMain.handle('clear-history', async () => {
 });
 
 ipcMain.handle('export-history', async (event, format = 'json') => {
-  console.log('Registering export-history handler with format:', format);
   try {
     const historyData = await fs.readFile('history.json', 'utf8');
     let history = [];
@@ -225,7 +208,6 @@ ipcMain.handle('export-history', async (event, format = 'json') => {
 
     const { canceled, filePath } = await dialog.showSaveDialog(saveOptions);
     if (canceled || !filePath) {
-      console.log('Export canceled by user');
       return { success: false, message: 'Export canceled' };
     }
 
@@ -244,7 +226,6 @@ ipcMain.handle('export-history', async (event, format = 'json') => {
       throw new Error('Unsupported format');
     }
 
-    console.log(`History exported to ${filePath} as ${format}`);
     return { success: true, message: `History exported to ${filePath}` };
   } catch (error) {
     console.error('Error exporting history:', error);

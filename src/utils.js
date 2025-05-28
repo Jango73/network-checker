@@ -6,10 +6,8 @@ window.utils.pathRecurrence = {};
 // Evaluates if a process is in a legitimate location
 window.utils.evaluateProcessLocation = (processName, executablePath, i18next) => {
   const lowerProcessName = processName.toLowerCase();
-  console.log(`Evaluating ${processName} at ${executablePath}`);
 
   if (!executablePath && window.config.systemProcesses.includes(lowerProcessName)) {
-    console.log(`System process ${processName} with no path, assuming legitimate`);
     return {
       score: 100,
       isSuspicious: false,
@@ -29,23 +27,18 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
   let score = 0;
   const normalizedPath = executablePath.replace(/\//g, '\\').toLowerCase();
   const parentDir = normalizedPath.substring(0, normalizedPath.lastIndexOf('\\') + 1);
-  console.log(`Normalized path: ${normalizedPath}, Parent dir: ${parentDir}`);
 
   if (window.config.processLocations[lowerProcessName]) {
     const isMatch = window.config.processLocations[lowerProcessName].some(regex => {
       const matches = regex.test(parentDir);
-      console.log(`Testing regex ${regex} against ${parentDir}: ${matches}`);
       return matches;
     });
     if (isMatch) {
       score += 100;
-      console.log(`Valid path detected for ${processName}`);
     } else if (['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(lowerProcessName)) {
       score -= 50;
-      console.log(`Generic process name ${processName} in unexpected path`);
     }
   } else {
-    console.log(`No location rules for ${processName}`);
   }
 
   const suspectFolders = [
@@ -57,14 +50,12 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
 
   if (suspectFolders.some(regex => regex.test(normalizedPath))) {
     score -= 50;
-    console.log(`Suspicious folder detected in ${normalizedPath}`);
   }
 
   const pathKey = `${lowerProcessName}:${normalizedPath}`;
   window.utils.pathRecurrence[pathKey] = (window.utils.pathRecurrence[pathKey] || 0) + 1;
   if (window.utils.pathRecurrence[pathKey] > 3) {
     score += 10;
-    console.log(`Recurrence bonus for ${pathKey}`);
   }
 
   const isSuspicious = score < 50;
@@ -73,14 +64,12 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
       ? i18next.t('error.suspect_path')
       : i18next.t('error.unexpected_path')
     : '';
-  console.log(`Evaluation for ${processName}: score=${score}, isSuspicious=${isSuspicious}, reason=${reason}`);
 
   return { score, isSuspicious, reason };
 };
 
 // Scans network connections
 window.utils.scanConnections = async (setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode) => {
-  console.log(`Starting scanConnections in ${scanMode} mode`);
   setIsScanning(true);
   setScanProgress({ current: 0, total: 0 });
 
@@ -107,13 +96,11 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
         if ((conn.isRisky || conn.isSuspicious) && !hasPlayedSound) {
           new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
           if (conn.isRisky) {
-            console.log(`Adding risky connection message for IP: ${ip}`, { ip });
             addMessage('warning.risky_connection', 'warning', { ip });
           }
           hasPlayedSound = true;
         }
       }
-      console.log('Mock scan completed, connections:', connections);
     } else {
       // Live mode: real scan
       const netstatOutput = await window.electron.ipcRenderer.invoke('run-netstat');
@@ -138,15 +125,12 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
       let requestCount = 0;
       let hasPlayedSound = false;
       setScanProgress({ current: 0, total: ipSet.size });
-      console.log('Scanning IPs:', ipSet.size);
 
       for (const ip of ipSet) {
         try {
           const response = await axios.get(`http://ip-api.com/json/${ip}`);
-          console.log(`API response for IP ${ip}:`, response.data);
           if (response.data.status === 'success') {
             const { country, isp, org, city, lat, lon } = response.data;
-            console.log(`Coordinates for ${city}: lat=${lat}, lon=${lon}`);
             const isRisky = bannedIPs.includes(ip) || riskyCountries.includes(country) || riskyProviders.some(p => isp.includes(p) || org.includes(p));
             const line = lines.find(l => l.includes(ip));
             const parts = line.trim().split(/\s+/);
@@ -191,7 +175,6 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
             if ((isRisky || isSuspicious) && !hasPlayedSound) {
               new Audio('https://freesound.org/data/previews/316/316847/4939433-lq.mp3').play();
               if (isRisky) {
-                console.log(`Adding risky connection message for IP: ${ip}`, { ip });
                 addMessage('warning.risky_connection', 'warning', { ip });
               }
               hasPlayedSound = true;
@@ -212,7 +195,6 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
         }
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      console.log('Live scan completed, connections:', connections);
     }
 
     setConnections(connections);
@@ -225,7 +207,6 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
     try {
       await window.electron.ipcRenderer.invoke('save-history', scanData, maxHistorySize);
       const updatedHistory = await window.electron.ipcRenderer.invoke('load-history');
-      console.log('History saved and updated:', updatedHistory);
       return updatedHistory || [];
     } catch (error) {
       console.error('Failed to save history:', error);
@@ -235,7 +216,6 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
     console.error(`Error in scanConnections (${scanMode} mode):`, error);
     addMessage('Failed to run scan in {mode} mode', 'error', { mode: scanMode });
   } finally {
-    console.log('Scan complete, resetting scanning states');
     setIsScanning(false);
     setScanProgress({ current: 0, total: 0 });
   }
