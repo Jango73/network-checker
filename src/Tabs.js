@@ -284,6 +284,7 @@ window.Tabs.renderConnectionsTable = (conns, i18next) => {
           <th>PID</th>
           <th>{i18next.t('process')}</th>
           <th>{i18next.t('risky')}</th>
+          <th>{i18next.t('suspicious')}</th>
           <th>WHOIS</th>
         </tr>
       </thead>
@@ -296,7 +297,8 @@ window.Tabs.renderConnectionsTable = (conns, i18next) => {
             <td>{conn.org}</td>
             <td>{conn.pid}</td>
             <td>{conn.processName}</td>
-            <td>{conn.isRisky ? i18next.t('riskyConnection') : '-'}</td>
+            <td>{conn.isRisky ? i18next.t('risky') : '-'}</td>
+            <td>{conn.isSuspicious ? i18next.t('suspicious') : '-'}</td>
             <td>
               <a href={`https://whois.domaintools.com/${conn.ip}`} target="_blank">WHOIS</a>
             </td>
