@@ -45,7 +45,6 @@
       const [ipError, setIpError] = useState('');
       const [providerError, setProviderError] = useState('');
       const [history, setHistory] = useState([]);
-      const [selectedScan, setSelectedScan] = useState(null);
       const [i18nLoaded, setI18nLoaded] = useState(false);
       const [i18nKey, setI18nKey] = useState(0);
       const [tabsLoaded, setTabsLoaded] = useState(false);
@@ -306,10 +305,8 @@
           {activeTab === 'history' && (
             <window.Tabs.HistoryContent
               history={history}
-              selectedScan={selectedScan}
-              setSelectedScan={setSelectedScan}
               handleExport={format => handleExport(format, addMessage, i18next)}
-              handleClearHistory={() => handleClearHistory(setHistory, setSelectedScan, addMessage, i18next)}
+              handleClearHistory={() => handleClearHistory(setHistory, addMessage, i18next)}
               i18next={i18next}
             />
           )}

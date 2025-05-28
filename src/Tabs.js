@@ -101,20 +101,28 @@ window.Tabs.MapContent = ({ connections, isDarkMode, i18next }) => {
   );
 };
 
-// History tab content (export/clear buttons, history table, scan details)
-window.Tabs.HistoryContent = ({ history, selectedScan, setSelectedScan, handleExport, handleClearHistory, i18next }) => {
+// History tab content (export/clear buttons, history table with expandable rows)
+window.Tabs.HistoryContent = ({ history, i18next, handleExport, handleClearHistory }) => {
+  const [expandedRow, setExpandedRow] = React.useState(null);
+
+  const toggleRow = (timestamp) => {
+    setExpandedRow(prev => prev === timestamp ? null : timestamp);
+  };
+
   return (
     <div>
-      <button className="clear" onClick={handleClearHistory}>
-        {i18next.t('clearHistory')}
-      </button>
-      <button className="export-json" onClick={() => handleExport('json')}>
-        {i18next.t('exportJSON')}
-      </button>
-      <button className="export-csv" onClick={() => handleExport('csv')}>
-        {i18next.t('exportCSV')}
-      </button>
-      <div style={{ marginTop: '1.25rem' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
+        <button className="clear" onClick={handleClearHistory}>
+          {i18next.t('clearHistory')}
+        </button>
+        <button className="export-json" onClick={() => handleExport('json')}>
+          {i18next.t('exportJSON')}
+        </button>
+        <button className="export-csv" onClick={() => handleExport('csv')}>
+          {i18next.t('exportCSV')}
+        </button>
+      </div>
+      <div>
         <h2>{i18next.t('history')}</h2>
         {history.length > 0 ? (
           <table>
@@ -126,16 +134,30 @@ window.Tabs.HistoryContent = ({ history, selectedScan, setSelectedScan, handleEx
               </tr>
             </thead>
             <tbody>
-              {history.map((scan, index) => (
-                <tr
-                  key={scan.timestamp}
-                  className="history-row"
-                  onClick={() => setSelectedScan(selectedScan?.timestamp === scan.timestamp ? null : scan)}
-                >
-                  <td>{new Date(scan.timestamp).toLocaleString()}</td>
-                  <td>{scan.totalConnections}</td>
-                  <td>{scan.riskyConnections}</td>
-                </tr>
+              {history.map((scan) => (
+                <React.Fragment key={scan.timestamp}>
+                  <tr
+                    className="history-row"
+                    onClick={() => toggleRow(scan.timestamp)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{new Date(scan.timestamp).toLocaleString()}</td>
+                    <td>{scan.totalConnections}</td>
+                    <td>{scan.riskyConnections}</td>
+                  </tr>
+                  {expandedRow === scan.timestamp && (
+                    <tr>
+                      <td colSpan="3" style={{ padding: '0.625rem' }}>
+                        <div style={{ margin: '0.625rem 0' }}>
+                          <h3>{i18next.t('scanDetails')} ({new Date(scan.timestamp).toLocaleString()})</h3>
+                          {typeof window.Tabs.renderConnectionsTable === 'function'
+                            ? window.Tabs.renderConnectionsTable(scan.connections, i18next)
+                            : <p>Error: renderConnectionsTable is not available.</p>}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -143,14 +165,6 @@ window.Tabs.HistoryContent = ({ history, selectedScan, setSelectedScan, handleEx
           <p>{i18next.t('noHistory')}</p>
         )}
       </div>
-      {selectedScan && (
-        <div style={{ marginTop: '1.25rem' }}>
-          <h2>{i18next.t('scanDetails')} ({new Date(selectedScan.timestamp).toLocaleString()})</h2>
-          {typeof window.Tabs.renderConnectionsTable === 'function'
-            ? window.Tabs.renderConnectionsTable(selectedScan.connections, i18next)
-            : <p>Error: renderConnectionsTable is not available.</p>}
-        </div>
-      )}
     </div>
   );
 };

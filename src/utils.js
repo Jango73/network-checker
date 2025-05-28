@@ -68,6 +68,10 @@ window.utils.evaluateProcessLocation = (processName, executablePath, i18next) =>
   return { score, isSuspicious, reason };
 };
 
+window.utils.playAlertSound = () => {
+  new Audio('../res/alert.mp3').play();
+}
+
 // Scans network connections
 window.utils.scanConnections = async (setConnections, setIsScanning, setScanProgress, addMessage, bannedIPs, riskyCountries, riskyProviders, maxHistorySize, i18next, scanMode) => {
   setIsScanning(true);
@@ -94,7 +98,7 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
       for (const conn of connections) {
         const ip = conn.ip;
         if ((conn.isRisky || conn.isSuspicious) && !hasPlayedSound) {
-          new Audio('https://freesound.org/data/previews/316/316847_4939433-lq.mp3').play();
+          window.utils.playAlertSound();
           if (conn.isRisky) {
             addMessage('warning.risky_connection', 'warning', { ip });
           }
@@ -173,7 +177,7 @@ window.utils.scanConnections = async (setConnections, setIsScanning, setScanProg
             });
 
             if ((isRisky || isSuspicious) && !hasPlayedSound) {
-              new Audio('https://freesound.org/data/previews/316/316847/4939433-lq.mp3').play();
+              window.utils.playAlertSound();
               if (isRisky) {
                 addMessage('warning.risky_connection', 'warning', { ip });
               }
@@ -277,11 +281,10 @@ window.utils.handleExport = async (format, addMessage, i18next) => {
 };
 
 // Clears scan history
-window.utils.handleClearHistory = async (setHistory, setSelectedScan, addMessage, i18next) => {
+window.utils.handleClearHistory = async (setHistory, addMessage, i18next) => {
   try {
     await window.electron.ipcRenderer.invoke('clear-history');
     setHistory([]);
-    setSelectedScan(null);
   } catch (error) {
     console.error('Failed to clear history:', error);
     addMessage('Failed to clear history', 'error');
@@ -300,6 +303,7 @@ window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRi
     setLanguage(window.config.DEFAULT_CONFIG.language);
     setPeriodicScan(window.config.DEFAULT_CONFIG.periodicScan);
     setScanMode(window.config.DEFAULT_CONFIG.scanMode);
+    await new Promise(resolve => setTimeout(resolve, 0));
     await window.electron.ipcRenderer.invoke('save-config', {
       riskyCountries: window.config.DEFAULT_CONFIG.riskyCountries,
       bannedIPs: window.config.DEFAULT_CONFIG.bannedIPs,
