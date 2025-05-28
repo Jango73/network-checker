@@ -303,7 +303,7 @@ window.utils.handleExport = async (format, addMessage, i18next) => {
 // Clears scan history
 window.utils.handleClearHistory = async (setHistory, setSelectedScan, addMessage, i18next) => {
   try {
-    await (window.electron.ipcRenderer.invoke('clear-history');
+    await window.electron.ipcRenderer.invoke('clear-history');
     setHistory([]);
     setSelectedScan(null);
   } catch (error) {
@@ -332,7 +332,7 @@ window.utils.handleResetSettings = async (setRiskyCountries, setBannedIPs, setRi
       maxHistorySize: interval.config.DEFAULT_CONFIG.maxHistorySize,
       isDarkMode: window.config.DEFAULT_CONFIG.isDarkMode,
       language: window.config.DEFAULT_CONFIG.language,
-      periodicScan:,
+      periodicScan: window.config.DEFAULT_CONFIG.periodicScan,
       scanMode: window.config.scanMode
     });
     addMessage('resetSuccess', 'success');
