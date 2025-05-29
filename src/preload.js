@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electron', {
         'run-netstat',
         'get-process-name',
         'get-process-path',
+        'get-process-signature',
         'load-config',
         'save-config',
         'load-history',

@@ -170,7 +170,7 @@ window.Tabs.HistoryContent = ({ history, i18next, handleExport, handleClearHisto
 };
 
 // Settings tab content (configuration forms)
-window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMode, intervalMin, setIntervalMin, maxHistorySize, setMaxHistorySize, bannedIPs, handleBannedIPsChange, ipError, riskyProviders, handleRiskyProvidersChange, providerError, riskyCountries, handleCountryClick, handleResetSettings, i18next, scanMode, setScanMode }) => {
+window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMode, intervalMin, setIntervalMin, maxHistorySize, setMaxHistorySize, bannedIPs, handleBannedIPsChange, ipError, riskyProviders, handleRiskyProvidersChange, providerError, riskyCountries, handleCountryClick, handleResetSettings, i18next, scanMode, setScanMode, trustedIPs, setTrustedIPs, trustedProcesses, setTrustedProcesses }) => {
   return (
     <div className="config">
       <div className="form-group">
@@ -217,6 +217,22 @@ window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMod
         {ipError && <div className="error-message">{ipError}</div>}
       </div>
       <div className="form-group">
+        <label>{i18next.t('trusted_ips')}</label>
+        <input
+          type="text"
+          value={trustedIPs.join(',')}
+          onChange={(e) => {
+            const newIPs = e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
+            const invalidIP = newIPs.find(ip => !window.utils.validateIP(ip));
+            if (invalidIP) {
+              // Ne rien faire si IP invalide, l'utilisateur peut corriger
+            } else {
+              setTrustedIPs(newIPs);
+            }
+          }}
+        />
+      </div>
+      <div className="form-group">
         <label>{i18next.t('riskyProviders')}</label>
         <input
           type="text"
@@ -224,6 +240,14 @@ window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMod
           onChange={handleRiskyProvidersChange}
         />
         {providerError && <div className="error-message">{providerError}</div>}
+      </div>
+      <div className="form-group">
+        <label>{i18next.t('trusted_processes')}</label>
+        <input
+          type="text"
+          value={trustedProcesses.join(',')}
+          onChange={(e) => setTrustedProcesses(e.target.value.split(',').map(p => p.trim()).filter(p => p))}
+        />
       </div>
       <div className="form-group">
         <label>{i18next.t('countriesRisky')}</label>
@@ -266,13 +290,13 @@ window.Tabs.AboutContent = ({ i18next }) => {
         </a>
       </p>
       <p>
-        This application is licensed under the
+        This application is licensed under the&nbsp;
         <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">
           GNU General Public License v3.0 (GPLv3).
         </a>.
       </p>
       <p>
-        Map (unmodified): "Mercator Projection" by Daniel R. Strebe, licensed under Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0).
+        Map (unmodified): "Mercator Projection" by Daniel R. Strebe, licensed under Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0).&nbsp;
         <a href="https://commons.wikimedia.org/wiki/File:Mercator_projection_Square.JPG" target="_blank" rel="noopener noreferrer">
           Source: Wikimedia Commons
         </a>.
@@ -282,7 +306,23 @@ window.Tabs.AboutContent = ({ i18next }) => {
 };
 
 // Renders the connections table
-window.Tabs.renderConnectionsTable = (conns, i18next) => {
+window.Tabs.renderConnectionsTable = (
+  conns,
+  i18next,
+  setTrustedIPs,
+  setTrustedProcesses,
+  setConnections,
+  setIsScanning,
+  setScanProgress,
+  addMessage,
+  bannedIPs,
+  riskyCountries,
+  riskyProviders,
+  maxHistorySize,
+  scanMode,
+  trustedIPs,
+  trustedProcesses
+) => {
   if (!conns || conns.length === 0) {
     return <p>{i18next.t('noConnections')}</p>;
   }
@@ -299,6 +339,7 @@ window.Tabs.renderConnectionsTable = (conns, i18next) => {
           <th>{i18next.t('risky')}</th>
           <th>{i18next.t('suspicious')}</th>
           <th>WHOIS</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -314,6 +355,82 @@ window.Tabs.renderConnectionsTable = (conns, i18next) => {
             <td>{conn.isSuspicious ? i18next.t('suspicious') : '-'}</td>
             <td>
               <a href={`https://whois.domaintools.com/${conn.ip}`} target="_blank">WHOIS</a>
+            </td>
+            <td>
+              {conn.isRisky && (
+                <button
+                  onClick={async () => {
+                    window.utils.handleTrustedIPsChange(conn.ip, trustedIPs, setTrustedIPs);
+                    await window.electron.ipcRenderer.invoke('save-config', {
+                      riskyCountries,
+                      bannedIPs,
+                      trustedIPs: trustedIPs.includes(conn.ip) ? trustedIPs.filter(i => i !== conn.ip) : [...trustedIPs, conn.ip],
+                      riskyProviders,
+                      trustedProcesses,
+                      intervalMin,
+                      maxHistorySize,
+                      isDarkMode,
+                      language,
+                      periodicScan,
+                      scanMode
+                    });
+                    window.utils.scanConnections(
+                      setConnections,
+                      setIsScanning,
+                      setScanProgress,
+                      addMessage,
+                      bannedIPs,
+                      riskyCountries,
+                      riskyProviders,
+                      maxHistorySize,
+                      i18next,
+                      scanMode,
+                      trustedIPs,
+                      trustedProcesses
+                    );
+                  }}
+                >
+                  {i18next.t('mark_ip_safe')}
+                </button>
+              )}
+              {conn.isSuspicious && (
+                <button
+                  onClick={async () => {
+                    window.utils.handleTrustedProcessesChange(conn.executablePath || conn.processName, trustedProcesses, setTrustedProcesses);
+                    await window.electron.ipcRenderer.invoke('save-config', {
+                      riskyCountries,
+                      bannedIPs,
+                      trustedIPs,
+                      riskyProviders,
+                      trustedProcesses: trustedProcesses.includes(conn.executablePath || conn.processName) 
+                        ? trustedProcesses.filter(p => p !== (conn.executablePath || conn.processName)) 
+                        : [...trustedProcesses, conn.executablePath || conn.processName],
+                      intervalMin,
+                      maxHistorySize,
+                      isDarkMode,
+                      language,
+                      periodicScan,
+                      scanMode
+                    });
+                    window.utils.scanConnections(
+                      setConnections,
+                      setIsScanning,
+                      setScanProgress,
+                      addMessage,
+                      bannedIPs,
+                      riskyCountries,
+                      riskyProviders,
+                      maxHistorySize,
+                      i18next,
+                      scanMode,
+                      trustedIPs,
+                      trustedProcesses
+                    );
+                  }}
+                >
+                  {i18next.t('mark_process_safe')}
+                </button>
+              )}
             </td>
           </tr>
         ))}
