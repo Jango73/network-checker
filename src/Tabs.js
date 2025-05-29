@@ -32,9 +32,21 @@ window.Tabs.MainContent = ({ connections, isScanning, scanConnections, periodicS
 
   return (
     <div>
-      <button onClick={scanConnections} disabled={isScanning}>
-        {isScanning ? <span className="spinner"></span> : i18next.t('check')}
-      </button>
+      <div style={{ display: 'flex', gap: '10px'}}>
+        <button onClick={scanConnections} disabled={isScanning}>
+          {isScanning ? <span className="spinner"></span> : i18next.t('check')}
+        </button>
+        <div className="form-group" style={{ marginTop: '0.625rem' }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={periodicScan}
+              onChange={() => setPeriodicScan(!periodicScan)}
+            />
+            {i18next.t('periodic')}
+          </label>
+        </div>
+      </div>
       {isScanning && scanProgress.total > 0 && (
         <div className="progress-container">
           <div className="progress-bar">
@@ -48,16 +60,6 @@ window.Tabs.MainContent = ({ connections, isScanning, scanConnections, periodicS
           </div>
         </div>
       )}
-      <div className="form-group" style={{ marginTop: '0.625rem' }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={periodicScan}
-            onChange={() => setPeriodicScan(!periodicScan)}
-          />
-          {i18next.t('periodic')}
-        </label>
-      </div>
       <div style={{ marginTop: '1.25rem' }}>
         <h2>{i18next.t('scannedIPs')}</h2>
         {typeof window.Tabs.renderConnectionsTable === 'function'
