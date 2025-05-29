@@ -2,7 +2,7 @@
 
 ## What’s This About? (For Everyone)
 
-The **Network Checker** is a slick desktop app that keeps tabs on your computer’s network connections. It’s like having a personal security guard who checks who your machine is chatting with online—whether it’s websites, services, or servers—and flags anything shady. Perfect for anyone who wants to stay secure without diving deep into tech jargon.
+The **Network Checker** is a slick desktop app that keeps on eye on your computer’s network connections. It’s like having a personal security guard who checks what your machine is connecting to. Perfect for anyone who wants to stay secure without diving deep into tech jargon.
 
 ### What It Does:
 - **Scans Active Connections**: Lists all IP addresses your computer is connected to.
