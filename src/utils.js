@@ -271,12 +271,6 @@ window.utils.scanConnections = async (
   }
 };
 
-// Validates an IP address
-window.utils.validateIP = (ip) => {
-  const ipRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-  return ipRegex.test(ip) && ip.split('.').every(num => parseInt(num) >= 0 && num <= parseInt(num) <= 255);
-};
-
 // Validates a provider name
 window.utils.validateProvider = (provider) => {
   return provider.length >= 3;
@@ -285,13 +279,7 @@ window.utils.validateProvider = (provider) => {
 // Handles banned IPs input changes
 window.utils.handleBannedIPsChange = (event, setBannedIPs, setIpError, i18next) => {
   const newIPs = event.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
-  const invalidIP = newIPs.find(ip => !window.utils.validateIP(ip));
-  if (invalidIP) {
-    setIpError(i18next.t('invalidIP'));
-  } else {
-    setIpError('');
-    setBannedIPs(newIPs);
-  }
+  setBannedIPs(newIPs);
 };
 
 // Handles risky providers input changes

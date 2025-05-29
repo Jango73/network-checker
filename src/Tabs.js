@@ -225,12 +225,7 @@ window.Tabs.SettingsContent = ({ language, setLanguage, isDarkMode, setIsDarkMod
           value={trustedIPs.join(',')}
           onChange={(e) => {
             const newIPs = e.target.value.split(',').map(ip => ip.trim()).filter(ip => ip);
-            const invalidIP = newIPs.find(ip => !window.utils.validateIP(ip));
-            if (invalidIP) {
-              // Ne rien faire si IP invalide, l'utilisateur peut corriger
-            } else {
-              setTrustedIPs(newIPs);
-            }
+            setTrustedIPs(newIPs);
           }}
         />
       </div>
