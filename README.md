@@ -34,8 +34,8 @@ The **Network Checker** is an Electron-based desktop app for monitoring network 
 
 ### Architecture:
 - **Key Files**:
-  - `index.html`: Entry point for the React UI, orchestrates scanning, config, and history.
-  - `index.css`: Styles the app, including dark mode and table layouts.
+  - `src/index.html`: Entry point for the React UI, orchestrates scanning, config, and history.
+  - `src/index.css`: Styles the app, including dark mode and table layouts.
   - `src/main.js`: Electron main process, handles window creation and IPC.
   - `src/preload.js`: Secures IPC communication between renderer and main processes.
   - `src/Tabs.js`: Defines React components for each tab (Main, Map, History, Settings, About).
