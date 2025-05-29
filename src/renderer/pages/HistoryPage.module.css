@@ -1,0 +1,53 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.summary:hover {
+  background-color: var(--border);
+}
+
+.details {
+  padding: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.empty {
+  text-align: center;
+  padding: 16px;
+  color: var(--text);
+}
+
+.clearButton {
+  background-color: var(--error);
+}
+
+.clearButton:hover {
+  background-color: #c82333;
+}

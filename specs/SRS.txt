@@ -1,0 +1,170 @@
+### Software Requirements Specification (SRS) for Network Checker
+
+#### 1. Introduction
+The Network Checker is a desktop application built using Electron, React, and i18next for internationalization. It monitors active network connections, evaluates their risk based on user-defined criteria, and provides a user-friendly interface to visualize and manage these connections. The application supports both live and test modes, with features for geolocation, process validation, history tracking, and customizable settings.
+
+#### 2. Purpose
+The purpose of this application is to allow users to monitor and analyze network connections on their system, identifying potentially risky connections based on IP addresses, countries, ISPs, and process legitimacy. It provides a graphical interface with a world map, tabular data, and configuration options, supporting multiple languages and themes.
+
+#### 3. Scope
+The application provides the following key functionalities:
+- Scan and display active network connections with details (IP, country, ISP, organization, process, etc.).
+- Identify risky connections based on user-configured banned IPs, risky countries, and risky providers.
+- Validate processes by checking their executable paths and signatures.
+- Visualize connections on a world map with clustering for nearby coordinates.
+- Maintain a history of scans with export capabilities (JSON and CSV).
+- Support for light and dark themes, multiple languages, and customizable scan settings.
+- Provide alerts for risky or suspicious connections with audio notifications.
+
+#### 4. Functional Requirements
+
+##### 4.1 User Interface
+The application must provide a responsive, tab-based interface with the following tabs:
+- **Main Tab**:
+  - Display a "Check Now" button to initiate a manual scan.
+  - Include a checkbox to enable/disable periodic scans.
+  - Show a progress bar during scans, indicating current/total IPs scanned and percentage completion.
+  - Display two tables:
+    - **Scanned IPs Table**: Lists all active connections with columns for IP, Country, ISP, Organization, PID, Process, Risky, Suspicious, WHOIS link, and Actions (Mark IP/Process as Safe for risky/suspicious entries).
+    - **Connections by Country Table**: Summarizes connections per country.
+  - Show temporary messages (error, warning, success, info) for user feedback, disappearing after 10 seconds.
+- **Map Tab**:
+  - Display a world map (Mercator projection) with pins representing connection locations.
+  - Cluster connections within 0.5% of map size, showing a count for clusters with multiple connections.
+  - Pins are colored red for risky/suspicious connections and green for safe ones, with risky pins pulsing.
+  - Hovering over a pin shows a tooltip with IP, country, city, and suspicion reason (if applicable).
+- **History Tab**:
+  - Display a table of past scans with columns for Scan Date, Total Connections, and Risky Connections.
+  - Allow row expansion to show detailed connection data for a selected scan.
+  - Provide buttons to clear history and export it as JSON or CSV.
+- **Settings Tab**:
+  - Allow configuration of:
+    - Language (English, French, Italian, German, Spanish, Greek, Russian, Chinese, Korean).
+    - Dark mode toggle.
+    - Scan interval (minutes, minimum 0).
+    - Maximum history size (MB, minimum 1).
+    - Banned IPs (comma-separated list, validated using IPv4/IPv6 regex).
+    - Trusted IPs (comma-separated list).
+    - Risky Providers (comma-separated list, minimum 3 characters per provider).
+    - Trusted Processes (comma-separated list).
+    - Risky Countries (multi-select dropdown from a predefined list).
+    - Scan Mode (Live or Test).
+  - Display error messages for invalid IP addresses or provider names.
+  - Include a "Reset to Defaults" button to restore default settings.
+- **About Tab**:
+  - Display static text with credits (coding by Grok, assembly by Jango73 with GitHub link).
+  - Include licensing information (GPLv3) and map source details (Creative Commons, Wikimedia link).
+
+##### 4.2 Network Scanning
+- **Live Mode**:
+  - Use `netstat -ano` to retrieve active connections with the `ESTABLISHED` state.
+  - Filter out local/private IPs (e.g., 10.*, 172.16-31.*, 192.168.*, 127.*, ::1, 0.0.0.0).
+  - For each valid IP, query `http://ip-api.com/json/{ip}` to retrieve geolocation data (country, ISP, org, city, lat, lon).
+  - Limit API requests to 45 per minute to avoid rate limiting, with a 60-second pause if exceeded.
+  - Retrieve process names using `tasklist /FO CSV`.
+  - Retrieve executable paths using `wmic process where ProcessId={pid} get ExecutablePath` or PowerShell fallback (`Get-Process -Id {pid} | Select-Object -ExpandProperty Path`).
+  - Retrieve process signature status using PowerShell (`Get-Process -Id {pid} | Get-AuthenticodeSignature | Select-Object -ExpandProperty Status`).
+- **Test Mode**:
+  - Use predefined mock connections from `window.config.testConnections`.
+  - Simulate scanning progress with a 50ms delay per connection.
+- **Risk Evaluation**:
+  - Mark a connection as risky if its IP is in banned IPs, its country is in risky countries, or its ISP/organization contains a risky provider, unless the IP is in trusted IPs.
+  - Mark a process as suspicious based on the evaluation logic in `evaluateProcessLocation` (see below).
+- **Process Evaluation**:
+  - Check if the process is in the user-defined trusted processes list (by name or path).
+  - For system processes (e.g., svchost.exe, lsass.exe) without a path, consider them legitimate.
+  - If no path is available, mark as suspicious with reason "No executable path found."
+  - For known processes (e.g., chrome.exe, firefox.exe), verify the path against predefined regex patterns in `window.config.processLocations`.
+  - Apply scoring:
+    - +100 for matching expected path.
+    - -50 for svchost.exe, cmd.exe, or rundll32.exe in unexpected paths.
+    - +80 for paths in legitimate subfolders (e.g., AppData\Local\Programs, Steam, EpicGamesLauncher).
+    - -30 for paths in suspicious folders (e.g., Temp, Downloads).
+    - +80 for valid signatures, -20 for unsigned processes.
+    - +20 for paths seen more than 3 times (`pathRecurrence`).
+    - +50 for processes seen in non-risky history scans more than 5 times.
+  - Mark as suspicious if score < 50, with reasons "Suspicious executable path" (score < 0) or "Unexpected executable path" (score ≥ 0).
+- **Alerts**:
+  - Play an alert sound (`../res/alert.mp3`) for the first risky or suspicious connection in a scan.
+  - Display a warning message for each risky connection (`Risky connection detected for IP {ip}`) or suspicious process (`Suspicious process: {processName} at {executablePath} ({reason})`).
+
+##### 4.3 History Management
+- Store scan results in `history.json` with:
+  - Timestamp (ISO format).
+  - Connections array (same structure as live/test mode).
+  - Total connections count.
+  - Risky connections count (risky or suspicious).
+- Limit history file size to the user-configured `maxHistorySize` (MB), removing oldest scans if exceeded.
+- Allow clearing the history file.
+- Support exporting history as:
+  - JSON: Direct copy of `history.json`.
+  - CSV: With headers `scanDate,totalConnections,riskyConnections,ip,country,isp,org,pid,processName,isRisky` and one row per connection per scan.
+- Show a file save dialog for exports, defaulting to the downloads folder with a filename like `network-history-YYYY-MM-DD`.
+
+##### 4.4 Configuration Management
+- Store user settings in `config.json` with fields:
+  - `riskyCountries`, `bannedIPs`, `trustedIPs`, `riskyProviders`, `trustedProcesses`, `intervalMin`, `maxHistorySize`, `isDarkMode`, `language`, `periodicScan`, `scanMode`.
+- Load defaults from `window.config.DEFAULT_CONFIG` if `config.json` is missing or empty.
+- Save settings automatically whenever they change.
+- Provide default values:
+  - Risky countries: Iran, Bangladesh, Venezuela, Honduras, Algeria, Nigeria, India, Panama, Thailand, Belarus, Kenya, South Africa, Ghana.
+  - Banned IPs: Empty.
+  - Trusted IPs: Empty.
+  - Risky providers: Choopa, LeaseWeb, QuadraNet, Ecatel, Sharktech, HostSailor, M247, WorldStream.
+  - Trusted processes: Empty.
+  - Interval: 30 minutes.
+  - Max history size: 10 MB.
+  - Dark mode: False.
+  - Language: English.
+  - Periodic scan: True.
+  - Scan mode: Live.
+
+##### 4.5 Internationalization
+- Load translations from `../data/translations.json`.
+- Support languages: English, French.
+- Fall back to English with hardcoded translations if `translations.json` fails to load.
+- Update UI dynamically when the language changes.
+- Use i18next for translation with keys like `appTitle`, `check`, `risky`, etc.
+
+##### 4.6 Styling and Themes
+- Support light and dark themes, toggled via the Settings tab.
+- Apply styles from `index.css`:
+  - Light theme: White background, black text.
+  - Dark theme: Dark gray background (#1e1e1e), white text.
+  - Responsive layout with flexbox, full viewport height.
+  - Styled buttons, tables, inputs, and tabs with hover effects.
+  - Error/warning/success/info messages with distinct colors and backgrounds.
+  - Progress bar with animated fill.
+  - Map container with centered, responsive image and absolute-positioned pins.
+
+#### 5. Non-Functional Requirements
+- **Platform**: Windows (due to use of `netstat`, `wmic`, and PowerShell).
+- **Performance**: Scans should complete within a reasonable time, with delays for API rate limits (100ms between requests, 60s pause after 45 requests).
+- **Security**: Use context isolation and disable node integration in Electron for secure IPC communication.
+- **Usability**: Interface must be intuitive, with clear feedback for actions and errors.
+- **Scalability**: Handle up to 100 simultaneous connections efficiently.
+- **Maintainability**: Code should be modular, with separate files for configuration, UI components, and utilities.
+
+#### 6. External Dependencies
+- **Electron**: For desktop application framework.
+- **React**: For UI components.
+- **i18next**: For internationalization.
+- **Axios**: For HTTP requests to the IP-API.
+- **Babel**: For JSX transformation.
+- **electron-builder**: For building the application.
+- **Map Image**: Mercator projection image (`../res/map.jpg`).
+- **Alert Sound**: Audio file (`../res/alert.mp3`).
+
+#### 7. Constraints
+- The application relies on `ip-api.com` for geolocation, which has a rate limit of 45 requests per minute.
+- Process path and signature checks are Windows-specific (using `wmic` and PowerShell).
+- The map image must be a Mercator projection for accurate coordinate mapping.
+- History size is limited by disk space and user-configured `maxHistorySize`.
+
+#### 8. Assumptions
+- Users have internet access for geolocation queries in live mode.
+- The system has `netstat`, `wmic`, and PowerShell available.
+- The `translations.json` file exists and contains valid translations for supported languages.
+- The map image and alert sound files are present in the `res` directory.
+
+This SRS provides a comprehensive guide for a developer to replicate the Network Checker with all its functionalities, ensuring a consistent user experience and robust feature set.

@@ -1,0 +1,46 @@
+.container {
+  margin-top: 16px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+}
+
+.table th,
+.table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  background-color: var(--background);
+  font-weight: bold;
+}
+
+.table tr:hover {
+  background-color: var(--border);
+}
+
+.risky {
+  color: var(--error);
+  font-weight: bold;
+}
+
+.suspicious {
+  color: var(--warning);
+  font-weight: bold;
+}
+
+.safe {
+  color: var(--success);
+}
+
+.empty {
+  text-align: center;
+  padding: 16px;
+  color: var(--text);
+}
