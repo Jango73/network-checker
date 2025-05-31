@@ -9,64 +9,100 @@ The **Network Checker** is a slick desktop app that keeps on eye on your compute
 - **Spots Risks**: Alerts you if a connection hits a risky country, IP, or provider you’ve flagged.
 - **Tracks History**: Saves past scans and lets you expand details right in the table for a quick look.
 - **Customizable**: You set what’s risky (countries, IPs, providers) and how often to scan.
-- **User-Friendly**: Supports 9 languages (English, French, Spanish, etc.), dark mode, and a clean interface.
+- **User-Friendly**: Supports 10 languages (English, French, Spanish, Russian, Chinese, etc.), dark mode, and a clean interface.
 
 Just click “Check Now,” and it’ll tell you if your network’s all good or if something’s fishy.
 
 ## How It Works (For Techies)
 
 The **Network Checker** is an Electron-based desktop app for monitoring network connections, built with React for a responsive UI and external APIs for IP analysis.
+It is meant to run on Windows but could be extended to Linux by adding the necessary process information in the relevant arrays.
 
-### Technical Features:
-- **Connection Scanning**: Uses `netstat` (via Electron’s `child_process`) to grab active TCP connections in the `ESTABLISHED` state.
-- **IP Analysis**: Queries `ip-api.com` for details like country, ISP, organization, and geolocation (latitude/longitude).
-- **Risk Detection**: Flags connections based on user-defined lists (banned IPs, risky countries, or providers).
-- **History Management**: Stores scans in a JSON file with a configurable size limit (default: 10 MB). View details inline with expandable table rows.
-- **Export Options**: Export history as JSON or CSV using Electron’s file dialogs.
-- **User Interface**:
-  - **React**: Drives the UI with tabs (Main, Map, History, Settings, About) and dynamic components.
-  - **i18next**: Powers internationalization for 9 languages (en, fr, it, de, es, el, ru, zh, ko) via `translations.json`.
-  - **Dark Mode**: Toggled with CSS (`index.css`) using `light` and `dark` classes.
-- **Configuration**: Persists settings (scan interval, risky lists, etc.) in a JSON file via Electron’s `fs` API.
-- **Validation**: Checks for valid IPs and provider names to avoid user errors.
-- **Performance**: Limits API requests to 45 per minute to respect `ip-api.com`’s free-tier cap, with delays as needed.
-- **Map Visualization**: Displays connections on a world map using geolocation data (in the Map tab).
+### Tech Stack
+- **Electron**: Powers the desktop app, handling the main process (Node.js) and renderer process (React).
+- **TypeScript**: Ensures type safety across the board.
+- **React**: Drives the UI in the renderer process, with hooks and components for a smooth user experience.
+- **Vite**: Handles fast builds and dev server for the frontend.
+- **Zustand**: Lightweight state management for the renderer process.
+- **i18next**: Manages internationalization for multi-language support.
+- **Axios**: Used for potential API calls (e.g., geolocation lookups).
+- **ESLint + Prettier**: Keeps the code clean and consistent.
+- **Electron Builder**: Packages the app for Windows (NSIS target).
 
-### Architecture:
-- **Key Files**:
-  - `src/index.html`: Entry point for the React UI, orchestrates scanning, config, and history.
-  - `src/index.css`: Styles the app, including dark mode and table layouts.
-  - `src/main.js`: Electron main process, handles window creation and IPC.
-  - `src/preload.js`: Secures IPC communication between renderer and main processes.
-  - `src/Tabs.js`: Defines React components for each tab (Main, Map, History, Settings, About).
-  - `src/utils.js`: Contains utility functions for scanning, validation, and history/export handling.
-  - `src/config.js`: Stores default configuration and constants (e.g., risky countries, regex for IPs).
-  - `src/Map.js`: Renders the network map visualization using connection geolocation data.
-  - `data/translations.json`: Holds translations for i18n support.
-- **Dependencies**:
-  - Electron: Desktop app framework.
-  - React, ReactDOM: UI rendering.
-  - Axios: HTTP requests to `ip-api.com`.
-  - i18next: Language support.
-  - Babel: JSX transpilation.
+### Project Structure
+```
+network-checker/
+├── src/
+│   ├── main/               # Electron main process (Node.js)
+│   │   ├── index.ts        # Entry point, creates BrowserWindow
+│   │   ├── preload.ts      # Secure bridge between main and renderer
+│   │   ├── services/       # Core logic for netstat, processes, config, history
+│   │   ├── utils/          # Helper functions (e.g., IP validation)
+│   │   └── ipc/            # IPC handlers for main-renderer communication
+│   ├── renderer/           # React frontend
+│   │   ├── components/     # Reusable UI components (e.g., ConnectionTable)
+│   │   ├── hooks/          # Custom hooks for config, history, scanning, i18n
+│   │   ├── pages/          # Main views: MainPage, MapPage, HistoryPage, SettingsPage
+│   │   ├── store/          # Zustand store for state management
+│   │   ├── styles/         # Global and module-specific CSS
+│   │   └── types/          # TypeScript type definitions for renderer
+│   ├── shared/             # Shared configs (e.g., defaultConfig.ts)
+│   └── types/              # Shared TypeScript types (connection, config, history)
+├── dist/                   # Build output
+├── .eslintrc.json          # ESLint config
+├── .prettierrc             # Prettier config
+├── package.json            # Dependencies and scripts
+├── tsconfig.json           # TypeScript config
+└── vite.config.ts          # Vite config for renderer
+```
 
-### Getting Started:
-1. Clone the repo: `git clone <repo-url>`.
-2. Install dependencies: `npm install`.
-3. Start the app: `npm start`.
-4. (Optional) Build an executable: `npm run build`.
+### How It Works
+1. **Main Process** (`src/main/`):
+   - **index.ts**: Sets up the Electron app, creates the `BrowserWindow`, and loads the renderer (dev: `localhost:5173`, prod: `index.html`).
+   - **preload.ts**: Exposes a secure `electron` API to the renderer via `contextBridge`, restricting IPC to specific channels (e.g., `run-netstat`, `load-config`).
+   - **services/**:
+     - `NetstatService.ts`: Runs `netstat -ano` to fetch active connections, parsing them into `Connection` objects (protocol, IPs, ports, PID).
+     - `ProcessService.ts`: Gets process details (name, path, signature status) using `tasklist` and `wmic` commands.
+     - `ConfigService.ts`: Manages `config.json` for user settings (banned IPs, trusted processes, etc.).
+     - `HistoryService.ts`: Handles `history.json` for storing and exporting scan history (JSON/CSV).
+   - **ipc/index.ts**: Defines IPC handlers to bridge main and renderer processes, ensuring secure communication.
 
-### Limitations:
-- `ip-api.com` free tier caps requests at 45 per minute.
-- Requires system permissions to run `netstat`.
-- Only monitors TCP connections (no UDP support yet).
-- Map visualization depends on `ip-api.com` geolocation accuracy.
+2. **Renderer Process** (`src/renderer/`):
+   - **index.tsx**: Entry point for React, initializes i18next and renders the `App` component.
+   - **pages/**:
+     - `MainPage.tsx`: Displays a control panel with a scan button, periodic scan toggle, and a `ConnectionTable` showing scan results.
+     - `MapPage.tsx`: Renders a canvas with a world map (`map.jpg`) and plots connections as pins (red for risky, green for safe) using Mercator projection.
+     - `HistoryPage.tsx`: Shows scan history with expandable entries and export options (JSON/CSV).
+     - `SettingsPage.tsx`: Allows users to manage banned IPs, risky countries/providers, trusted IPs/processes, and app settings (language, theme, scan interval).
+   - **hooks/**:
+     - `useConfig.ts`: Loads/saves config via IPC and syncs with Zustand store.
+     - `useHistory.ts`: Manages scan history (load, save, export, clear) via IPC.
+     - `useScan.ts`: Handles network scanning logic, integrating with `NetstatService` and geolocation lookups.
+     - `useI18n.ts`: Wraps i18next for translations.
+   - **store/index.ts**: Centralized Zustand store for config, connections, scan results, history, and messages.
 
-### Future Improvements:
-- Add confirmation prompts for resetting settings or clearing history.
-- Integrate additional IP analysis APIs for redundancy.
-- Enhance map visualization with interactive features (e.g., click to filter connections).
-- Support UDP connection monitoring.
+3. **Key Features**:
+   - **Network Scanning**: Uses `netstat` to list active TCP/UDP connections, enriched with process details and geolocation data (IP, country, city, etc.).
+   - **Risk Detection**: Flags connections as risky/suspicious based on user-defined banned IPs, risky countries/providers, or untrusted processes.
+   - **History Management**: Stores scan results in `history.json`, with size limits and export options.
+   - **Interactive Map**: Visualizes connections on a world map with clustering for nearby points and tooltips for details.
+   - **Configurability**: Users can tweak settings like scan intervals, trusted IPs/processes, and risky countries via a settings page.
+   - **i18n**: Supports multiple languages (English, French, Spanish, etc.) via i18next.
+   - **Theming**: Light/dark mode toggle with CSS variables.
 
-### License:
-Licensed under the GNU General Public License v3.0 (GPLv3). See `LICENSE` for details.
+4. **Build & Run**:
+   - **Dev**: `npm run dev` for Vite dev server, `npm run start` to launch Electron.
+   - **Build**: `npm run build` compiles TypeScript and Vite, then uses Electron Builder to package for Windows.
+   - **Lint/Format**: `npm run lint` and `npm run format` for code quality.
+
+### Getting Started
+1. Clone the repo: `git clone https://github.com/Jango73/network-checker.git`
+2. Install dependencies: `npm install`
+3. Run in dev mode: `npm run dev` or `npm run start`
+4. Build for production: `npm run build`
+
+### Notes for Devs
+- **Security**: IPC channels are restricted to prevent unauthorized access. `contextIsolation` and `nodeIntegration: false` are enabled.
+- **Extensibility**: Add new IPC channels in `preload.ts` and `ipc/index.ts` for new features. Extend `Config` and `HistoryEntry` types as needed.
+- **Geolocation**: The app assumes external API calls for geolocation (not shown in code). Integrate with services like IP-API or MaxMind for real-world use.
+- **Performance**: History trimming ensures `history.json` stays under `maxHistorySize` (default 10MB).
