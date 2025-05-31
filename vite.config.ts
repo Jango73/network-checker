@@ -31,6 +31,7 @@ export default defineConfig({
           alias: {
             '@main': path.resolve(__dirname, 'src/main'),
             '@renderer': path.resolve(__dirname, 'src/renderer'),
+            '@shared': path.resolve(__dirname, 'src/shared'),
             '@types': path.resolve(__dirname, 'src/types'),
             '@assets': path.resolve(__dirname, 'src/renderer/assets'),
           },
@@ -43,6 +44,7 @@ export default defineConfig({
     alias: {
       '@renderer': path.resolve(__dirname, 'src/renderer'),
       '@main': path.resolve(__dirname, 'src/main'),
+      '@shared': path.resolve(__dirname, 'src/shared'),
       '@types': path.resolve(__dirname, 'src/types'),
       '@assets': path.resolve(__dirname, 'src/renderer/assets'),
     },
