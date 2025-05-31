@@ -13,7 +13,9 @@
     },
     "files": [
       "dist/main/**/*",
-      "dist/renderer/**/*"
+      "dist/renderer/**/*",
+      "dist/shared/**/*",
+      "dist/assets/**/*"
     ],
     "win": {
       "target": "nsis"
