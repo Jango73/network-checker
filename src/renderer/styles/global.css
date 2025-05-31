@@ -2,26 +2,30 @@
 :root {
   --background: #ffffff;
   --text: #333333;
-  --primary: #007bff;
+  --primary: #0060C0;
+  --primary-hover: #0060C0;
   --secondary: #6c757d;
-  --error: #dc3545;
-  --success: #28a745;
+  --error: #e02020;
+  --error-hover: #c02020;
+  --success: #30b040;
   --warning: #ffc107;
   --border: #dee2e6;
-  --card-bg: #f8f9fa;
+  --card-bg: #f0f0f0;
 }
 
 /* Variables CSS for dark theme */
 .dark {
   --background: #1a1a1a;
   --text: #e0e0e0;
-  --primary: #66b0ff;
+  --primary: #60b0f0;
+  --primary-hover: #50a0d0;
   --secondary: #adb5bd;
-  --error: #ff6b6b;
-  --success: #51cf66;
+  --error: #e02020;
+  --error-hover: #c02020;
+  --success: #30b040;
   --warning: #ff922b;
   --border: #495057;
-  --card-bg: #2c2c2c;
+  --card-bg: #303030;
 }
 
 /* Global styles */
@@ -53,7 +57,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Centralized control styles */
 button {
   background-color: var(--primary);
   color: #ffffff;
@@ -66,7 +69,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: var(--primary-hover);
 }
 
 button:disabled {
@@ -79,12 +82,12 @@ button.danger {
 }
 
 button.danger:hover:not(:disabled) {
-  background-color: #c82333;
+  background-color: var(--error-hover);
 }
 
 button.active {
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--text);
 }
 
 input,
