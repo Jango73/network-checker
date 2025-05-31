@@ -6,7 +6,7 @@ import { registerIpcHandlers } from './ipc';
 // Create main application window
 function createWindow() {
   const preloadPath = path.join(__dirname, 'preload.js');
-  
+
   // Verify if preload file exists
   if (!fs.existsSync(preloadPath)) {
     throw new Error(`Preload script not found at ${preloadPath}`);
@@ -20,7 +20,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
   });
 
   // Ensure IPC handlers are registered before loading the window

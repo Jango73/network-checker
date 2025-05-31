@@ -41,7 +41,10 @@ export default function HistoryPage() {
       <div className={styles.controls}>
         <button onClick={() => handleExport('json')}>{t('exportJSON')}</button>
         <button onClick={() => handleExport('csv')}>{t('exportCSV')}</button>
-        <button className={`${styles.clearButton} danger`} onClick={handleClearHistory}>
+        <button
+          className={`${styles.clearButton} danger`}
+          onClick={handleClearHistory}
+        >
           {t('clearHistory')}
         </button>
       </div>
@@ -49,7 +52,7 @@ export default function HistoryPage() {
         <p className={styles.empty}>{t('noHistory')}</p>
       ) : (
         <ul className={styles.list}>
-          {history.map((entry) => {
+          {history.map(entry => {
             const uniqueKey = `${entry.timestamp}-${entry.ip}`;
             return (
               <li key={uniqueKey} className={styles.entry}>
@@ -63,8 +66,8 @@ export default function HistoryPage() {
                     {entry.isRisky
                       ? t('risky')
                       : entry.isSuspicious
-                      ? `${t('suspicious')} (${entry.suspicionReason})`
-                      : t('safe')}
+                        ? `${t('suspicious')} (${entry.suspicionReason})`
+                        : t('safe')}
                   </span>
                 </div>
                 {expandedEntry === uniqueKey && (
@@ -82,11 +85,12 @@ export default function HistoryPage() {
                       <strong>{t('provider')}:</strong> {entry.provider || '-'}
                     </p>
                     <p>
-                      <strong>{t('organization')}:</strong> {entry.organization || '-'}
+                      <strong>{t('organization')}:</strong>{' '}
+                      {entry.organization || '-'}
                     </p>
                     <p>
-                      <strong>{t('coordinates')}:</strong> Lat: {entry.lat || '-'}, Lon:{' '}
-                      {entry.lon || '-'}
+                      <strong>{t('coordinates')}:</strong> Lat:{' '}
+                      {entry.lat || '-'}, Lon: {entry.lon || '-'}
                     </p>
                     <p>
                       <strong>{t('pid')}:</strong> {entry.pid}
@@ -95,11 +99,13 @@ export default function HistoryPage() {
                       <strong>{t('process')}:</strong> {entry.process || '-'}
                     </p>
                     <p>
-                      <strong>{t('processPath')}:</strong> {entry.processPath || '-'}
+                      <strong>{t('processPath')}:</strong>{' '}
+                      {entry.processPath || '-'}
                     </p>
                     {(entry.isRisky || entry.isSuspicious) && (
                       <p>
-                        <strong>{t('reason')}:</strong> {entry.suspicionReason || '-'}
+                        <strong>{t('reason')}:</strong>{' '}
+                        {entry.suspicionReason || '-'}
                       </p>
                     )}
                   </div>

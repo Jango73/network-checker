@@ -6,7 +6,12 @@ import { useTheme } from '@renderer/hooks/useTheme';
 import { Config } from '../../types/config';
 import styles from './SettingsPage.module.css';
 
-type ArrayConfigKeys = 'bannedIPs' | 'riskyCountries' | 'riskyProviders' | 'trustedIPs' | 'trustedProcesses';
+type ArrayConfigKeys =
+  | 'bannedIPs'
+  | 'riskyCountries'
+  | 'riskyProviders'
+  | 'trustedIPs'
+  | 'trustedProcesses';
 
 const ALL_COUNTRIES = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria',
@@ -75,7 +80,10 @@ export default function SettingsPage() {
   };
 
   const handleRemoveFromList = (key: ArrayConfigKeys, value: string) => {
-    saveConfig({ ...config, [key]: config[key].filter((item) => item !== value) });
+    saveConfig({
+      ...config,
+      [key]: config[key].filter(item => item !== value),
+    });
   };
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -86,10 +94,16 @@ export default function SettingsPage() {
     saveConfig({ ...config, scanMode: e.target.value as 'live' | 'test' });
   };
 
-  const handleNumericChange = (key: 'scanInterval' | 'maxHistorySize', value: string) => {
+  const handleNumericChange = (
+    key: 'scanInterval' | 'maxHistorySize',
+    value: string
+  ) => {
     const num = parseInt(value);
     if (!isNaN(num) && num >= 0) {
-      saveConfig({ ...config, [key]: key === 'scanInterval' ? num * 1000 : num });
+      saveConfig({
+        ...config,
+        [key]: key === 'scanInterval' ? num * 1000 : num,
+      });
     }
   };
 
@@ -97,7 +111,7 @@ export default function SettingsPage() {
   const handleCountryToggle = (country: string) => {
     const isSelected = config.riskyCountries.includes(country);
     const newRiskyCountries = isSelected
-      ? config.riskyCountries.filter((c) => c !== country)
+      ? config.riskyCountries.filter(c => c !== country)
       : [...config.riskyCountries, country];
     saveConfig({ ...config, riskyCountries: newRiskyCountries });
   };
@@ -130,12 +144,17 @@ export default function SettingsPage() {
             onChange={handleInputChange}
             placeholder={t('enterIP')}
           />
-          <button onClick={() => handleAddToList('bannedIPs', form.bannedIP)}>{t('add')}</button>
+          <button onClick={() => handleAddToList('bannedIPs', form.bannedIP)}>
+            {t('add')}
+          </button>
         </div>
         <ul className={styles.list}>
-          {config.bannedIPs.map((ip) => (
+          {config.bannedIPs.map(ip => (
             <li key={ip}>
-              {ip} <button onClick={() => handleRemoveFromList('bannedIPs', ip)}>{t('remove')}</button>
+              {ip}{' '}
+              <button onClick={() => handleRemoveFromList('bannedIPs', ip)}>
+                {t('remove')}
+              </button>
             </li>
           ))}
         </ul>
@@ -144,8 +163,11 @@ export default function SettingsPage() {
       {/* Risky Countries */}
       <section className={styles.section}>
         <h2>{t('riskyCountries')}</h2>
-        <ul className={styles.list} style={{ maxHeight: '200px', overflowY: 'auto' }}>
-          {ALL_COUNTRIES.map((country) => (
+        <ul
+          className={styles.list}
+          style={{ maxHeight: '200px', overflowY: 'auto' }}
+        >
+          {ALL_COUNTRIES.map(country => (
             <li key={country}>
               <label>
                 <input
@@ -171,12 +193,23 @@ export default function SettingsPage() {
             onChange={handleInputChange}
             placeholder={t('enterProvider')}
           />
-          <button onClick={() => handleAddToList('riskyProviders', form.riskyProvider)}>{t('add')}</button>
+          <button
+            onClick={() =>
+              handleAddToList('riskyProviders', form.riskyProvider)
+            }
+          >
+            {t('add')}
+          </button>
         </div>
         <ul className={styles.list}>
-          {config.riskyProviders.map((provider) => (
+          {config.riskyProviders.map(provider => (
             <li key={provider}>
-              {provider} <button onClick={() => handleRemoveFromList('riskyProviders', provider)}>{t('remove')}</button>
+              {provider}{' '}
+              <button
+                onClick={() => handleRemoveFromList('riskyProviders', provider)}
+              >
+                {t('remove')}
+              </button>
             </li>
           ))}
         </ul>
@@ -193,12 +226,17 @@ export default function SettingsPage() {
             onChange={handleInputChange}
             placeholder={t('enterIP')}
           />
-          <button onClick={() => handleAddToList('trustedIPs', form.trustedIP)}>{t('add')}</button>
+          <button onClick={() => handleAddToList('trustedIPs', form.trustedIP)}>
+            {t('add')}
+          </button>
         </div>
         <ul className={styles.list}>
-          {config.trustedIPs.map((ip) => (
+          {config.trustedIPs.map(ip => (
             <li key={ip}>
-              {ip} <button onClick={() => handleRemoveFromList('trustedIPs', ip)}>{t('remove')}</button>
+              {ip}{' '}
+              <button onClick={() => handleRemoveFromList('trustedIPs', ip)}>
+                {t('remove')}
+              </button>
             </li>
           ))}
         </ul>
@@ -215,12 +253,25 @@ export default function SettingsPage() {
             onChange={handleInputChange}
             placeholder={t('enterProcess')}
           />
-          <button onClick={() => handleAddToList('trustedProcesses', form.trustedProcess)}>{t('add')}</button>
+          <button
+            onClick={() =>
+              handleAddToList('trustedProcesses', form.trustedProcess)
+            }
+          >
+            {t('add')}
+          </button>
         </div>
         <ul className={styles.list}>
-          {config.trustedProcesses.map((process) => (
+          {config.trustedProcesses.map(process => (
             <li key={process}>
-              {process} <button onClick={() => handleRemoveFromList('trustedProcesses', process)}>{t('remove')}</button>
+              {process}{' '}
+              <button
+                onClick={() =>
+                  handleRemoveFromList('trustedProcesses', process)
+                }
+              >
+                {t('remove')}
+              </button>
             </li>
           ))}
         </ul>
@@ -229,7 +280,10 @@ export default function SettingsPage() {
       {/* Appearance */}
       <section className={styles.section}>
         <h2>{t('appearance')}</h2>
-        <button onClick={toggleTheme} style={{ padding: '8px 16px', width: 'auto' }}>
+        <button
+          onClick={toggleTheme}
+          style={{ padding: '8px 16px', width: 'auto' }}
+        >
           {t('toggleDarkMode')}
         </button>
       </section>
@@ -261,7 +315,7 @@ export default function SettingsPage() {
               type="number"
               name="scanInterval"
               value={form.scanInterval}
-              onChange={(e) => {
+              onChange={e => {
                 setForm({ ...form, scanInterval: e.target.value });
                 handleNumericChange('scanInterval', e.target.value);
               }}
@@ -277,7 +331,7 @@ export default function SettingsPage() {
               type="number"
               name="maxHistorySize"
               value={form.maxHistorySize}
-              onChange={(e) => {
+              onChange={e => {
                 setForm({ ...form, maxHistorySize: e.target.value });
                 handleNumericChange('maxHistorySize', e.target.value);
               }}
@@ -306,7 +360,12 @@ export default function SettingsPage() {
       <section className={styles.section}>
         <h2>{t('dangerZone')}</h2>
         <div className={styles.inputGroup}>
-          <button className={`${styles.resetButton} danger`} onClick={handleReset}>{t('resetSettings')}</button>
+          <button
+            className={`${styles.resetButton} danger`}
+            onClick={handleReset}
+          >
+            {t('resetSettings')}
+          </button>
         </div>
       </section>
     </div>

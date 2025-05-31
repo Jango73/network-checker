@@ -14,7 +14,10 @@ export class HistoryService {
       const data = await fs.readFile(HISTORY_PATH, 'utf-8');
       const history = JSON.parse(data) as HistoryEntry[];
       // Sort history by timestamp in descending order
-      return history.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      return history.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
         await this.saveHistory([]);
@@ -29,27 +32,46 @@ export class HistoryService {
    * @param entries Array of history entries to save.
    * @param maxSize Maximum size of history file in MB.
    */
-  async saveHistory(entries: HistoryEntry[], maxSize: number = 10): Promise<void> {
+  async saveHistory(
+    entries: HistoryEntry[],
+    maxSize: number = 10
+  ): Promise<void> {
     try {
       // Sort entries by timestamp in descending order before saving
-      const sortedEntries = entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const sortedEntries = entries.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
       const data = JSON.stringify(sortedEntries, null, 2);
       const sizeInMB = Buffer.byteLength(data, 'utf8') / (1024 * 1024);
 
       if (sizeInMB > maxSize) {
         // Calculate total and risky connections for trimming
-        const groupedByScan = sortedEntries.reduce((acc, entry) => {
-          const scanDate = entry.timestamp.split('T')[0];
-          if (!acc[scanDate]) {
-            acc[scanDate] = { entries: [], totalConnections: 0, riskyConnections: 0};
+        const groupedByScan = sortedEntries.reduce(
+          (acc, entry) => {
+            const scanDate = entry.timestamp.split('T')[0];
+            if (!acc[scanDate]) {
+              acc[scanDate] = {
+                entries: [],
+                totalConnections: 0,
+                riskyConnections: 0,
+              };
+            }
+            acc[scanDate].entries.push(entry);
+            acc[scanDate].totalConnections++;
+            if (entry.isRisky || entry.isSuspicious) {
+              acc[scanDate].riskyConnections++;
+            }
+            return acc;
+          },
+          {} as {
+            [key: string]: {
+              entries: HistoryEntry[];
+              totalConnections: number;
+              riskyConnections: number;
+            };
           }
-          acc[scanDate].entries.push(entry);
-          acc[scanDate].totalConnections++;
-          if (entry.isRisky || entry.isSuspicious) {
-            acc[scanDate].riskyConnections++;
-          }
-          return acc;
-        }, {} as { [key: string]: { entries: HistoryEntry[]; totalConnections: number; riskyConnections: number } });
+        );
 
         // Sort scans by date and keep newest until within size limit
         const sortedScans = Object.keys(groupedByScan).sort().reverse();
@@ -57,7 +79,9 @@ export class HistoryService {
         const trimmedEntries: HistoryEntry[] = [];
         for (const scanDate of sortedScans) {
           const scanEntries = groupedByScan[scanDate].entries;
-          const scanSize = Buffer.byteLength(JSON.stringify(scanEntries), 'utf8') / (1024 * 1024);
+          const scanSize =
+            Buffer.byteLength(JSON.stringify(scanEntries), 'utf8') /
+            (1024 * 1024);
           if (totalSize + scanSize <= maxSize) {
             trimmedEntries.push(...scanEntries);
             totalSize += scanSize;
@@ -65,7 +89,10 @@ export class HistoryService {
             break;
           }
         }
-        await fs.writeFile(HISTORY_PATH, JSON.stringify(trimmedEntries, null, 2));
+        await fs.writeFile(
+          HISTORY_PATH,
+          JSON.stringify(trimmedEntries, null, 2)
+        );
       } else {
         await fs.writeFile(HISTORY_PATH, data);
       }
@@ -90,7 +117,10 @@ export class HistoryService {
    * @param format Export format ('json' or 'csv').
    * @param outputPath Path to save the exported file.
    */
-  async exportHistory(format: 'json' | 'csv', outputPath: string): Promise<void> {
+  async exportHistory(
+    format: 'json' | 'csv',
+    outputPath: string
+  ): Promise<void> {
     try {
       const entries = await this.loadHistory();
 
@@ -115,23 +145,37 @@ export class HistoryService {
           'isSuspicious',
           'suspicionReason',
         ];
-        const groupedByScan = entries.reduce((acc, entry) => {
-          const scanDate = entry.timestamp.split('T')[0];
-          if (!acc[scanDate]) {
-            acc[scanDate] = { entries: [], totalConnections: 0, riskyConnections: 0 };
+        const groupedByScan = entries.reduce(
+          (acc, entry) => {
+            const scanDate = entry.timestamp.split('T')[0];
+            if (!acc[scanDate]) {
+              acc[scanDate] = {
+                entries: [],
+                totalConnections: 0,
+                riskyConnections: 0,
+              };
+            }
+            acc[scanDate].entries.push(entry);
+            acc[scanDate].totalConnections++;
+            if (entry.isRisky || entry.isSuspicious) {
+              acc[scanDate].riskyConnections++;
+            }
+            return acc;
+          },
+          {} as {
+            [key: string]: {
+              entries: HistoryEntry[];
+              totalConnections: number;
+              riskyConnections: number;
+            };
           }
-          acc[scanDate].entries.push(entry);
-          acc[scanDate].totalConnections++;
-          if (entry.isRisky || entry.isSuspicious) {
-            acc[scanDate].riskyConnections++;
-          }
-          return acc;
-        }, {} as { [key: string]: { entries: HistoryEntry[]; totalConnections: number; riskyConnections: number } });
+        );
 
         const rows: string[] = [];
         for (const scanDate of Object.keys(groupedByScan)) {
-          const { entries, totalConnections, riskyConnections } = groupedByScan[scanDate];
-          entries.forEach((entry) => {
+          const { entries, totalConnections, riskyConnections } =
+            groupedByScan[scanDate];
+          entries.forEach(entry => {
             rows.push(
               [
                 scanDate,
@@ -151,8 +195,8 @@ export class HistoryService {
                 entry.isSuspicious.toString(),
                 entry.suspicionReason || '',
               ]
-                .map((val) => `"${val.replace(/"/g, '""')}"`)
-                .join(','),
+                .map(val => `"${val.replace(/"/g, '""')}"`)
+                .join(',')
             );
           });
         }

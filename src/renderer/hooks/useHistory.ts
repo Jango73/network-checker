@@ -17,7 +17,10 @@ export const useHistory = () => {
         throw new Error(response.error);
       }
     } catch (error) {
-      addMessage('error', `Failed to load history: ${(error as Error).message}`);
+      addMessage(
+        'error',
+        `Failed to load history: ${(error as Error).message}`
+      );
     }
   }, [setHistory, addMessage]);
 
@@ -28,7 +31,7 @@ export const useHistory = () => {
   const saveHistory = useCallback(
     async (results: any[]) => {
       try {
-        const entries: HistoryEntry[] = results.map((result) => ({
+        const entries: HistoryEntry[] = results.map(result => ({
           timestamp: new Date().toISOString(),
           ip: result.ip,
           country: result.country || '',
@@ -49,7 +52,7 @@ export const useHistory = () => {
         const response = await window.electron.ipcRenderer.invoke(
           'save-history',
           updatedHistory,
-          config.maxHistorySize,
+          config.maxHistorySize
         );
         if (response.success) {
           setHistory(updatedHistory);
@@ -58,10 +61,13 @@ export const useHistory = () => {
           throw new Error(response.error);
         }
       } catch (error) {
-        addMessage('error', `Failed to save history: ${(error as Error).message}`);
+        addMessage(
+          'error',
+          `Failed to save history: ${(error as Error).message}`
+        );
       }
     },
-    [history, setHistory, addMessage, config.maxHistorySize],
+    [history, setHistory, addMessage, config.maxHistorySize]
   );
 
   /**
@@ -69,7 +75,8 @@ export const useHistory = () => {
    */
   const clearHistory = useCallback(async () => {
     try {
-      const response = await window.electron.ipcRenderer.invoke('clear-history');
+      const response =
+        await window.electron.ipcRenderer.invoke('clear-history');
       if (response.success) {
         setHistory([]);
         addMessage('success', 'History cleared successfully');
@@ -77,7 +84,10 @@ export const useHistory = () => {
         throw new Error(response.error);
       }
     } catch (error) {
-      addMessage('error', `Failed to clear history: ${(error as Error).message}`);
+      addMessage(
+        'error',
+        `Failed to clear history: ${(error as Error).message}`
+      );
     }
   }, [setHistory, addMessage]);
 
@@ -89,17 +99,27 @@ export const useHistory = () => {
   const exportHistory = useCallback(
     async (format: 'json' | 'csv', outputPath: string) => {
       try {
-        const response = await window.electron.ipcRenderer.invoke('export-history', format, outputPath);
+        const response = await window.electron.ipcRenderer.invoke(
+          'export-history',
+          format,
+          outputPath
+        );
         if (response.success) {
-          addMessage('success', `History exported successfully to ${outputPath}`);
+          addMessage(
+            'success',
+            `History exported successfully to ${outputPath}`
+          );
         } else {
           throw new Error(response.error);
         }
       } catch (error) {
-        addMessage('error', `Failed to export history: ${(error as Error).message}`);
+        addMessage(
+          'error',
+          `Failed to export history: ${(error as Error).message}`
+        );
       }
     },
-    [addMessage],
+    [addMessage]
   );
 
   // Load history when the hook is first used

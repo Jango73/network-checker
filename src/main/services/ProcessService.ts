@@ -18,13 +18,19 @@ export class ProcessService {
    */
   async getProcessName(pid: number): Promise<string> {
     try {
-      const { stdout } = await execAsync(`tasklist /FI "PID eq ${pid}" /FO CSV`);
-      const lines = stdout.split('\n').filter((line) => line.includes(`"${pid}"`));
+      const { stdout } = await execAsync(
+        `tasklist /FI "PID eq ${pid}" /FO CSV`
+      );
+      const lines = stdout
+        .split('\n')
+        .filter(line => line.includes(`"${pid}"`));
       if (lines.length === 0) return '';
       const [name] = lines[0].split('","');
       return name ? name.replace(/^"/, '') : '';
     } catch (error) {
-      throw new Error(`Failed to get process name for PID ${pid}: ${(error as Error).message}`);
+      throw new Error(
+        `Failed to get process name for PID ${pid}: ${(error as Error).message}`
+      );
     }
   }
 
@@ -35,11 +41,15 @@ export class ProcessService {
    */
   async getProcessPath(pid: number): Promise<string> {
     try {
-      const { stdout } = await execAsync(`wmic process where ProcessId=${pid} get ExecutablePath /VALUE`);
+      const { stdout } = await execAsync(
+        `wmic process where ProcessId=${pid} get ExecutablePath /VALUE`
+      );
       const match = stdout.match(/ExecutablePath=(.*)/);
       return match ? path.normalize(match[1].trim()) : '';
     } catch (error) {
-      throw new Error(`Failed to get process path for PID ${pid}: ${(error as Error).message}`);
+      throw new Error(
+        `Failed to get process path for PID ${pid}: ${(error as Error).message}`
+      );
     }
   }
 
@@ -53,10 +63,14 @@ export class ProcessService {
       const processPath = await this.getProcessPath(pid);
       if (!processPath) return false;
 
-      const { stdout } = await execAsync(`powershell -Command "Get-AuthenticodeSignature -FilePath '${processPath}' | Select-Object -ExpandProperty Status"`);
+      const { stdout } = await execAsync(
+        `powershell -Command "Get-AuthenticodeSignature -FilePath '${processPath}' | Select-Object -ExpandProperty Status"`
+      );
       return stdout.trim() === 'Valid';
     } catch (error) {
-      throw new Error(`Failed to verify signature for PID ${pid}: ${(error as Error).message}`);
+      throw new Error(
+        `Failed to verify signature for PID ${pid}: ${(error as Error).message}`
+      );
     }
   }
 

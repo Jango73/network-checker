@@ -3,12 +3,29 @@ import { Config } from '../types/config';
 export const DEFAULT_CONFIG: Config = {
   bannedIPs: [],
   riskyCountries: [
-    'Iran', 'Bangladesh', 'Venezuela', 'Honduras', 'Algeria', 'Nigeria',
-    'India', 'Panama', 'Thailand', 'Belarus', 'Kenya', 'South Africa', 'Ghana'
+    'Iran',
+    'Bangladesh',
+    'Venezuela',
+    'Honduras',
+    'Algeria',
+    'Nigeria',
+    'India',
+    'Panama',
+    'Thailand',
+    'Belarus',
+    'Kenya',
+    'South Africa',
+    'Ghana',
   ],
   riskyProviders: [
-    'Choopa', 'LeaseWeb', 'QuadraNet', 'Ecatel', 'Sharktech',
-    'HostSailor', 'M247', 'WorldStream'
+    'Choopa',
+    'LeaseWeb',
+    'QuadraNet',
+    'Ecatel',
+    'Sharktech',
+    'HostSailor',
+    'M247',
+    'WorldStream',
   ],
   trustedIPs: [],
   trustedProcesses: [],

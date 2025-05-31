@@ -20,13 +20,13 @@ export const useI18n = () => {
         console.error('Failed to change language:', error);
       }
     },
-    [i18n, config, saveConfig],
+    [i18n, config, saveConfig]
   );
 
   // Apply language from config on mount
   useEffect(() => {
     if (config.language && i18n.language !== config.language) {
-      i18n.changeLanguage(config.language).catch((error) => {
+      i18n.changeLanguage(config.language).catch(error => {
         console.error('Failed to apply config language:', error);
       });
     }

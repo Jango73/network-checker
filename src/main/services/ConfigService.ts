@@ -20,7 +20,9 @@ export class ConfigService {
         await this.saveConfig(DEFAULT_CONFIG);
         return DEFAULT_CONFIG;
       }
-      throw new Error(`Failed to load configuration: ${(error as Error).message}`);
+      throw new Error(
+        `Failed to load configuration: ${(error as Error).message}`
+      );
     }
   }
 
@@ -32,7 +34,9 @@ export class ConfigService {
     try {
       await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2));
     } catch (error) {
-      throw new Error(`Failed to save configuration: ${(error as Error).message}`);
+      throw new Error(
+        `Failed to save configuration: ${(error as Error).message}`
+      );
     }
   }
 

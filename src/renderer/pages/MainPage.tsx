@@ -53,7 +53,13 @@ export default function MainPage() {
         {isScanning && (
           <div className={styles.progress}>
             <progress value={progress} max={100} />
-            <span>{t('scanProgress', { completed: scanResults.length, total: connections.length, percentage: Math.round(progress) })}</span>
+            <span>
+              {t('scanProgress', {
+                completed: scanResults.length,
+                total: connections.length,
+                percentage: Math.round(progress),
+              })}
+            </span>
           </div>
         )}
       </div>
@@ -65,10 +71,10 @@ export default function MainPage() {
               messages[0].type === 'error'
                 ? 'var(--error)'
                 : messages[0].type === 'success'
-                ? 'var(--success)'
-                : messages[0].type === 'warning'
-                ? 'var(--warning)'
-                : 'var(--primary)',
+                  ? 'var(--success)'
+                  : messages[0].type === 'warning'
+                    ? 'var(--warning)'
+                    : 'var(--primary)',
             color: '#fff',
             padding: '8px',
             margin: '8px 0',

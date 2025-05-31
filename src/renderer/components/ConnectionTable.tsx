@@ -24,7 +24,10 @@ export default function ConnectionTable() {
     }
   };
 
-  const handleMarkProcessAsSafe = (processPath: string, processName: string) => {
+  const handleMarkProcessAsSafe = (
+    processPath: string,
+    processName: string
+  ) => {
     if (processName && !config.trustedProcesses.includes(processPath)) {
       const newTrustedProcesses = [...config.trustedProcesses, processPath];
       saveConfig({ ...config, trustedProcesses: newTrustedProcesses });
@@ -36,7 +39,9 @@ export default function ConnectionTable() {
 
   const handleMarkCountryAsSafe = (country: string) => {
     if (country && config.riskyCountries.includes(country)) {
-      const newRiskyCountries = config.riskyCountries.filter((c) => c !== country);
+      const newRiskyCountries = config.riskyCountries.filter(
+        c => c !== country
+      );
       saveConfig({ ...config, riskyCountries: newRiskyCountries });
       addMessage('success', t('countryMarkedSafe', { country }));
     }
@@ -104,18 +109,30 @@ export default function ConnectionTable() {
                           {t('markIPAsSafe')}
                         </button>
                       )}
-                      {!config.trustedProcesses.includes(result.processPath) && (
+                      {!config.trustedProcesses.includes(
+                        result.processPath
+                      ) && (
                         <button
-                          onClick={() => handleMarkProcessAsSafe(result.processPath, result.process)}
+                          onClick={() =>
+                            handleMarkProcessAsSafe(
+                              result.processPath,
+                              result.process
+                            )
+                          }
                         >
                           {t('markProcessAsSafe')}
                         </button>
                       )}
-                      {result.country && config.riskyCountries.includes(result.country) && (
-                        <button onClick={() => handleMarkCountryAsSafe(result.country)}>
-                          {t('markCountryAsSafe')}
-                        </button>
-                      )}
+                      {result.country &&
+                        config.riskyCountries.includes(result.country) && (
+                          <button
+                            onClick={() =>
+                              handleMarkCountryAsSafe(result.country)
+                            }
+                          >
+                            {t('markCountryAsSafe')}
+                          </button>
+                        )}
                     </>
                   ) : (
                     '-'

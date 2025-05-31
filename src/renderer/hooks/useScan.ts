@@ -11,11 +11,14 @@ import { isValidIP, isLocalIP } from '@main/utils/ip';
 
 // Process locations for known processes
 const PROCESS_LOCATIONS: { [key: string]: RegExp } = {
-  'chrome.exe': /Program Files( \(x86\))?\\Google\\Chrome\\Application\\chrome\.exe$/i,
+  'chrome.exe':
+    /Program Files( \(x86\))?\\Google\\Chrome\\Application\\chrome\.exe$/i,
   'firefox.exe': /Program Files( \(x86\))?\\Mozilla Firefox\\firefox\.exe$/i,
-  'msedge.exe': /Program Files( \(x86\))?\\Microsoft\\Edge\\Application\\msedge\.exe$/i,
+  'msedge.exe':
+    /Program Files( \(x86\))?\\Microsoft\\Edge\\Application\\msedge\.exe$/i,
   'opera.exe': /Program Files( \(x86\))?\\Opera\\opera\.exe$/i,
-  'brave.exe': /Program Files( \(x86\))?\\BraveSoftware\\Brave-Browser\\Application\\brave\.exe$/i,
+  'brave.exe':
+    /Program Files( \(x86\))?\\BraveSoftware\\Brave-Browser\\Application\\brave\.exe$/i,
   'code.exe': /Program Files( \(x86\))?\\Microsoft VS Code\\Code\.exe$/i,
   'discord.exe': /AppData\\Local\\Discord\\app-[0-9.]+\.exe$/i,
   'spotify.exe': /AppData\\Roaming\\Spotify\\Spotify\.exe$/i,
@@ -26,21 +29,21 @@ const PROCESS_LOCATIONS: { [key: string]: RegExp } = {
 
 // Common system processes
 const SYSTEM_PROCESSES = [
-  'svchost.exe',    // Service Host process for Windows services
-  'lsass.exe',      // Local Security Authority process for authentication
-  'wininit.exe',    // Windows Start-Up application
-  'csrss.exe',      // Client/Server Runtime Subsystem for user-mode operations
-  'smss.exe',       // Session Manager Subsystem for session initialization
-  'winlogon.exe',   // Windows Logon process for user login
-  'dwm.exe',        // Desktop Window Manager
-  'services.exe',   // Services control process for managing Windows services
-  'taskhostw.exe',  // Task Host for Windows tasks
-  'conhost.exe',    // Console Host for command-line applications
-  'rundll32.exe',   // Runs DLLs as applications
-  'dllhost.exe',    // COM Surrogate for hosting DLLs
-  'msmpeng.exe',    // Microsoft Defender
-  'spoolsv.exe',    // Printing
-  'ctfmon.exe',     // Language
+  'svchost.exe', // Service Host process for Windows services
+  'lsass.exe', // Local Security Authority process for authentication
+  'wininit.exe', // Windows Start-Up application
+  'csrss.exe', // Client/Server Runtime Subsystem for user-mode operations
+  'smss.exe', // Session Manager Subsystem for session initialization
+  'winlogon.exe', // Windows Logon process for user login
+  'dwm.exe', // Desktop Window Manager
+  'services.exe', // Services control process for managing Windows services
+  'taskhostw.exe', // Task Host for Windows tasks
+  'conhost.exe', // Console Host for command-line applications
+  'rundll32.exe', // Runs DLLs as applications
+  'dllhost.exe', // COM Surrogate for hosting DLLs
+  'msmpeng.exe', // Microsoft Defender
+  'spoolsv.exe', // Printing
+  'ctfmon.exe', // Language
 ];
 
 // Suspicious folder patterns
@@ -86,13 +89,16 @@ const evaluateProcessLocation = (
   processPath: string,
   isSigned: boolean,
   config: Config,
-  history: History[],
+  history: History[]
 ): ProcessEvaluation => {
   let score = 0;
   let reason = '';
 
   // Check trusted processes
-  if (config.trustedProcesses.includes(processName) || config.trustedProcesses.includes(processPath)) {
+  if (
+    config.trustedProcesses.includes(processName) ||
+    config.trustedProcesses.includes(processPath)
+  ) {
     return { isSuspicious: false, reason: 'Trusted process' };
   }
 
@@ -113,17 +119,21 @@ const evaluateProcessLocation = (
   }
 
   // Specific process penalties
-  if (['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(processName.toLowerCase())) {
+  if (
+    ['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(
+      processName.toLowerCase()
+    )
+  ) {
     if (!knownProcessRegex || !knownProcessRegex.test(processPath)) {
       score -= 50;
     }
   }
 
   // Folder-based scoring
-  if (LEGITIMATE_FOLDERS.some((regex) => regex.test(processPath))) {
+  if (LEGITIMATE_FOLDERS.some(regex => regex.test(processPath))) {
     score += 80;
   }
-  if (SUSPICIOUS_FOLDERS.some((regex) => regex.test(processPath))) {
+  if (SUSPICIOUS_FOLDERS.some(regex => regex.test(processPath))) {
     score -= 30;
   }
 
@@ -138,7 +148,8 @@ const evaluateProcessLocation = (
 
   // History-based scoring
   const nonRiskyCount = history.filter(
-    (entry: History) => entry.process === processName && !entry.isRisky && !entry.isSuspicious,
+    (entry: History) =>
+      entry.process === processName && !entry.isRisky && !entry.isSuspicious
   ).length;
   if (nonRiskyCount > 5) {
     score += 50;
@@ -147,7 +158,8 @@ const evaluateProcessLocation = (
   // Final evaluation
   const isSuspicious = score < 50;
   if (isSuspicious) {
-    reason = score < 0 ? 'Suspicious executable path' : 'Unexpected executable path';
+    reason =
+      score < 0 ? 'Suspicious executable path' : 'Unexpected executable path';
   }
 
   return { isSuspicious, reason };
@@ -155,7 +167,16 @@ const evaluateProcessLocation = (
 
 export const useScan = () => {
   const { t } = useI18n();
-  const { config, connections, setConnections, addMessage, history, setScanResults, isScanning, setIsScanning } = useStore();
+  const {
+    config,
+    connections,
+    setConnections,
+    addMessage,
+    history,
+    setScanResults,
+    isScanning,
+    setIsScanning,
+  } = useStore();
   const { saveHistory } = useHistory();
 
   /**
@@ -177,7 +198,8 @@ export const useScan = () => {
       let rawConnections: Connection[] = [];
 
       if (config.scanMode === 'live') {
-        const response = await window.electron.ipcRenderer.invoke('run-netstat');
+        const response =
+          await window.electron.ipcRenderer.invoke('run-netstat');
         if (!response.success) {
           throw new Error(response.error || 'Failed to run netstat');
         }
@@ -187,7 +209,7 @@ export const useScan = () => {
             conn.state === 'ESTABLISHED' &&
             isValidIP(conn.remoteAddress) &&
             !isLocalIP(conn.remoteAddress) &&
-            conn.remoteAddress !== '::',
+            conn.remoteAddress !== '::'
         );
       } else {
         // Mock data for test mode
@@ -212,7 +234,9 @@ export const useScan = () => {
           },
         ];
         // Simulate delay for test mode
-        await new Promise((resolve) => setTimeout(resolve, rawConnections.length * 50));
+        await new Promise(resolve =>
+          setTimeout(resolve, rawConnections.length * 50)
+        );
       }
 
       setConnections(rawConnections);
@@ -226,7 +250,7 @@ export const useScan = () => {
         if (requestCount >= 45) {
           const elapsed = Date.now() - startTime;
           if (elapsed < 60000) {
-            await new Promise((resolve) => setTimeout(resolve, 60000 - elapsed));
+            await new Promise(resolve => setTimeout(resolve, 60000 - elapsed));
           }
           requestCount = 0;
           startTime = Date.now();
@@ -254,27 +278,39 @@ export const useScan = () => {
         const processPath = pathResp.data || '';
 
         if (!sigResp.success) {
-          addMessage('error', `Failed to get process signature for PID ${processName}`);
+          addMessage(
+            'error',
+            `Failed to get process signature for PID ${processName}`
+          );
           console.error(sigResp.error);
         }
 
         const isSigned = sigResp.data || false;
 
         // Evaluate process
-        const { isSuspicious, reason } = evaluateProcessLocation(processName, processPath, isSigned, config, history);
+        const { isSuspicious, reason } = evaluateProcessLocation(
+          processName,
+          processPath,
+          isSigned,
+          config,
+          history
+        );
 
         // Get IP info
         let country = '',
-            provider = '',
-            organization = '',
-            city = '',
-            lat = 0,
-            lon = 0;
+          provider = '',
+          organization = '',
+          city = '',
+          lat = 0,
+          lon = 0;
 
         try {
-            const { data } = await axios.get(`http://ip-api.com/json/${conn.remoteAddress}`, {
-            timeout: 5000,
-          });
+          const { data } = await axios.get(
+            `http://ip-api.com/json/${conn.remoteAddress}`,
+            {
+              timeout: 5000,
+            }
+          );
           requestCount++;
           country = data.country || '';
           provider = data.isp || '';
@@ -283,15 +319,22 @@ export const useScan = () => {
           lat = data.lat || 0;
           lon = data.lon || 0;
         } catch (error) {
-          addMessage('warning', `Failed to fetch IP info for ${conn.remoteAddress}: ${(error as Error).message}`);
+          addMessage(
+            'warning',
+            `Failed to fetch IP info for ${conn.remoteAddress}: ${(error as Error).message}`
+          );
         }
 
         // Evaluate connection
         const isRisky =
           config.bannedIPs.includes(conn.remoteAddress) ||
           config.riskyCountries.includes(country) ||
-          config.riskyProviders.some((p) => provider.toLowerCase().includes(p.toLowerCase())) ||
-          config.riskyProviders.some((p) => organization.toLowerCase().includes(p.toLowerCase()));
+          config.riskyProviders.some(p =>
+            provider.toLowerCase().includes(p.toLowerCase())
+          ) ||
+          config.riskyProviders.some(p =>
+            organization.toLowerCase().includes(p.toLowerCase())
+          );
 
         const result: ScanResult = {
           ip: conn.remoteAddress,
@@ -315,17 +358,23 @@ export const useScan = () => {
         // Play alert sound for first risky/suspicious connection
         if (isRisky || isSuspicious) {
           const audio = new Audio(alertSound);
-          audio.play().catch((err) => console.error('Failed to play alert sound:', err));
+          audio
+            .play()
+            .catch(err => console.error('Failed to play alert sound:', err));
           addMessage(
             'warning',
             isRisky
               ? t('riskyConnectionDetected', { ip: conn.remoteAddress })
-              : t('suspiciousProcessDetected', { processName, processPath, reason }),
+              : t('suspiciousProcessDetected', {
+                  processName,
+                  processPath,
+                  reason,
+                })
           );
         }
 
         // Delay between requests
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
 
       // Save results to history
@@ -338,7 +387,14 @@ export const useScan = () => {
     } finally {
       setIsScanning(false);
     }
-  }, [config, setConnections, addMessage, history, setScanResults, saveHistory]);
+  }, [
+    config,
+    setConnections,
+    addMessage,
+    history,
+    setScanResults,
+    saveHistory,
+  ]);
 
   /**
    * Auto-scan based on scanInterval and periodicScan.

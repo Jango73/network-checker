@@ -25,35 +25,40 @@ interface CanvasCoordinates {
 }
 
 // Utility functions
-const transformToMapCoordinates = (lat: number, lon: number): CanvasCoordinates => {
+const transformToMapCoordinates = (
+  lat: number,
+  lon: number
+): CanvasCoordinates => {
   const x = ((lon + 180) / 360) * 100; // Longitude: -180..180 to 0..100%
   const latRad = (lat * Math.PI) / 180;
   const mercatorY = Math.log(Math.tan(Math.PI / 4 + latRad / 2));
   const maxMercatorY = Math.log(Math.tan(Math.PI / 4 + (85 * Math.PI) / 360));
   const minMercatorY = Math.log(Math.tan(Math.PI / 4 + (-85 * Math.PI) / 360));
-  const y = (1 - (mercatorY - minMercatorY) / (maxMercatorY - minMercatorY)) * 100;
+  const y =
+    (1 - (mercatorY - minMercatorY) / (maxMercatorY - minMercatorY)) * 100;
   return { x, y };
 };
 
 const clusterConnections = (
   connections: MapConnection[],
   canvasWidth: number,
-  canvasHeight: number,
+  canvasHeight: number
 ): MapConnection[] => {
   const clustered: MapConnection[] = [];
   const pixelThreshold = 10;
 
   for (const conn of connections) {
-    const { x: xPercent, y: yPercent } = transformToMapCoordinates(conn.lat, conn.lon);
+    const { x: xPercent, y: yPercent } = transformToMapCoordinates(
+      conn.lat,
+      conn.lon
+    );
     const x = (xPercent / 100) * canvasWidth;
     const y = (yPercent / 100) * canvasHeight;
 
     let added = false;
     for (const cluster of clustered) {
-      const { x: clusterXPercent, y: clusterYPercent } = transformToMapCoordinates(
-        cluster.lat,
-        cluster.lon,
-      );
+      const { x: clusterXPercent, y: clusterYPercent } =
+        transformToMapCoordinates(cluster.lat, cluster.lon);
       const clusterX = (clusterXPercent / 100) * canvasWidth;
       const clusterY = (clusterYPercent / 100) * canvasHeight;
       const distance = Math.sqrt((x - clusterX) ** 2 + (y - clusterY) ** 2);
@@ -95,9 +100,16 @@ export default function MapPage() {
       canvas.height = mapContainerRef.current!.clientHeight;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      const clustered = clusterConnections(connections, canvas.width, canvas.height);
-      clustered.forEach((conn) => {
-        const { x: xPercent, y: yPercent } = transformToMapCoordinates(conn.lat, conn.lon);
+      const clustered = clusterConnections(
+        connections,
+        canvas.width,
+        canvas.height
+      );
+      clustered.forEach(conn => {
+        const { x: xPercent, y: yPercent } = transformToMapCoordinates(
+          conn.lat,
+          conn.lon
+        );
         const x = (xPercent / 100) * canvas.width;
         const y = (yPercent / 100) * canvas.height;
 
@@ -134,7 +146,8 @@ export default function MapPage() {
    * Handle mouse move to show tooltip.
    */
   const handleMouseMove = (e: MouseEvent) => {
-    if (!canvasRef.current || !tooltipRef.current || !mapContainerRef.current) return;
+    if (!canvasRef.current || !tooltipRef.current || !mapContainerRef.current)
+      return;
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -155,12 +168,15 @@ export default function MapPage() {
         suspicionReason: scanResults[i]?.suspicionReason || '',
       })),
       canvas.width,
-      canvas.height,
+      canvas.height
     );
 
     let tooltipContent = '';
     for (const conn of clustered) {
-      const { x: xPercent, y: yPercent } = transformToMapCoordinates(conn.lat, conn.lon);
+      const { x: xPercent, y: yPercent } = transformToMapCoordinates(
+        conn.lat,
+        conn.lon
+      );
       const x = (xPercent / 100) * canvas.width;
       const y = (yPercent / 100) * canvas.height;
       if (Math.sqrt((mouseX - x) ** 2 + (y - mouseY) ** 2) < 10) {

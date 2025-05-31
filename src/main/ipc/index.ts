@@ -22,7 +22,10 @@ export function registerIpcHandlers(): void {
       const connections = await netstatService.getConnections();
       return { success: true, data: connections } as IpcResponse<any>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<any>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<any>;
     }
   });
 
@@ -32,7 +35,10 @@ export function registerIpcHandlers(): void {
       const name = await processService.getProcessName(pid);
       return { success: true, data: name } as IpcResponse<string>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<string>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<string>;
     }
   });
 
@@ -42,7 +48,10 @@ export function registerIpcHandlers(): void {
       const path = await processService.getProcessPath(pid);
       return { success: true, data: path } as IpcResponse<string>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<string>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<string>;
     }
   });
 
@@ -52,7 +61,10 @@ export function registerIpcHandlers(): void {
       const isSigned = await processService.isProcessSigned(pid);
       return { success: true, data: isSigned } as IpcResponse<boolean>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<boolean>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<boolean>;
     }
   });
 
@@ -62,7 +74,10 @@ export function registerIpcHandlers(): void {
       const config = await configService.loadConfig();
       return { success: true, data: config } as IpcResponse<any>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<any>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<any>;
     }
   });
 
@@ -72,7 +87,10 @@ export function registerIpcHandlers(): void {
       await configService.saveConfig(config);
       return { success: true } as IpcResponse<void>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<void>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<void>;
     }
   });
 
@@ -82,7 +100,10 @@ export function registerIpcHandlers(): void {
       const config = await configService.resetConfig();
       return { success: true, data: config } as IpcResponse<any>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<any>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<any>;
     }
   });
 
@@ -92,19 +113,28 @@ export function registerIpcHandlers(): void {
       const history = await historyService.loadHistory();
       return { success: true, data: history } as IpcResponse<any>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<any>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<any>;
     }
   });
 
   // Save history
-  ipcMain.handle('save-history', async (_event, entries: any[], maxSize: number) => {
-    try {
-      await historyService.saveHistory(entries, maxSize);
-      return { success: true } as IpcResponse<void>;
-    } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<void>;
+  ipcMain.handle(
+    'save-history',
+    async (_event, entries: any[], maxSize: number) => {
+      try {
+        await historyService.saveHistory(entries, maxSize);
+        return { success: true } as IpcResponse<void>;
+      } catch (error) {
+        return {
+          success: false,
+          error: (error as Error).message,
+        } as IpcResponse<void>;
+      }
     }
-  });
+  );
 
   // Clear history
   ipcMain.handle('clear-history', async () => {
@@ -112,17 +142,26 @@ export function registerIpcHandlers(): void {
       await historyService.clearHistory();
       return { success: true } as IpcResponse<void>;
     } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<void>;
+      return {
+        success: false,
+        error: (error as Error).message,
+      } as IpcResponse<void>;
     }
   });
 
   // Export history
-  ipcMain.handle('export-history', async (_event, format: 'json' | 'csv', outputPath: string) => {
-    try {
-      await historyService.exportHistory(format, outputPath);
-      return { success: true } as IpcResponse<void>;
-    } catch (error) {
-      return { success: false, error: (error as Error).message } as IpcResponse<void>;
+  ipcMain.handle(
+    'export-history',
+    async (_event, format: 'json' | 'csv', outputPath: string) => {
+      try {
+        await historyService.exportHistory(format, outputPath);
+        return { success: true } as IpcResponse<void>;
+      } catch (error) {
+        return {
+          success: false,
+          error: (error as Error).message,
+        } as IpcResponse<void>;
+      }
     }
-  });
+  );
 }

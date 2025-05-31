@@ -15,7 +15,7 @@ const validChannels = [
   'export-history',
 ] as const;
 
-type ValidChannel = typeof validChannels[number];
+type ValidChannel = (typeof validChannels)[number];
 
 // Interface pour l'API exposée au renderer
 interface ElectronAPI {
