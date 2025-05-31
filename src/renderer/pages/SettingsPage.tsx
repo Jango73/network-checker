@@ -82,8 +82,8 @@ export default function SettingsPage() {
     saveConfig({ ...config, language: e.target.value });
   };
 
-  const handleScanModeChange = (mode: 'live' | 'test') => {
-    saveConfig({ ...config, scanMode: mode });
+  const handleScanModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    saveConfig({ ...config, scanMode: e.target.value as 'live' | 'test' });
   };
 
   const handleNumericChange = (key: 'scanInterval' | 'maxHistorySize', value: string) => {
@@ -103,13 +103,13 @@ export default function SettingsPage() {
   };
 
   const handleReset = async () => {
-    const confirmed = window.confirm('Are you sure you want to reset settings to default?');
+    const confirmed = window.confirm(t('confirmReset'));
     if (!confirmed) return;
 
     try {
       await resetConfig();
       await loadConfig();
-      addMessage('success', 'Settings reset to default');
+      addMessage('success', t('settingsReset'));
     } catch (error) {
       addMessage('error', (error as Error).message);
     }
@@ -287,29 +287,26 @@ export default function SettingsPage() {
           </label>
         </div>
       </section>
+
+      {/* Dev Zone */}
       <section className={styles.section}>
         <h2>{t('devZone')}</h2>
         <div className={styles.inputGroup}>
-          <div className={styles.inputGroup}>
-            <button
-              className={config.scanMode === 'live' ? styles.active : ''}
-              onClick={() => handleScanModeChange('live')}
-            >
-              {t('live')}
-            </button>
-            <button
-              className={config.scanMode === 'test' ? styles.active : ''}
-              onClick={() => handleScanModeChange('test')}
-            >
-              {t('test')}
-            </button>
-          </div>
-          </div>
+          <label>
+            {t('scanMode')}&nbsp;
+            <select value={config.scanMode} onChange={handleScanModeChange}>
+              <option value="live">{t('live')}</option>
+              <option value="test">{t('test')}</option>
+            </select>
+          </label>
+        </div>
       </section>
+
+      {/* Danger Zone */}
       <section className={styles.section}>
         <h2>{t('dangerZone')}</h2>
         <div className={styles.inputGroup}>
-          <button className={styles.resetButton} onClick={handleReset}>Reset to Defaults</button>
+          <button className={`${styles.resetButton} danger`} onClick={handleReset}>{t('resetSettings')}</button>
         </div>
       </section>
     </div>

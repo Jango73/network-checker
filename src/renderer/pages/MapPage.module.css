@@ -2,23 +2,55 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  height: 100%;
-  width: 100%;
 }
 
-.map {
-  flex: 1;
-  min-height: 400px;
-  height: 100%;
-  width: 100%;
-  position: relative;
-  border: 1px solid var(--border);
+.controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress progress {
+  width: 200px;
+}
+
+.interval {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.interval input {
+  width: 60px;
+}
+
+.message {
+  transition: opacity 0.3s;
+  padding: 8px;
+  margin: 8px 0;
   border-radius: 4px;
-  overflow: hidden;
+  color: #fff;
 }
 
-.canvas {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.message.error {
+  background-color: var(--error);
+}
+
+.message.success {
+  background-color: var(--success);
+}
+
+.message.warning {
+  background-color: var(--warning);
+}
+
+.message.info {
+  background-color: var(--primary);
 }

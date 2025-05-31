@@ -43,11 +43,3 @@
   padding: 16px;
   color: var(--text);
 }
-
-.clearButton {
-  background-color: var(--error);
-}
-
-.clearButton:hover {
-  background-color: #c82333;
-}

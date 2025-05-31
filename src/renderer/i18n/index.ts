@@ -41,12 +41,10 @@ const resources = {
       scanCompleted: 'Scan completed successfully',
       scanFailed: 'Scan failed: {{error}}',
       periodicScan: 'Periodic Scan',
-      // useScan
       riskyConnectionDetected: 'Risky connection detected for IP {{ip}}',
       suspiciousProcessDetected: 'Suspicious process: {{processName}} at {{processPath}} ({{reason}})',
       apiRateLimitExceeded: 'API rate limit exceeded',
       geoLookupFailed: 'Failed to lookup geolocation for IP {{ip}}: {{error}}',
-      // SettingsPage
       save: 'Save',
       remove: 'Remove',
       trustedIPs: 'Trusted IPs',
@@ -72,14 +70,15 @@ const resources = {
       live: 'Live',
       test: 'Test',
       dangerZone: 'Danger zone',
-      // HistoryPage
+      resetSettings: 'Reset settings',
+      confirmReset: 'Are you sure you want to reset settings to default?',
+      settingsReset: 'Settings reset to default',
       exportJSON: 'Export as JSON',
       exportCSV: 'Export as CSV',
       clearHistory: 'Clear History',
       noHistory: 'No history found',
       historyCleared: 'History cleared successfully',
       timestamp: 'Timestamp',
-      // AboutPage
       appInfo: 'Application information',
       description: 'Description',
       aboutDescription: 'This is a simple network connection checker. It scans active connections and checks to see if anything shady is going on, like an open connection to a blacklisted country. Or a suspicious process. Or a blacklisted provider...'

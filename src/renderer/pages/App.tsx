@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useI18n } from '@renderer/hooks/useI18n';
 import MainPage from '@renderer/pages/MainPage';
 import MapPage from '@renderer/pages/MapPage';
 import HistoryPage from '@renderer/pages/HistoryPage';
 import SettingsPage from '@renderer/pages/SettingsPage';
 import AboutPage from '@renderer/pages/AboutPage';
+import { useI18n } from '@renderer/hooks/useI18n';
 import styles from './App.module.css';
 
 export default function App() {
@@ -32,31 +32,31 @@ export default function App() {
     <div className={styles.app}>
       <nav className={styles.nav}>
         <button
-          className={`${styles.tab} ${activeTab === 'main' ? styles.active : ''}`}
+          className={activeTab === 'main' ? 'active' : ''}
           onClick={() => setActiveTab('main')}
         >
           {t('main')}
         </button>
         <button
-          className={`${styles.tab} ${activeTab === 'map' ? styles.active : ''}`}
+          className={activeTab === 'map' ? 'active' : ''}
           onClick={() => setActiveTab('map')}
         >
           {t('map')}
         </button>
         <button
-          className={`${styles.tab} ${activeTab === 'history' ? styles.active : ''}`}
+          className={activeTab === 'history' ? 'active' : ''}
           onClick={() => setActiveTab('history')}
         >
           {t('history')}
         </button>
         <button
-          className={`${styles.tab} ${activeTab === 'settings' ? styles.active : ''}`}
+          className={activeTab === 'settings' ? 'active' : ''}
           onClick={() => setActiveTab('settings')}
         >
           {t('settings')}
         </button>
         <button
-          className={`${styles.tab} ${activeTab === 'about' ? styles.active : ''}`}
+          className={activeTab === 'about' ? 'active' : ''}
           onClick={() => setActiveTab('about')}
         >
           {t('about')}

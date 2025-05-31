@@ -41,7 +41,7 @@ export default function HistoryPage() {
       <div className={styles.controls}>
         <button onClick={() => handleExport('json')}>{t('exportJSON')}</button>
         <button onClick={() => handleExport('csv')}>{t('exportCSV')}</button>
-        <button className={styles.clearButton} onClick={handleClearHistory}>
+        <button className={`${styles.clearButton} danger`} onClick={handleClearHistory}>
           {t('clearHistory')}
         </button>
       </div>

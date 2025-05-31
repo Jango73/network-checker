@@ -6,29 +6,10 @@
 
 .nav {
   display: flex;
+  gap: 8px;
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border);
   padding: 8px;
-}
-
-.tab {
-  background: none;
-  border: none;
-  padding: 8px 16px;
-  color: var(--text);
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.tab:hover {
-  background-color: var(--border);
-}
-
-.tab.active {
-  background-color: var(--primary);
-  color: #ffffff;
-  border-radius: 4px;
 }
 
 .content {

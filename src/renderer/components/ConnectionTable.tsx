@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react';
 import { useI18n } from '@renderer/hooks/useI18n';
 import { useStore } from '@renderer/store';
 import { useConfig } from '@renderer/hooks/useConfig';
-import { useScan } from '@renderer/hooks/useScan';
 import { ScanResult } from '../../types/network';
 import styles from './ConnectionTable.module.css';
 
 export default function ConnectionTable() {
   const { t } = useI18n();
-  const { scanResults, addMessage } = useStore();
+  const { scanResults, addMessage, isScanning } = useStore();
   const { config, saveConfig } = useConfig();
-  const { isScanning } = useScan();
   const [results, setResults] = useState<ScanResult[]>([]);
 
   // Update results when scanResults or config change

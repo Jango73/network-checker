@@ -1,4 +1,4 @@
-/* Variables CSS pour le thème clair */
+/* Variables CSS for light theme */
 :root {
   --background: #ffffff;
   --text: #333333;
@@ -11,7 +11,7 @@
   --card-bg: #f8f9fa;
 }
 
-/* Variables CSS pour le thème sombre */
+/* Variables CSS for dark theme */
 .dark {
   --background: #1a1a1a;
   --text: #e0e0e0;
@@ -24,7 +24,7 @@
   --card-bg: #2c2c2c;
 }
 
-/* Styles globaux */
+/* Global styles */
 * {
   margin: 0;
   padding: 0;
@@ -50,6 +50,7 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Centralized control styles */
 button {
   background-color: var(--primary);
   color: #ffffff;
@@ -61,13 +62,26 @@ button {
   transition: background-color 0.2s;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   background-color: #0056b3;
 }
 
 button:disabled {
   background-color: var(--secondary);
   cursor: not-allowed;
+}
+
+button.danger {
+  background-color: var(--error);
+}
+
+button.danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+button.active {
+  background-color: var(--primary);
+  color: #ffffff;
 }
 
 input, select {
@@ -82,4 +96,18 @@ input, select {
 input:focus, select:focus {
   outline: none;
   border-color: var(--primary);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.checkbox input {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
 }

@@ -8,8 +8,8 @@ import styles from './MainPage.module.css';
 
 export default function MainPage() {
   const { t } = useI18n();
-  const { scanNetwork, isScanning } = useScan();
-  const { messages, connections, scanResults } = useStore();
+  const { scanNetwork } = useScan();
+  const { messages, connections, scanResults, isScanning } = useStore();
   const { config, saveConfig } = useConfig();
   const [progress, setProgress] = useState(0);
 

@@ -40,6 +40,8 @@ interface StoreState {
     messageQueue: Message[];
     addMessage: (type: MessageType, text: string) => void;
     removeMessage: (id: number) => void;
+    isScanning: boolean;
+    setIsScanning: (value: boolean) => void;
 }
 
 let messageIdCounter = 1;
@@ -92,4 +94,8 @@ export const useStore = create<StoreState>((set, get) => ({
             const updatedQueue = state.messageQueue.slice(1);
             return { messages: nextMessage, messageQueue: updatedQueue };
         }),
+
+    isScanning: false,
+    setIsScanning: (value) => set({ isScanning: value }),
+
 }));

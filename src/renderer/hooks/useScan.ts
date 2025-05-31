@@ -155,16 +155,14 @@ const evaluateProcessLocation = (
 
 export const useScan = () => {
   const { t } = useI18n();
-  const { config, connections, setConnections, addMessage, history, setScanResults } = useStore();
+  const { config, connections, setConnections, addMessage, history, setScanResults, isScanning, setIsScanning } = useStore();
   const { saveHistory } = useHistory();
-  const [isScanning, setIsScanning] = useState(false);
 
   /**
    * Perform a network scan (live or test mode).
    * @returns Array of scan results or undefined if scan fails.
    */
   const scanNetwork = useCallback(async () => {
-    if (isScanning) return;
     setIsScanning(true);
     setScanResults([]); // Reset scan results to ensure progress starts from 0
 
