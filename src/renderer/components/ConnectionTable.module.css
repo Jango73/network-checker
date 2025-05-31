@@ -44,3 +44,18 @@
   padding: 16px;
   color: var(--text);
 }
+
+/* Added styles for expandable rows */
+.summary {
+  cursor: pointer;
+}
+
+.summary:hover {
+  background-color: var(--border);
+}
+
+.details {
+  padding: 8px;
+  border-top: 1px solid var(--border);
+  background-color: var(--background);
+}

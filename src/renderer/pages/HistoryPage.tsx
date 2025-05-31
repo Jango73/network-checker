@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '@renderer/hooks/useI18n';
 import { useHistory } from '@renderer/hooks/useHistory';
+import ConnectionDetails from '@renderer/components/ConnectionDetails';
 import styles from './HistoryPage.module.css';
 
 export default function HistoryPage() {
@@ -72,42 +73,21 @@ export default function HistoryPage() {
                 </div>
                 {expandedEntry === uniqueKey && (
                   <div className={styles.details}>
-                    <p>
-                      <strong>{t('ip')}:</strong> {entry.ip}
-                    </p>
-                    <p>
-                      <strong>{t('country')}:</strong> {entry.country || '-'}
-                    </p>
-                    <p>
-                      <strong>{t('city')}:</strong> {entry.city || '-'}
-                    </p>
-                    <p>
-                      <strong>{t('provider')}:</strong> {entry.provider || '-'}
-                    </p>
-                    <p>
-                      <strong>{t('organization')}:</strong>{' '}
-                      {entry.organization || '-'}
-                    </p>
-                    <p>
-                      <strong>{t('coordinates')}:</strong> Lat:{' '}
-                      {entry.lat || '-'}, Lon: {entry.lon || '-'}
-                    </p>
-                    <p>
-                      <strong>{t('pid')}:</strong> {entry.pid}
-                    </p>
-                    <p>
-                      <strong>{t('process')}:</strong> {entry.process || '-'}
-                    </p>
-                    <p>
-                      <strong>{t('processPath')}:</strong>{' '}
-                      {entry.processPath || '-'}
-                    </p>
-                    {(entry.isRisky || entry.isSuspicious) && (
-                      <p>
-                        <strong>{t('reason')}:</strong>{' '}
-                        {entry.suspicionReason || '-'}
-                      </p>
-                    )}
+                    <ConnectionDetails
+                      ip={entry.ip}
+                      country={entry.country}
+                      city={entry.city}
+                      provider={entry.provider}
+                      organization={entry.organization}
+                      lat={entry.lat}
+                      lon={entry.lon}
+                      pid={entry.pid}
+                      process={entry.process}
+                      processPath={entry.processPath}
+                      isRisky={entry.isRisky}
+                      isSuspicious={entry.isSuspicious}
+                      suspicionReason={entry.suspicionReason}
+                    />
                   </div>
                 )}
               </li>
