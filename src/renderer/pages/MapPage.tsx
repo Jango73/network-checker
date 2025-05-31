@@ -96,8 +96,22 @@ export default function MapPage() {
     const img = new Image();
     img.src = mapImage;
     img.onload = () => {
-      canvas.width = mapContainerRef.current!.clientWidth;
-      canvas.height = mapContainerRef.current!.clientHeight;
+      const containerWidth = mapContainerRef.current!.clientWidth;
+      const containerHeight = mapContainerRef.current!.clientHeight;
+      const imgAspectRatio = img.width / img.height;
+      const containerRatio = containerWidth / containerHeight;
+
+      if (containerRatio > imgAspectRatio) {
+        canvas.height = containerHeight;
+        canvas.width = containerHeight * imgAspectRatio;
+      } else {
+        canvas.width = containerWidth;
+        canvas.height = containerWidth / imgAspectRatio;
+      }
+
+      canvas.style.width = `${canvas.width}px`;
+      canvas.style.height = `${canvas.height}px`;
+
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       const clustered = clusterConnections(
@@ -146,16 +160,19 @@ export default function MapPage() {
    * Handle mouse move to show tooltip.
    */
   const handleMouseMove = (e: MouseEvent) => {
-    if (!canvasRef.current || !tooltipRef.current || !mapContainerRef.current)
+    if (!canvasRef.current || !tooltipRef.current || !mapContainerRef.current) {
+      console.warn('Missing canvas, tooltip, or container references');
       return;
+    }
 
+    const container = mapContainerRef.current;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    const clustered = clusterConnections(
-      connections.map((conn, i) => ({
+    const connectionsWithGeo: MapConnection[] = connections
+      .map((conn, i) => ({
         ip: conn.remoteAddress,
         lat: scanResults[i]?.lat || 0,
         lon: scanResults[i]?.lon || 0,
@@ -166,12 +183,19 @@ export default function MapPage() {
         isRisky: scanResults[i]?.isRisky || false,
         isSuspicious: scanResults[i]?.isSuspicious || false,
         suspicionReason: scanResults[i]?.suspicionReason || '',
-      })),
+      }))
+      .filter(conn => conn.lat !== 0 && conn.lon !== 0);
+
+    const clustered = clusterConnections(
+      connectionsWithGeo,
       canvas.width,
       canvas.height
     );
 
     let tooltipContent = '';
+    let nearestConn: MapConnection | null = null;
+    let minDistance = Infinity;
+
     for (const conn of clustered) {
       const { x: xPercent, y: yPercent } = transformToMapCoordinates(
         conn.lat,
@@ -179,42 +203,41 @@ export default function MapPage() {
       );
       const x = (xPercent / 100) * canvas.width;
       const y = (yPercent / 100) * canvas.height;
-      if (Math.sqrt((mouseX - x) ** 2 + (y - mouseY) ** 2) < 10) {
-        tooltipContent = `
-          <b>${t('ip')}:</b> ${conn.ip}<br>
-          <b>${t('country')}:</b> ${conn.country}<br>
-          <b>${t('city')}:</b> ${conn.city}<br>
-          ${conn.isRisky || conn.isSuspicious ? `<b>${t('reason')}:</b> ${conn.suspicionReason}` : ''}
-        `;
-        break;
+      const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
+      if (distance < 10 && distance < minDistance) {
+        minDistance = distance;
+        nearestConn = conn;
       }
     }
 
-    if (tooltipContent) {
+    if (nearestConn) {
+      tooltipContent = `
+        <b>${t('ip')}:</b> ${nearestConn.ip}<br>
+        <b>${t('country')}:</b> ${nearestConn.country}<br>
+        <b>${t('city')}:</b> ${nearestConn.city}<br>
+        ${nearestConn.isRisky || nearestConn.isSuspicious ? `<b>${t('reason')}:</b> ${nearestConn.suspicionReason}` : ''}
+      `;
       tooltipRef.current.innerHTML = tooltipContent;
       tooltipRef.current.style.display = 'block';
 
-      // Adjust tooltip position relative to canvas and ensure it stays within bounds
+      // Position tooltip relative to canvas
       const tooltipWidth = tooltipRef.current.offsetWidth;
       const tooltipHeight = tooltipRef.current.offsetHeight;
-      const containerWidth = mapContainerRef.current.clientWidth;
-      const containerHeight = mapContainerRef.current.clientHeight;
+      let tooltipX = e.clientX + 15;
+      let tooltipY = e.clientY - tooltipHeight - 10;
 
-      let tooltipX = e.clientX - rect.left + 15; // Closer to cursor
-      let tooltipY = e.clientY - rect.top - 10; // Above cursor
-
-      // Prevent tooltip from going out of bounds
-      if (tooltipX + tooltipWidth > containerWidth) {
-        tooltipX = containerWidth - tooltipWidth - 5;
+      // Keep tooltip within canvas bounds
+      if (tooltipX + tooltipWidth > canvas.width) {
+        tooltipX = canvas.width - tooltipWidth - 5;
       }
       if (tooltipX < 0) {
         tooltipX = 5;
       }
-      if (tooltipY + tooltipHeight > containerHeight) {
-        tooltipY = containerHeight - tooltipHeight - 5;
-      }
       if (tooltipY < 0) {
-        tooltipY = 5;
+        tooltipY = e.clientX + 10; // Below cursor if above top
+      }
+      if (tooltipY + tooltipHeight > canvas.height) {
+        tooltipY = canvas.height - tooltipHeight - 5;
       }
 
       tooltipRef.current.style.left = `${tooltipX}px`;
@@ -228,34 +251,38 @@ export default function MapPage() {
    * Handle window resize to update canvas size.
    */
   const handleResize = () => {
-    const connectionsWithGeo: MapConnection[] = connections.map((conn, i) => ({
-      ip: conn.remoteAddress,
-      lat: scanResults[i]?.lat || 0,
-      lon: scanResults[i]?.lon || 0,
-      country: scanResults[i]?.country || '',
-      city: scanResults[i]?.city || '',
-      pid: conn.pid,
-      protocol: conn.protocol,
-      isRisky: scanResults[i]?.isRisky || false,
-      isSuspicious: scanResults[i]?.isSuspicious || false,
-      suspicionReason: scanResults[i]?.suspicionReason || '',
-    }));
+    const connectionsWithGeo: MapConnection[] = connections
+      .map((conn, i) => ({
+        ip: conn.remoteAddress,
+        lat: scanResults[i]?.lat || 0,
+        lon: scanResults[i]?.lon || 0,
+        country: scanResults[i]?.country || '',
+        city: scanResults[i]?.city || '',
+        pid: conn.pid,
+        protocol: conn.protocol,
+        isRisky: scanResults[i]?.isRisky || false,
+        isSuspicious: scanResults[i]?.isSuspicious || false,
+        suspicionReason: scanResults[i]?.suspicionReason || '',
+      }))
+      .filter(conn => conn.lat !== 0 && conn.lon !== 0);
     drawMap(connectionsWithGeo);
   };
 
   useEffect(() => {
-    const connectionsWithGeo: MapConnection[] = connections.map((conn, i) => ({
-      ip: conn.remoteAddress,
-      lat: scanResults[i]?.lat || 0,
-      lon: scanResults[i]?.lon || 0,
-      country: scanResults[i]?.country || '',
-      city: scanResults[i]?.city || '',
-      pid: conn.pid,
-      protocol: conn.protocol,
-      isRisky: scanResults[i]?.isRisky || false,
-      isSuspicious: scanResults[i]?.isSuspicious || false,
-      suspicionReason: scanResults[i]?.suspicionReason || '',
-    }));
+    const connectionsWithGeo: MapConnection[] = connections
+      .map((conn, i) => ({
+        ip: conn.remoteAddress,
+        lat: scanResults[i]?.lat || 0,
+        lon: scanResults[i]?.lon || 0,
+        country: scanResults[i]?.country || '',
+        city: scanResults[i]?.city || '',
+        pid: conn.pid,
+        protocol: conn.protocol,
+        isRisky: scanResults[i]?.isRisky || false,
+        isSuspicious: scanResults[i]?.isSuspicious || false,
+        suspicionReason: scanResults[i]?.suspicionReason || '',
+      }))
+      .filter(conn => conn.lat !== 0 && conn.lon !== 0);
 
     drawMap(connectionsWithGeo);
 
@@ -275,19 +302,7 @@ export default function MapPage() {
       <h1>{t('map')}</h1>
       <div ref={mapContainerRef} className={styles.map}>
         <canvas ref={canvasRef} className={styles.canvas}></canvas>
-        <div
-          ref={tooltipRef}
-          style={{
-            position: 'absolute',
-            background: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '8px',
-            borderRadius: '4px',
-            display: 'none',
-            pointerEvents: 'none',
-            zIndex: 10, // Ensure tooltip is above canvas
-          }}
-        ></div>
+        <div ref={tooltipRef} className={styles.tooltip}></div>
       </div>
     </div>
   );

@@ -8,7 +8,12 @@ import axios from 'axios';
 import alertSound from '@assets/alert.mp3';
 import { useHistory } from '@renderer/hooks/useHistory';
 import { isValidIP, isLocalIP } from '@main/utils/ip';
-import { PROCESS_LOCATIONS, SYSTEM_PROCESSES, SUSPICIOUS_FOLDERS, LEGITIMATE_FOLDERS } from '@shared/processConfig';
+import {
+  PROCESS_LOCATIONS,
+  SYSTEM_PROCESSES,
+  SUSPICIOUS_FOLDERS,
+  LEGITIMATE_FOLDERS,
+} from '@shared/processConfig';
 
 // Track path recurrence
 const pathRecurrence: { [key: string]: number } = {};
