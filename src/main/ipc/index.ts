@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, dialog } from 'electron';
 import { NetstatService } from '../services/NetstatService';
 import { ProcessService } from '../services/ProcessService';
 import { ConfigService } from '../services/ConfigService';
@@ -161,6 +161,28 @@ export function registerIpcHandlers(): void {
           success: false,
           error: (error as Error).message,
         } as IpcResponse<void>;
+      }
+    }
+  );
+
+  // Show save dialog
+  ipcMain.handle(
+    'show-save-dialog',
+    async (_event, options: { defaultPath: string; filters: { name: string; extensions: string[] }[] }) => {
+      try {
+        const result = await dialog.showSaveDialog({
+          defaultPath: options.defaultPath,
+          filters: options.filters,
+        });
+        if (result.canceled || !result.filePath) {
+          return { success: false, error: 'Exportation annulée' } as IpcResponse<string>;
+        }
+        return { success: true, data: result.filePath } as IpcResponse<string>;
+      } catch (error) {
+        return {
+          success: false,
+          error: (error as Error).message,
+        } as IpcResponse<string>;
       }
     }
   );

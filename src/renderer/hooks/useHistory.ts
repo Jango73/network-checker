@@ -1,9 +1,11 @@
 import { useCallback, useEffect } from 'react';
 import { useStore } from '@renderer/store';
+import { useI18n } from './useI18n';
 import { HistoryEntry } from '../../types/history';
 
 export const useHistory = () => {
-  const { history, setHistory, addMessage, config, scanResults } = useStore();
+  const { history, setHistory, addMessage, config } = useStore();
+  const { t } = useI18n();
 
   /**
    * Load scan history from the main process.
@@ -14,60 +16,39 @@ export const useHistory = () => {
       if (response.success) {
         setHistory(response.data);
       } else {
-        throw new Error(response.error);
+        addMessage('error', t('historyLoadFailed', { error: response.error }));
       }
     } catch (error) {
-      addMessage(
-        'error',
-        `Failed to load history: ${(error as Error).message}`
-      );
+      addMessage('error', t('historyLoadFailed', { error: (error as Error).message }));
     }
-  }, [setHistory, addMessage]);
+  }, [setHistory, addMessage, t]);
 
   /**
    * Save scan history to the main process.
    * @param results Array of scan results to save.
    */
   const saveHistory = useCallback(
-    async (results: any[]) => {
+    async (results: Omit<HistoryEntry, 'timestamp'>[]) => {
+      const entries: HistoryEntry[] = results.map(result => ({
+        ...result,
+        timestamp: new Date().toISOString(),
+      }));
       try {
-        const entries: HistoryEntry[] = results.map(result => ({
-          timestamp: new Date().toISOString(),
-          ip: result.ip,
-          country: result.country || '',
-          provider: result.provider || '',
-          organization: result.organization || '',
-          city: result.city || '',
-          lat: result.lat || 0,
-          lon: result.lon || 0,
-          pid: result.pid || 0,
-          process: result.process || '',
-          processPath: result.processPath || '',
-          isRisky: !!result.isRisky,
-          isSuspicious: !!result.isSuspicious,
-          suspicionReason: result.suspicionReason || '',
-        }));
-
-        const updatedHistory = [...history, ...entries];
         const response = await window.electron.ipcRenderer.invoke(
           'save-history',
-          updatedHistory,
+          [...history, ...entries],
           config.maxHistorySize
         );
         if (response.success) {
-          setHistory(updatedHistory);
-          addMessage('success', 'History saved successfully');
+          await loadHistory();
         } else {
-          throw new Error(response.error);
+          addMessage('error', t('historySaveFailed', { error: response.error }));
         }
       } catch (error) {
-        addMessage(
-          'error',
-          `Failed to save history: ${(error as Error).message}`
-        );
+        addMessage('error', t('historySaveFailed', { error: (error as Error).message }));
       }
     },
-    [history, setHistory, addMessage, config.maxHistorySize]
+    [history, config.maxHistorySize, loadHistory, addMessage, t]
   );
 
   /**
@@ -75,21 +56,17 @@ export const useHistory = () => {
    */
   const clearHistory = useCallback(async () => {
     try {
-      const response =
-        await window.electron.ipcRenderer.invoke('clear-history');
+      const response = await window.electron.ipcRenderer.invoke('clear-history');
       if (response.success) {
         setHistory([]);
-        addMessage('success', 'History cleared successfully');
+        addMessage('success', t('historyCleared'));
       } else {
-        throw new Error(response.error);
+        addMessage('error', t('historyClearFailed', { error: response.error }));
       }
     } catch (error) {
-      addMessage(
-        'error',
-        `Failed to clear history: ${(error as Error).message}`
-      );
+      addMessage('error', t('historyClearFailed', { error: (error as Error).message }));
     }
-  }, [setHistory, addMessage]);
+  }, [setHistory, addMessage, t]);
 
   /**
    * Export scan history to JSON or CSV.
@@ -97,29 +74,34 @@ export const useHistory = () => {
    * @param outputPath Path to save the exported file.
    */
   const exportHistory = useCallback(
-    async (format: 'json' | 'csv', outputPath: string) => {
+    async (format: 'json' | 'csv') => {
+      const date = new Date().toISOString().split('T')[0];
+      const defaultPath = `network-history-${date}.${format}`;
       try {
+        const dialogResponse = await window.electron.ipcRenderer.invoke('show-save-dialog', {
+          defaultPath,
+          filters: [{ name: format.toUpperCase(), extensions: [format] }],
+        });
+        if (!dialogResponse.success) {
+          addMessage('warning', t('exportCancelled'));
+          return;
+        }
+        const outputPath = dialogResponse.data;
         const response = await window.electron.ipcRenderer.invoke(
           'export-history',
           format,
           outputPath
         );
         if (response.success) {
-          addMessage(
-            'success',
-            `History exported successfully to ${outputPath}`
-          );
+          addMessage('success', t('historyExported', { format }));
         } else {
-          throw new Error(response.error);
+          addMessage('error', t('historyExportFailed', { error: response.error }));
         }
       } catch (error) {
-        addMessage(
-          'error',
-          `Failed to export history: ${(error as Error).message}`
-        );
+        addMessage('error', t('historyExportFailed', { error: (error as Error).message }));
       }
     },
-    [addMessage]
+    [addMessage, t]
   );
 
   // Load history when the hook is first used

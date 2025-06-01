@@ -18,16 +18,6 @@ export default function HistoryPage() {
   };
 
   /**
-   * Export history to JSON or CSV.
-   * @param format Export format ('json' or 'csv').
-   */
-  const handleExport = async (format: 'json' | 'csv') => {
-    const date = new Date().toISOString().split('T')[0];
-    const outputPath = `network-history-${date}.${format}`; // Should use file dialog in production
-    await exportHistory(format, outputPath);
-  };
-
-  /**
    * Handle clear history with confirmation.
    */
   const handleClearHistory = async () => {
@@ -40,8 +30,8 @@ export default function HistoryPage() {
     <div className={styles.container}>
       <h1>{t('history')}</h1>
       <div className={styles.controls}>
-        <button onClick={() => handleExport('json')}>{t('exportJSON')}</button>
-        <button onClick={() => handleExport('csv')}>{t('exportCSV')}</button>
+        <button onClick={() => exportHistory('json')}>{t('exportJSON')}</button>
+        <button onClick={() => exportHistory('csv')}>{t('exportCSV')}</button>
         <button
           className={`${styles.clearButton} danger`}
           onClick={handleClearHistory}
