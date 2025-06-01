@@ -4,6 +4,7 @@ import MapPage from '@renderer/pages/MapPage';
 import HistoryPage from '@renderer/pages/HistoryPage';
 import SettingsPage from '@renderer/pages/SettingsPage';
 import AboutPage from '@renderer/pages/AboutPage';
+import { usePeriodicScan } from '@renderer/hooks/usePeriodicScan';
 import { useI18n } from '@renderer/hooks/useI18n';
 import styles from './App.module.css';
 
@@ -27,6 +28,9 @@ export default function App() {
         return <MainPage />;
     }
   };
+
+  // Start periodic scan
+  usePeriodicScan();
 
   return (
     <div className={styles.app}>

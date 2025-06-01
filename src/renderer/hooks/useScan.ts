@@ -340,12 +340,5 @@ export const useScan = () => {
     getPathRecurrence,
   ]);
 
-  // Handle periodic scanning
-  useEffect(() => {
-    if (!config.periodicScan || config.scanInterval <= 0) return;
-    const interval = setInterval(() => scanNetwork(), config.scanInterval);
-    return () => clearInterval(interval);
-  }, [config.periodicScan, config.scanInterval, scanNetwork]);
-
   return { scanNetwork, isScanning };
 };
