@@ -1,72 +1,99 @@
-import { useState } from 'react';
+import { useI18n } from '@renderer/hooks/useI18n';
+import { useStore } from '@renderer/store';
+import { useConfig } from '@renderer/hooks/useConfig';
+import { useState, useEffect } from 'react';
+import { usePeriodicScan } from '@renderer/hooks/usePeriodicScan';
 import MainPage from '@renderer/pages/MainPage';
 import MapPage from '@renderer/pages/MapPage';
 import HistoryPage from '@renderer/pages/HistoryPage';
 import SettingsPage from '@renderer/pages/SettingsPage';
 import AboutPage from '@renderer/pages/AboutPage';
-import { usePeriodicScan } from '@renderer/hooks/usePeriodicScan';
-import { useI18n } from '@renderer/hooks/useI18n';
 import styles from './App.module.css';
 
 export default function App() {
   const { t } = useI18n();
+  const { messages, removeMessage } = useStore();
+  const { config } = useConfig();
   const [activeTab, setActiveTab] = useState('main');
+  const { timeUntilNextScan } = usePeriodicScan();
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'main':
-        return <MainPage />;
-      case 'map':
-        return <MapPage />;
-      case 'history':
-        return <HistoryPage />;
-      case 'settings':
-        return <SettingsPage />;
-      case 'about':
-        return <AboutPage />;
-      default:
-        return <MainPage />;
-    }
+  // Format time to mm:ss
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.round(seconds % 60);
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Start periodic scan
-  usePeriodicScan();
-
   return (
-    <div className={styles.app}>
-      <nav className={styles.nav}>
-        <button
-          className={activeTab === 'main' ? 'active' : ''}
-          onClick={() => setActiveTab('main')}
-        >
-          {t('main')}
-        </button>
-        <button
-          className={activeTab === 'map' ? 'active' : ''}
-          onClick={() => setActiveTab('map')}
-        >
-          {t('map')}
-        </button>
-        <button
-          className={activeTab === 'history' ? 'active' : ''}
-          onClick={() => setActiveTab('history')}
-        >
-          {t('history')}
-        </button>
-        <button
-          className={activeTab === 'settings' ? 'active' : ''}
-          onClick={() => setActiveTab('settings')}
-        >
-          {t('settings')}
-        </button>
-        <button
-          className={activeTab === 'about' ? 'active' : ''}
-          onClick={() => setActiveTab('about')}
-        >
-          {t('about')}
-        </button>
-      </nav>
-      <main className={styles.content}>{renderContent()}</main>
+    <div className={styles.container}>
+      {/* Messages and timer bar */}
+      <div className={styles.header}>
+        <div className={styles.messages}>
+          {messages.length > 0 && (
+            <div
+              className={`${styles.message} ${styles[messages[0].type]}`}
+              style={{
+                backgroundColor:
+                  messages[0].type === 'error'
+                    ? 'var(--error)'
+                    : messages[0].type === 'success'
+                      ? 'var(--success)'
+                      : messages[0].type === 'warning'
+                        ? 'var(--warning)'
+                        : 'var(--primary)',
+                color: '#fff',
+                padding: '8px',
+                margin: '8px 0',
+                borderRadius: '4px',
+              }}
+              onClick={() => removeMessage(messages[0].id)}
+            >
+              {messages[0].text}
+            </div>
+          )}
+        </div>
+        {config.periodicScan && (
+          <div className={styles.timer}>
+            <span>{t('nextScan')}</span>
+            <span>{formatTime(timeUntilNextScan / 1000)}</span>
+          </div>
+        )}
+      </div>
+      <div className={styles.tabContainer}>
+        <nav className={styles.nav}>
+          <div
+            className={`${styles.navLink} ${activeTab === 'main' ? styles.active : ''}`}
+            onClick={() => setActiveTab('main')}
+          >
+            {t('scan')}
+          </div>
+          <div
+            className={`${styles.navLink} ${activeTab === 'map' ? styles.active : ''}`}
+            onClick={() => setActiveTab('map')}
+          >
+            {t('map')}
+          </div>
+          <div
+            className={`${styles.navLink} ${activeTab === 'history' ? styles.active : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            {t('history')}
+          </div>
+          <div
+            className={`${styles.navLink} ${activeTab === 'settings' ? styles.active : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            {t('settings')}
+          </div>
+        </nav>
+        <main className={styles.main}>
+          {activeTab === 'main' && <MainPage />}
+          {activeTab === 'map' && <MapPage />}
+          {activeTab === 'history' && <HistoryPage />}
+          {activeTab === 'settings' && <SettingsPage />}
+          {activeTab === 'about' && <AboutPage />}
+        </main>
+      </div>
     </div>
   );
 }

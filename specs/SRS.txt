@@ -20,6 +20,10 @@ The application provides the following key functionalities:
 
 ##### 4.1 User Interface
 The application must provide a responsive, tab-based interface with the following tabs:
+- **Main Page**:
+  - Show temporary messages (error, warning, success, info) for user feedback, disappearing after 10 seconds.
+  - Show the remaining minutes:seconds before the next periodic scan (blank if periodic scan is disabled)
+  - Display a tab control for the rest of the application
 - **Main Tab**:
   - Display a "Check Now" button to initiate a manual scan.
   - Include a checkbox to enable/disable periodic scans.
@@ -27,7 +31,6 @@ The application must provide a responsive, tab-based interface with the followin
   - Display two tables:
     - **Scanned IPs Table**: Lists all active connections with columns for IP, Country, ISP, Organization, PID, Process, Risky, Suspicious, WHOIS link, and Actions (Mark IP/Process as Safe for risky/suspicious entries).
     - **Connections by Country Table**: Summarizes connections per country.
-  - Show temporary messages (error, warning, success, info) for user feedback, disappearing after 10 seconds.
 - **Map Tab**:
   - Display a world map (Mercator projection) with pins representing connection locations.
   - Cluster connections within 0.5% of map size, showing a count for clusters with multiple connections.

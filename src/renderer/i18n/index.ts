@@ -5,6 +5,7 @@ const resources = {
   en: {
     translation: {
       welcome: 'Network Checker',
+      nextScan: "Next scan in",
       scan: 'Scan Network',
       main: 'Main',
       map: 'Map',

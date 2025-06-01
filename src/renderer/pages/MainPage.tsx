@@ -9,7 +9,7 @@ import styles from './MainPage.module.css';
 export default function MainPage() {
   const { t } = useI18n();
   const { scanNetwork } = useScan();
-  const { messages, connections, scanResults, isScanning } = useStore();
+  const { connections, scanResults, isScanning } = useStore();
   const { config, saveConfig } = useConfig();
   const [progress, setProgress] = useState(0);
 
@@ -63,27 +63,6 @@ export default function MainPage() {
           </div>
         )}
       </div>
-      {messages.length > 0 && (
-        <div
-          className={`${styles.message} ${styles[messages[0].type]}`}
-          style={{
-            backgroundColor:
-              messages[0].type === 'error'
-                ? 'var(--error)'
-                : messages[0].type === 'success'
-                  ? 'var(--success)'
-                  : messages[0].type === 'warning'
-                    ? 'var(--warning)'
-                    : 'var(--primary)',
-            color: '#fff',
-            padding: '8px',
-            margin: '8px 0',
-            borderRadius: '4px',
-          }}
-        >
-          {messages[0].text}
-        </div>
-      )}
       <ConnectionTable />
     </div>
   );
