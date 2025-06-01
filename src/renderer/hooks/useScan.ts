@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import axios from 'axios';
 import { useStore } from '@renderer/store';
 import { useI18n } from '@renderer/hooks/useI18n';
+import { useHistory } from '@renderer/hooks/useHistory';
 import { Connection, ScanResult, ProcessEvaluation } from '../../types/network';
 import { Config } from '../../types/config';
 import { History } from '../../types/history';
-import axios from 'axios';
 import alertSound from '@assets/alert.mp3';
-import { useHistory } from '@renderer/hooks/useHistory';
 import { isValidIP, isLocalIP } from '@main/utils/ip';
 import {
   PROCESS_LOCATIONS,
@@ -15,11 +15,32 @@ import {
   LEGITIMATE_FOLDERS,
 } from '@shared/processConfig';
 
+// Mock connections for test mode
+const TEST_CONNECTIONS: Connection[] = [
+  {
+    protocol: 'TCP',
+    localAddress: '127.0.0.1',
+    localPort: 8080,
+    remoteAddress: '8.8.8.8',
+    remotePort: 80,
+    state: 'ESTABLISHED',
+    pid: 1234,
+  },
+  {
+    protocol: 'TCP',
+    localAddress: '127.0.0.1',
+    localPort: 8081,
+    remoteAddress: '2001:4860:4860::8888',
+    remotePort: 80,
+    state: 'ESTABLISHED',
+    pid: 1235,
+  },
+];
+
 export const useScan = () => {
   const { t } = useI18n();
   const {
     config,
-    connections,
     setConnections,
     addMessage,
     history,
@@ -31,120 +52,166 @@ export const useScan = () => {
   } = useStore();
   const { saveHistory } = useHistory();
 
-/**
- * Evaluate process legitimacy based on SRS scoring rules.
- * @param processName Process name.
- * @param processPath Process executable path.
- * @param isSigned Whether the process is digitally signed.
- * @returns Evaluation result with suspicion status and reason.
- */
-const evaluateProcessLocation = (
-  processName: string,
-  processPath: string,
-  isSigned: boolean,
-  config: Config,
-  history: History[]
-): ProcessEvaluation => {
-  let score = 0;
-  let reason = '';
+  /**
+   * Evaluates a process's legitimacy using SRS scoring rules.
+   * @param processName Name of the process.
+   * @param processPath Full path to the process executable.
+   * @param isSigned Whether the process is digitally signed.
+   * @returns Object indicating if the process is suspicious and the reason.
+   */
+  const evaluateProcessLocation = (
+    processName: string,
+    processPath: string,
+    isSigned: boolean
+  ): ProcessEvaluation => {
+    // Trusted processes are automatically safe
+    if (
+      config.trustedProcesses.includes(processName.toLowerCase()) ||
+      config.trustedProcesses.includes(processPath)
+    ) {
+      return { isSuspicious: false, reason: t('trustedProcess') };
+    }
 
-  // Check trusted processes
-  if (
-    config.trustedProcesses.includes(processName) ||
-    config.trustedProcesses.includes(processPath)
-  ) {
-    return { isSuspicious: false, reason: 'Trusted process' };
-  }
+    // System processes without a path are considered safe
+    if (!processPath && SYSTEM_PROCESSES.includes(processName.toLowerCase())) {
+      return { isSuspicious: false, reason: t('systemProcess') };
+    }
 
-  // System processes without path
-  if (SYSTEM_PROCESSES.includes(processName.toLowerCase()) && !processPath) {
-    return { isSuspicious: false, reason: 'System process' };
-  }
+    // Missing path is suspicious
+    if (!processPath) {
+      return { isSuspicious: true, reason: t('noExecutablePath') };
+    }
 
-  // No path available
-  if (!processPath) {
-    return { isSuspicious: true, reason: 'No executable path found' };
-  }
+    let score = 0;
+    let reason = '';
 
-  // Known processes
-  const knownProcessRegex = PROCESS_LOCATIONS[processName.toLowerCase()];
-  if (knownProcessRegex && knownProcessRegex.test(processPath)) {
-    score += 100;
-  }
+    // Check if process is in its expected location
+    const knownProcessRegex = PROCESS_LOCATIONS[processName.toLowerCase()];
+    if (knownProcessRegex?.test(processPath)) {
+      score += 100;
+    }
 
-  // Specific process penalties
-  if (
-    ['svchost.exe', 'cmd.exe', 'rundll32.exe'].includes(
-      processName.toLowerCase()
-    )
-  ) {
-    if (!knownProcessRegex || !knownProcessRegex.test(processPath)) {
+    // Penalize specific processes if not in expected locations
+    const sensitiveProcesses = ['svchost.exe', 'cmd.exe', 'rundll32.exe'];
+    if (
+      sensitiveProcesses.includes(processName.toLowerCase()) &&
+      (!knownProcessRegex || !knownProcessRegex.test(processPath))
+    ) {
       score -= 50;
     }
-  }
 
-  // Folder-based scoring
-  if (LEGITIMATE_FOLDERS.some(regex => regex.test(processPath))) {
-    score += 80;
-  }
-  if (SUSPICIOUS_FOLDERS.some(regex => regex.test(processPath))) {
-    score -= 30;
-  }
+    // Score based on folder location
+    if (LEGITIMATE_FOLDERS.some(regex => regex.test(processPath))) {
+      score += 80;
+    }
+    if (SUSPICIOUS_FOLDERS.some(regex => regex.test(processPath))) {
+      score -= 30;
+    }
 
-  // Signature status
-  score += isSigned ? 80 : -20;
+    // Score based on signature
+    score += isSigned ? 80 : -20;
 
-  // Check path recurrence
-  incrementPathRecurrence(processPath);
-  const recurrence = getPathRecurrence(processPath);
-  if (recurrence > 3) {
-    score += 20;
-  }
+    // Score based on path recurrence
+    incrementPathRecurrence(processPath);
+    const recurrence = getPathRecurrence(processPath);
+    if (recurrence > 3) {
+      score += 20;
+    }
 
-  // History-based scoring
-  const nonRiskyCount = history.filter(
-    (entry: History) =>
-      entry.process === processName && !entry.isRisky && !entry.isSuspicious
-  ).length;
-  if (nonRiskyCount > 5) {
-    score += 50;
-  }
+    // Score based on history
+    const nonRiskyCount = history.filter(
+      (entry: History) =>
+        entry.process.toLowerCase() === processName.toLowerCase() &&
+        !entry.isRisky &&
+        !entry.isSuspicious
+    ).length;
+    if (nonRiskyCount > 5) {
+      score += 50;
+    }
 
-  // Final evaluation
-  const isSuspicious = score < 50;
-  if (isSuspicious) {
-    reason =
-      score < 0 ? 'Suspicious executable path' : 'Unexpected executable path';
-  }
+    // Determine suspicion
+    const isSuspicious = score < 50;
+    if (isSuspicious) {
+      reason = score < 0 ? t('suspiciousPath') : t('unexpectedPath');
+    }
 
     return { isSuspicious, reason };
   };
 
   /**
-   * Perform a network scan (live or test mode).
-   * @returns Array of scan results or undefined if scan fails.
+   * Evaluates if a connection is risky based on configuration.
+   * @param conn Connection details.
+   * @param geoData Geolocation data for the remote IP.
+   * @returns True if the connection is risky, false otherwise.
+   */
+  const evaluateConnectionRisk = (
+    conn: Connection,
+    geoData: { country: string; provider: string; organization: string }
+  ): boolean => {
+    if (config.trustedIPs.includes(conn.remoteAddress)) {
+      return false;
+    }
+    if (config.bannedIPs.includes(conn.remoteAddress)) {
+      return true;
+    }
+    if (config.riskyCountries.includes(geoData.country)) {
+      return true;
+    }
+    return config.riskyProviders.some(p =>
+      geoData.provider.toLowerCase().includes(p.toLowerCase()) ||
+      geoData.organization.toLowerCase().includes(p.toLowerCase())
+    );
+  };
+
+  /**
+   * Fetches geolocation data for an IP address.
+   * @param ip IP address to query.
+   * @returns Geolocation data or null if the request fails.
+   */
+  const fetchGeoData = async (ip: string) => {
+    try {
+      const { data } = await axios.get(`http://ip-api.com/json/${ip}`, {
+        timeout: 5000,
+      });
+      if (data.status !== 'success') {
+        throw new Error('Invalid response');
+      }
+      return {
+        country: data.country || '',
+        provider: data.isp || '',
+        organization: data.org || '',
+        city: data.city || '',
+        lat: data.lat || 0,
+        lon: data.lon || 0,
+      };
+    } catch (error) {
+      addMessage('warning', t('geoDataFailed', { ip, error: (error as Error).message }));
+      return null;
+    }
+  };
+
+  /**
+   * Performs a network scan in live or test mode.
+   * @returns Array of scan results.
    */
   const scanNetwork = useCallback(async () => {
     setIsScanning(true);
-    setScanResults([]); // Reset scan results to ensure progress starts from 0
+    setScanResults([]);
 
-    // Check if IPC is available
-    if (!window.electron || !window.electron.ipcRenderer) {
-      addMessage('error', 'IPC communication is not initialized');
+    if (!window.electron?.ipcRenderer) {
+      addMessage('error', t('ipcNotInitialized'));
       setIsScanning(false);
       return [];
     }
 
     try {
+      // Fetch connections
       let rawConnections: Connection[] = [];
-
       if (config.scanMode === 'live') {
-        const response =
-          await window.electron.ipcRenderer.invoke('run-netstat');
+        const response = await window.electron.ipcRenderer.invoke('run-netstat');
         if (!response.success) {
-          throw new Error(response.error || 'Failed to run netstat');
+          throw new Error(response.error || t('netstatFailed'));
         }
-
         rawConnections = response.data.filter(
           (conn: Connection) =>
             conn.state === 'ESTABLISHED' &&
@@ -153,31 +220,8 @@ const evaluateProcessLocation = (
             conn.remoteAddress !== '::'
         );
       } else {
-        // Mock data for test mode
-        rawConnections = [
-          {
-            protocol: 'TCP',
-            localAddress: '127.0.0.1',
-            localPort: 8080,
-            remoteAddress: '8.8.8.8',
-            remotePort: 80,
-            state: 'ESTABLISHED',
-            pid: 1234,
-          },
-          {
-            protocol: 'TCP',
-            localAddress: '127.0.0.1',
-            localPort: 8081,
-            remoteAddress: '2001:4860:4860::8888',
-            remotePort: 80,
-            state: 'ESTABLISHED',
-            pid: 1235,
-          },
-        ];
-        // Simulate delay for test mode
-        await new Promise(resolve =>
-          setTimeout(resolve, rawConnections.length * 50)
-        );
+        rawConnections = TEST_CONNECTIONS;
+        await new Promise(resolve => setTimeout(resolve, rawConnections.length * 50));
       }
 
       setConnections(rawConnections);
@@ -185,6 +229,7 @@ const evaluateProcessLocation = (
       const results: ScanResult[] = [];
       let requestCount = 0;
       let startTime = Date.now();
+      let hasAlerted = false;
 
       for (const conn of rawConnections) {
         // Rate limiting: 45 requests per minute
@@ -197,133 +242,88 @@ const evaluateProcessLocation = (
           startTime = Date.now();
         }
 
-        // Get process info
+        // Fetch process info
         const [nameResp, pathResp, sigResp] = await Promise.all([
           window.electron.ipcRenderer.invoke('get-process-name', conn.pid),
           window.electron.ipcRenderer.invoke('get-process-path', conn.pid),
           window.electron.ipcRenderer.invoke('get-process-signature', conn.pid),
         ]);
 
+        const processName = nameResp.success ? nameResp.data : '';
+        const processPath = pathResp.success ? pathResp.data : '';
+        const isSigned = sigResp.success ? sigResp.data : false;
+
         if (!nameResp.success) {
-          addMessage('error', `Failed to get process name for PID ${conn.pid}`);
-          console.error(nameResp.error);
+          addMessage('error', t('processNameFailed', { pid: conn.pid, error: nameResp.error }));
         }
-
-        const processName = nameResp.data || '';
-
         if (!pathResp.success) {
-          addMessage('error', `Failed to get process path for PID ${conn.pid}`);
-          console.error(pathResp.error);
+          addMessage('error', t('processPathFailed', { pid: conn.pid, error: pathResp.error }));
         }
-
-        const processPath = pathResp.data || '';
-
         if (!sigResp.success) {
-          addMessage(
-            'error',
-            `Failed to get process signature for PID ${processName}`
-          );
-          console.error(sigResp.error);
+          addMessage('error', t('processSignatureFailed', { processName, error: sigResp.error }));
         }
-
-        const isSigned = sigResp.data || false;
 
         // Evaluate process
         const { isSuspicious, reason } = evaluateProcessLocation(
           processName,
           processPath,
-          isSigned,
-          config,
-          history
+          isSigned
         );
 
-        // Get IP info
-        let country = '',
-          provider = '',
-          organization = '',
-          city = '',
-          lat = 0,
-          lon = 0;
+        // Fetch geolocation data
+        const geoData = await fetchGeoData(conn.remoteAddress);
+        requestCount++;
 
-        try {
-          const { data } = await axios.get(
-            `http://ip-api.com/json/${conn.remoteAddress}`,
-            {
-              timeout: 5000,
-            }
-          );
-          requestCount++;
-          country = data.country || '';
-          provider = data.isp || '';
-          organization = data.org || '';
-          city = data.city || '';
-          lat = data.lat || 0;
-          lon = data.lon || 0;
-        } catch (error) {
-          addMessage(
-            'warning',
-            `Failed to fetch IP info for ${conn.remoteAddress}: ${(error as Error).message}`
-          );
-        }
+        // Evaluate connection risk
+        const isRisky = geoData ? evaluateConnectionRisk(conn, geoData) : true;
 
-        // Evaluate connection
-        const isRisky =
-          config.bannedIPs.includes(conn.remoteAddress) ||
-          config.riskyCountries.includes(country) ||
-          config.riskyProviders.some(p =>
-            provider.toLowerCase().includes(p.toLowerCase())
-          ) ||
-          config.riskyProviders.some(p =>
-            organization.toLowerCase().includes(p.toLowerCase())
-          );
-
+        // Build scan result
         const result: ScanResult = {
           ip: conn.remoteAddress,
-          country,
-          provider,
-          organization,
-          city,
-          lat,
-          lon,
+          country: geoData?.country || '',
+          provider: geoData?.provider || '',
+          organization: geoData?.organization || '',
+          city: geoData?.city || '',
+          lat: geoData?.lat || 0,
+          lon: geoData?.lon || 0,
           pid: conn.pid,
           process: processName,
           processPath,
           isRisky,
           isSuspicious: isRisky ? false : isSuspicious,
-          suspicionReason: isRisky ? 'Risky connection' : reason,
+          suspicionReason: isRisky ? t('riskyConnection') : reason,
         };
 
         results.push(result);
         setScanResults([...results]);
 
-        // Play alert sound for first risky/suspicious connection
-        if (isRisky || isSuspicious) {
+        // Trigger alert for risky or suspicious connections
+        if ((isRisky || isSuspicious) && !hasAlerted) {
           const audio = new Audio(alertSound);
-          audio
-            .play()
-            .catch(err => console.error('Failed to play alert sound:', err));
-          addMessage(
-            'warning',
-            isRisky
-              ? t('riskyConnectionDetected', { ip: conn.remoteAddress })
-              : t('suspiciousProcessDetected', {
-                  processName,
-                  processPath,
-                  reason,
-                })
-          );
+          audio.play().catch(err => console.error('Failed to play alert:', err));
+          hasAlerted = true;
         }
 
-        // Delay between requests
+        // Notify user
+        if (isRisky) {
+          addMessage('warning', t('riskyConnectionDetected', { ip: conn.remoteAddress }));
+        } else if (isSuspicious) {
+          addMessage('warning', t('suspiciousProcessDetected', { processName, processPath, reason }));
+        }
+
+        // Delay to prevent overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
-      // Save results to history
-      await saveHistory(results);
-      addMessage('success', 'Scan completed successfully');
+      // Save to history
+      if (results.length > 0) {
+        await saveHistory(results);
+      }
+      addMessage('success', t('scanCompleted'));
+
       return results;
     } catch (error) {
-      addMessage('error', `Scan failed: ${(error as Error).message}`);
+      addMessage('error', t('scanFailed', { error: (error as Error).message }));
       return [];
     } finally {
       setIsScanning(false);
@@ -335,18 +335,17 @@ const evaluateProcessLocation = (
     history,
     setScanResults,
     saveHistory,
+    t,
+    incrementPathRecurrence,
+    getPathRecurrence,
   ]);
 
-  /**
-   * Auto-scan based on scanInterval and periodicScan.
-   */
+  // Handle periodic scanning
   useEffect(() => {
     if (!config.periodicScan || config.scanInterval <= 0) return;
-    const interval = setInterval(() => {
-      scanNetwork();
-    }, config.scanInterval);
+    const interval = setInterval(() => scanNetwork(), config.scanInterval);
     return () => clearInterval(interval);
-  }, [config.scanInterval, config.periodicScan, scanNetwork]);
+  }, [config.periodicScan, config.scanInterval, scanNetwork]);
 
   return { scanNetwork, isScanning };
 };
