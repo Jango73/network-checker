@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Config } from '../../types/config';
-import { Connection } from '../../types/connection';
+import { Connection } from '../../types/network';
 import { HistoryEntry } from '../../types/history';
 
 type MessageType = 'success' | 'error' | 'warning' | 'info';

@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { Connection } from '../../types/connection';
+import { Connection } from '../../types/network';
 import { isValidIP } from '../utils/ip';
 
 const execAsync = promisify(exec);
