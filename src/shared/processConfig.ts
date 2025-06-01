@@ -20,6 +20,7 @@ export const PROCESS_LOCATIONS: { [key: string]: RegExp } = {
   'notepad.exe': /Windows\\(System32|SysWOW64)\\notepad\.exe$/i,
   'explorer.exe': /Windows\\explorer\.exe$/i,
   'taskmgr.exe': /Windows\\System32\\Taskmgr\.exe$/i,
+  'Microsoft.Photos.exe': /Program Files\\WindowsApps\\Microsoft\.Windows\.Photos_[\d.]+_x64__8wekyb3d8bbwe\\Microsoft\.Photos\.exe$/i
 };
 
 /**
