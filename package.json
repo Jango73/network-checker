@@ -27,6 +27,7 @@
     "build": "tsc && vite build && electron-builder",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts,.tsx",
+    "lint-fix": "eslint .  --fix --ext .ts,.tsx",
     "format": "prettier --write .",
     "build:main": "tsc --project tsconfig.json --outDir dist/main"
   },
