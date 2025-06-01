@@ -42,6 +42,9 @@ interface StoreState {
   removeMessage: (id: number) => void;
   isScanning: boolean;
   setIsScanning: (value: boolean) => void;
+  pathRecurrence: Map<string, number>;
+  incrementPathRecurrence: (path: string) => void;
+  getPathRecurrence: (path: string) => number;
 }
 
 let messageIdCounter = 1;
@@ -108,4 +111,16 @@ export const useStore = create<StoreState>((set, get) => ({
 
   isScanning: false,
   setIsScanning: value => set({ isScanning: value }),
+
+  pathRecurrence: new Map<string, number>(),
+  incrementPathRecurrence: (path: string) => {
+    set(state => {
+      const newRecurrence = new Map(state.pathRecurrence);
+      newRecurrence.set(path, (newRecurrence.get(path) || 0) + 1);
+      return { pathRecurrence: newRecurrence };
+    });
+  },
+  getPathRecurrence: (path: string) => {
+    return get().pathRecurrence.get(path) || 0;
+  },
 }));

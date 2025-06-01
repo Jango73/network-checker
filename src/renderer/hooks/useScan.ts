@@ -15,8 +15,21 @@ import {
   LEGITIMATE_FOLDERS,
 } from '@shared/processConfig';
 
-// Track path recurrence
-const pathRecurrence: { [key: string]: number } = {};
+export const useScan = () => {
+  const { t } = useI18n();
+  const {
+    config,
+    connections,
+    setConnections,
+    addMessage,
+    history,
+    setScanResults,
+    isScanning,
+    setIsScanning,
+    incrementPathRecurrence,
+    getPathRecurrence,
+  } = useStore();
+  const { saveHistory } = useHistory();
 
 /**
  * Evaluate process legitimacy based on SRS scoring rules.
@@ -81,9 +94,10 @@ const evaluateProcessLocation = (
   // Signature status
   score += isSigned ? 80 : -20;
 
-  // Path recurrence
-  pathRecurrence[processPath] = (pathRecurrence[processPath] || 0) + 1;
-  if (pathRecurrence[processPath] > 3) {
+  // Check path recurrence
+  incrementPathRecurrence(processPath);
+  const recurrence = getPathRecurrence(processPath);
+  if (recurrence > 3) {
     score += 20;
   }
 
@@ -103,22 +117,8 @@ const evaluateProcessLocation = (
       score < 0 ? 'Suspicious executable path' : 'Unexpected executable path';
   }
 
-  return { isSuspicious, reason };
-};
-
-export const useScan = () => {
-  const { t } = useI18n();
-  const {
-    config,
-    connections,
-    setConnections,
-    addMessage,
-    history,
-    setScanResults,
-    isScanning,
-    setIsScanning,
-  } = useStore();
-  const { saveHistory } = useHistory();
+    return { isSuspicious, reason };
+  };
 
   /**
    * Perform a network scan (live or test mode).
@@ -294,7 +294,7 @@ export const useScan = () => {
         };
 
         results.push(result);
-        setScanResults([...results]); // Update scan results incrementally
+        setScanResults([...results]);
 
         // Play alert sound for first risky/suspicious connection
         if (isRisky || isSuspicious) {
