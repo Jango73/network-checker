@@ -69,17 +69,17 @@ export const useScan = () => {
       config.trustedProcesses.includes(processName.toLowerCase()) ||
       config.trustedProcesses.includes(processPath)
     ) {
-      return { isSuspicious: false, reason: t('trustedProcess') };
+      return { isRisky: false, reason: t('trustedProcess') };
     }
 
     // System processes without a path are considered safe
     if (!processPath && SYSTEM_PROCESSES.includes(processName.toLowerCase())) {
-      return { isSuspicious: false, reason: t('systemProcess') };
+      return { isRisky: false, reason: t('systemProcess') };
     }
 
     // Missing path is suspicious
     if (!processPath) {
-      return { isSuspicious: true, reason: t('noExecutablePath') };
+      return { isRisky: true, reason: t('noExecutablePath') };
     }
 
     let score = 0;
@@ -122,20 +122,19 @@ export const useScan = () => {
     const nonRiskyCount = history.filter(
       (entry: History) =>
         entry.process.toLowerCase() === processName.toLowerCase() &&
-        !entry.isRisky &&
-        !entry.isSuspicious
+        !entry.isRisky
     ).length;
     if (nonRiskyCount > 5) {
       score += 50;
     }
 
     // Determine suspicion
-    const isSuspicious = score < 50;
-    if (isSuspicious) {
+    const isRisky = score < 50;
+    if (isRisky) {
       reason = score < 0 ? t('suspiciousPath') : t('unexpectedPath');
     }
 
-    return { isSuspicious, reason };
+    return { isRisky, reason };
   };
 
   /**
@@ -264,7 +263,7 @@ export const useScan = () => {
         }
 
         // Evaluate process
-        const { isSuspicious, reason } = evaluateProcessLocation(
+        let { isRisky, reason } = evaluateProcessLocation(
           processName,
           processPath,
           isSigned
@@ -275,7 +274,10 @@ export const useScan = () => {
         requestCount++;
 
         // Evaluate connection risk
-        const isRisky = geoData ? evaluateConnectionRisk(conn, geoData) : true;
+        if (isRisky === false && geoData) {
+          isRisky = evaluateConnectionRisk(conn, geoData);
+          reason = t('riskyGeoloc');
+        }
 
         // Build scan result
         const result: ScanResult = {
@@ -290,15 +292,14 @@ export const useScan = () => {
           process: processName,
           processPath,
           isRisky,
-          isSuspicious: isRisky ? false : isSuspicious,
-          suspicionReason: isRisky ? t('riskyConnection') : reason,
+          suspicionReason: reason,
         };
 
         results.push(result);
         setScanResults([...results]);
 
         // Trigger alert for risky or suspicious connections
-        if ((isRisky || isSuspicious) && !hasAlerted) {
+        if (isRisky && !hasAlerted) {
           const audio = new Audio(alertSound);
           audio.play().catch(err => console.error('Failed to play alert:', err));
           hasAlerted = true;
@@ -306,9 +307,7 @@ export const useScan = () => {
 
         // Notify user
         if (isRisky) {
-          addMessage('warning', t('riskyConnectionDetected', { ip: conn.remoteAddress }));
-        } else if (isSuspicious) {
-          addMessage('warning', t('suspiciousProcessDetected', { processName, processPath, reason }));
+          addMessage('warning', t('riskyConnectionDetected', { ip: conn.remoteAddress, processName, processPath, reason }));
         }
 
         // Delay to prevent overwhelming the system

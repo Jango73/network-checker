@@ -23,7 +23,6 @@ interface ScanResult {
   process: string;
   processPath: string;
   isRisky: boolean;
-  isSuspicious: boolean;
   suspicionReason: string;
 }
 

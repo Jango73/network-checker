@@ -97,11 +97,7 @@ export default function ConnectionTable() {
                     <td>{result.process || '-'}</td>
                     <td>
                       {result.isRisky ? (
-                        <span className={styles.risky}>{t('risky')}</span>
-                      ) : result.isSuspicious ? (
-                        <span className={styles.suspicious}>
-                          {t('suspicious')} ({result.suspicionReason})
-                        </span>
+                        <span className={styles.risky}>{t('risky')} ({result.suspicionReason})</span>
                       ) : (
                         <span className={styles.safe}>{t('safe')}</span>
                       )}
@@ -116,7 +112,7 @@ export default function ConnectionTable() {
                       </a>
                     </td>
                     <td>
-                      {result.isRisky || result.isSuspicious ? (
+                      {result.isRisky ? (
                         <>
                           {!config.trustedIPs.includes(result.ip) && (
                             <button onClick={() => handleMarkIPAsSafe(result.ip)}>
@@ -168,7 +164,6 @@ export default function ConnectionTable() {
                           process={result.process}
                           processPath={result.processPath}
                           isRisky={result.isRisky}
-                          isSuspicious={result.isSuspicious}
                           suspicionReason={result.suspicionReason}
                         />
                       </td>

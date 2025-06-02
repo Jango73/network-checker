@@ -26,7 +26,6 @@ export interface ScanResult {
   process: string;
   processPath: string;
   isRisky: boolean;
-  isSuspicious: boolean;
   suspicionReason: string;
 }
 
@@ -34,6 +33,6 @@ export interface ScanResult {
  * Process evaluation result.
  */
 export interface ProcessEvaluation {
-  isSuspicious: boolean;
+  isRisky: boolean;
   reason: string;
 }

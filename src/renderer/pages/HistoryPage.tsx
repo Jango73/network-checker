@@ -55,10 +55,8 @@ export default function HistoryPage() {
                   <span>{entry.ip}</span>
                   <span>
                     {entry.isRisky
-                      ? t('risky')
-                      : entry.isSuspicious
-                        ? `${t('suspicious')} (${entry.suspicionReason})`
-                        : t('safe')}
+                      ? `${t('risky')} (${entry.suspicionReason})`
+                      : t('safe')}
                   </span>
                 </div>
                 {expandedEntry === uniqueKey && (
@@ -75,7 +73,6 @@ export default function HistoryPage() {
                       process={entry.process}
                       processPath={entry.processPath}
                       isRisky={entry.isRisky}
-                      isSuspicious={entry.isSuspicious}
                       suspicionReason={entry.suspicionReason}
                     />
                   </div>

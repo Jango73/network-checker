@@ -13,7 +13,6 @@ interface MapConnection {
   pid: number;
   protocol: string;
   isRisky: boolean;
-  isSuspicious: boolean;
   suspicionReason: string;
   count?: number;
 }
@@ -130,14 +129,14 @@ export default function MapPage() {
         // Draw pin
         ctx.beginPath();
         ctx.arc(x, y, 10, 0, 2 * Math.PI);
-        ctx.fillStyle = conn.isRisky || conn.isSuspicious ? 'red' : 'green';
+        ctx.fillStyle = conn.isRisky ? 'red' : 'green';
         ctx.fill();
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         // Pulsing effect for risky pins
-        if (conn.isRisky || conn.isSuspicious) {
+        if (conn.isRisky) {
           ctx.beginPath();
           ctx.arc(x, y, 12 + Math.sin(Date.now() / 500) * 2, 0, 2 * Math.PI);
           ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
@@ -181,7 +180,6 @@ export default function MapPage() {
         pid: conn.pid,
         protocol: conn.protocol,
         isRisky: scanResults[i]?.isRisky || false,
-        isSuspicious: scanResults[i]?.isSuspicious || false,
         suspicionReason: scanResults[i]?.suspicionReason || '',
       }))
       .filter(conn => conn.lat !== 0 && conn.lon !== 0);
@@ -215,7 +213,7 @@ export default function MapPage() {
         <b>${t('ip')}:</b> ${nearestConn.ip}<br>
         <b>${t('country')}:</b> ${nearestConn.country}<br>
         <b>${t('city')}:</b> ${nearestConn.city}<br>
-        ${nearestConn.isRisky || nearestConn.isSuspicious ? `<b>${t('reason')}:</b> ${nearestConn.suspicionReason}` : ''}
+        ${nearestConn.isRisky ? `<b>${t('reason')}:</b> ${nearestConn.suspicionReason}` : ''}
       `;
       tooltipRef.current.innerHTML = tooltipContent;
       tooltipRef.current.style.display = 'block';
@@ -261,7 +259,6 @@ export default function MapPage() {
         pid: conn.pid,
         protocol: conn.protocol,
         isRisky: scanResults[i]?.isRisky || false,
-        isSuspicious: scanResults[i]?.isSuspicious || false,
         suspicionReason: scanResults[i]?.suspicionReason || '',
       }))
       .filter(conn => conn.lat !== 0 && conn.lon !== 0);
@@ -279,7 +276,6 @@ export default function MapPage() {
         pid: conn.pid,
         protocol: conn.protocol,
         isRisky: scanResults[i]?.isRisky || false,
-        isSuspicious: scanResults[i]?.isSuspicious || false,
         suspicionReason: scanResults[i]?.suspicionReason || '',
       }))
       .filter(conn => conn.lat !== 0 && conn.lon !== 0);

@@ -1,7 +1,6 @@
 export interface History {
   process: string;
   isRisky: boolean;
-  isSuspicious: boolean;
 }
 
 export interface HistoryEntry {
@@ -17,6 +16,5 @@ export interface HistoryEntry {
   process: string;
   processPath: string;
   isRisky: boolean;
-  isSuspicious: boolean;
   suspicionReason: string;
 }

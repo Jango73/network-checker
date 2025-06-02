@@ -59,7 +59,7 @@ export class HistoryService {
             }
             acc[scanDate].entries.push(entry);
             acc[scanDate].totalConnections++;
-            if (entry.isRisky || entry.isSuspicious) {
+            if (entry.isRisky) {
               acc[scanDate].riskyConnections++;
             }
             return acc;
@@ -142,7 +142,6 @@ export class HistoryService {
           'processName',
           'processPath',
           'isRisky',
-          'isSuspicious',
           'suspicionReason',
         ];
         const groupedByScan = entries.reduce(
@@ -157,7 +156,7 @@ export class HistoryService {
             }
             acc[scanDate].entries.push(entry);
             acc[scanDate].totalConnections++;
-            if (entry.isRisky || entry.isSuspicious) {
+            if (entry.isRisky) {
               acc[scanDate].riskyConnections++;
             }
             return acc;
@@ -192,7 +191,6 @@ export class HistoryService {
                 entry.process || '',
                 entry.processPath || '',
                 entry.isRisky.toString(),
-                entry.isSuspicious.toString(),
                 entry.suspicionReason || '',
               ]
                 .map(val => `"${val.replace(/"/g, '""')}"`)

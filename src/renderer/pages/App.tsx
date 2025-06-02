@@ -29,7 +29,7 @@ export default function App() {
       {/* Messages and timer bar */}
       <div className={styles.header}>
         <div className={styles.messages}>
-          {messages.length > 0 && (
+          {messages.length > 0 ? (
             <div
               className={`${styles.message} ${styles[messages[0].type]}`}
               style={{
@@ -50,6 +50,18 @@ export default function App() {
             >
               {messages[0].text}
             </div>
+          ) : (
+            <div
+              className={`${styles.message}`}
+              style={{
+                padding: '8px',
+                margin: '8px 0',
+                borderRadius: '4px',
+              }}
+              onClick={() => removeMessage(messages[0].id)}
+            >
+              &nbsp;
+            </div>
           )}
         </div>
         {config.periodicScan && (
@@ -65,7 +77,7 @@ export default function App() {
             className={`${styles.navLink} ${activeTab === 'main' ? styles.active : ''}`}
             onClick={() => setActiveTab('main')}
           >
-            {t('scan')}
+            {t('main')}
           </div>
           <div
             className={`${styles.navLink} ${activeTab === 'map' ? styles.active : ''}`}

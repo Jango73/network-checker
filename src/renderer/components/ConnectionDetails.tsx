@@ -14,7 +14,6 @@ interface ConnectionDetailsProps {
   process: string | null;
   processPath: string | null;
   isRisky: boolean;
-  isSuspicious: boolean;
   suspicionReason: string | null;
 }
 
@@ -30,7 +29,6 @@ export default function ConnectionDetails({
   process,
   processPath,
   isRisky,
-  isSuspicious,
   suspicionReason,
 }: ConnectionDetailsProps) {
   const { t } = useI18n();
@@ -64,7 +62,7 @@ export default function ConnectionDetails({
       <p>
         <strong>{t('processPath')}:</strong> {processPath || '-'}
       </p>
-      {(isRisky || isSuspicious) && (
+      {(isRisky) && (
         <p>
           <strong>{t('reason')}:</strong> {suspicionReason || '-'}
         </p>
