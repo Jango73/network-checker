@@ -25,6 +25,7 @@ export interface ScanResult {
   pid: number;
   process: string;
   processPath: string;
+  isSigned: boolean;
   isRisky: boolean;
   suspicionReason: string;
 }

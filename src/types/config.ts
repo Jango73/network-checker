@@ -8,6 +8,5 @@ export interface Config {
   language: string;
   scanInterval: number;
   maxHistorySize: number;
-  scanMode: 'live' | 'test';
   periodicScan: boolean;
 }

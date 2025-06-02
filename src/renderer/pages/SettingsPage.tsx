@@ -68,10 +68,6 @@ export default function SettingsPage() {
     saveConfig({ ...config, language: e.target.value });
   };
 
-  const handleScanModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    saveConfig({ ...config, scanMode: e.target.value as 'live' | 'test' });
-  };
-
   const handleNumericChange = (
     key: 'scanInterval' | 'maxHistorySize',
     value: string
@@ -324,13 +320,6 @@ export default function SettingsPage() {
       <section className={styles.section}>
         <h2>{t('devZone')}</h2>
         <div className={styles.inputGroup}>
-          <label>
-            {t('scanMode')}&nbsp;
-            <select value={config.scanMode} onChange={handleScanModeChange}>
-              <option value="live">{t('live')}</option>
-              <option value="test">{t('test')}</option>
-            </select>
-          </label>
         </div>
       </section>
 

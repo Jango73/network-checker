@@ -14,6 +14,7 @@ const validChannels = [
   'clear-history',
   'export-history',
   'show-save-dialog',
+  'get-ruleset',
 ] as const;
 
 type ValidChannel = (typeof validChannels)[number];

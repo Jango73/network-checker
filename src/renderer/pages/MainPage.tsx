@@ -9,7 +9,7 @@ import styles from './MainPage.module.css';
 export default function MainPage() {
   const { t } = useI18n();
   const { scanNetwork } = useScan();
-  const { connections, scanResults, isScanning } = useStore();
+  const { connections, scanResults, isScanning, addMessage } = useStore();
   const { config, saveConfig } = useConfig();
   const [progress, setProgress] = useState(0);
 
@@ -27,13 +27,19 @@ export default function MainPage() {
   // Handle scan button click
   const handleScanClick = async () => {
     if (!isScanning) {
-      await scanNetwork();
+      await scanNetwork(false);
     }
   };
 
   // Handle periodic scan toggle
   const handlePeriodicScanToggle = () => {
     saveConfig({ ...config, periodicScan: !config.periodicScan });
+  };
+
+ const handleScanWithFakeConnClick = async () => {
+    if (!isScanning) {
+      await scanNetwork(true);
+    }
   };
 
   return (
@@ -62,6 +68,7 @@ export default function MainPage() {
             </span>
           </div>
         )}
+        <button onClick={() => handleScanWithFakeConnClick()}>Scan with a fake connection</button>
       </div>
       <ConnectionTable />
     </div>

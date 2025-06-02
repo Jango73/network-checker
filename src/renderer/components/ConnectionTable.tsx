@@ -163,6 +163,7 @@ export default function ConnectionTable() {
                           pid={result.pid}
                           process={result.process}
                           processPath={result.processPath}
+                          isSigned={result.isSigned}
                           isRisky={result.isRisky}
                           suspicionReason={result.suspicionReason}
                         />

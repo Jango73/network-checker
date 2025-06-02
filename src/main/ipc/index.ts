@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { ipcMain, dialog } from 'electron';
 import { NetstatService } from '../services/NetstatService';
 import { ProcessService } from '../services/ProcessService';
@@ -9,6 +11,8 @@ interface IpcResponse<T> {
   data?: T;
   error?: string;
 }
+
+const RULESET_PATH = path.join(process.cwd(), 'ruleset.json');
 
 export function registerIpcHandlers(): void {
   const netstatService = new NetstatService();
@@ -186,4 +190,9 @@ export function registerIpcHandlers(): void {
       }
     }
   );
+
+  ipcMain.handle('get-ruleset', () => {
+    const data = fs.readFileSync(RULESET_PATH, 'utf-8');
+    return JSON.parse(data);
+  });
 }

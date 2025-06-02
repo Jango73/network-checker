@@ -59,7 +59,6 @@ export const useStore = create<StoreState>((set, get) => ({
     language: 'en',
     scanInterval: 60000,
     maxHistorySize: 10,
-    scanMode: 'live',
     periodicScan: true,
   },
   setConfig: config => set({ config }),
@@ -121,5 +120,5 @@ export const useStore = create<StoreState>((set, get) => ({
   },
   getPathRecurrence: (path: string) => {
     return get().pathRecurrence.get(path) || 0;
-  },
+  }
 }));

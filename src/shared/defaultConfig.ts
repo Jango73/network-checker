@@ -33,7 +33,6 @@ export const DEFAULT_CONFIG: Config = {
   language: 'en',
   scanInterval: 30 * 60 * 1000,
   maxHistorySize: 10,
-  scanMode: 'live',
   periodicScan: true,
 };
 

@@ -106,7 +106,7 @@ The application must provide a responsive, tab-based interface with the followin
 
 ##### 4.4 Configuration Management
 - Store user settings in `config.json` with fields:
-  - `riskyCountries`, `bannedIPs`, `trustedIPs`, `riskyProviders`, `trustedProcesses`, `intervalMin`, `maxHistorySize`, `isDarkMode`, `language`, `periodicScan`, `scanMode`.
+  - `riskyCountries`, `bannedIPs`, `trustedIPs`, `riskyProviders`, `trustedProcesses`, `intervalMin`, `maxHistorySize`, `isDarkMode`, `language`, `periodicScan`
 - Load defaults from `window.config.DEFAULT_CONFIG` if `config.json` is missing or empty.
 - Save settings automatically whenever they change.
 - Provide default values:

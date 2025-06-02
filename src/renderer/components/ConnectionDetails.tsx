@@ -13,6 +13,7 @@ interface ConnectionDetailsProps {
   pid: number;
   process: string | null;
   processPath: string | null;
+  isSigned:boolean; 
   isRisky: boolean;
   suspicionReason: string | null;
 }
@@ -28,6 +29,7 @@ export default function ConnectionDetails({
   pid,
   process,
   processPath,
+  isSigned,
   isRisky,
   suspicionReason,
 }: ConnectionDetailsProps) {
@@ -61,6 +63,9 @@ export default function ConnectionDetails({
       </p>
       <p>
         <strong>{t('processPath')}:</strong> {processPath || '-'}
+      </p>
+      <p>
+        <strong>{t('isSigned')}:</strong> {isSigned ? t('yes') : t('no')}
       </p>
       {(isRisky) && (
         <p>
