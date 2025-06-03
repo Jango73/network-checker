@@ -41,6 +41,12 @@ Available in english, french, spanish, italian, german, dutch, russian, chinese,
    npm run dev
    ```
 
+5. Run tests
+
+   ```
+   npm run test
+   ```
+
 4. Build for production:
 
    ```
