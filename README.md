@@ -1,117 +1,127 @@
 # Network Checker
 
-## What’s This About? (For Everyone)
+**Network Checker** is a Windows desktop application built with Electron and React. It scans active network connections, enriches them with metadata (IP, country, ISP, process, signature status), and evaluates their risk using a customizable rule-based engine. The app features an interactive UI with map visualization, history tracking, alerts, and export options.
 
-The **Network Checker** is a slick desktop app that keeps on eye on your computer’s network connections. It’s like having a personal security guard who checks what your machine is connecting to. Perfect for anyone who wants to stay secure without diving deep into tech jargon.
+## Features
 
-### What It Does:
+- Scan active TCP/UDP connections using `netstat`
+- Enrich results with geolocation and provider data from `ip-api.com`
+- Extract process information via `tasklist`, `wmic`, and PowerShell
+- Verify process digital signatures
+- Custom scoring engine with rule-based evaluation (`ruleset.json`)
+- Identify risky or suspicious connections
+- Interactive interface with:
+  - World map with color-coded pins
+  - Detailed tables
+  - History tab with exports (CSV/JSON)
+  - Customizable settings (dark mode, language, risk criteria, etc.)
+- Support for multiple languages (i18next)
+- Dark and light themes
+- Test mode with mock connections
 
-- **Scans Active Connections**: Lists all IP addresses your computer is connected to.
-- **Spots Risks**: Alerts you if a connection hits a risky country, IP, or provider you’ve flagged.
-- **Tracks History**: Saves past scans and lets you expand details right in the table for a quick look.
-- **Customizable**: You set what’s risky (countries, IPs, providers) and how often to scan.
-- **User-Friendly**: Supports 10 languages (English, French, Spanish, Russian, Chinese, etc.), dark mode, and a clean interface.
+## Installation
 
-Just click “Check Now,” and it’ll tell you if your network’s all good or if something’s fishy.
+1. Clone the repository:
 
-## How It Works (For Techies)
+   ```
+   git clone https://github.com/Jango73/network-checker.git
+   cd network-checker
+   ```
 
-The **Network Checker** is an Electron-based desktop app for monitoring network connections, built with React for a responsive UI and external APIs for IP analysis.
-It is meant to run on Windows but could be extended to Linux by adding the necessary process information in the relevant arrays and modifying the services to allow for Linux methods.
+2. Install dependencies:
 
-### Tech Stack
+   ```
+   npm install
+   ```
 
-- **Electron**: Powers the desktop app, handling the main process (Node.js) and renderer process (React).
-- **TypeScript**: Ensures type safety across the board.
-- **React**: Drives the UI in the renderer process, with hooks and components for a smooth user experience.
-- **Vite**: Handles fast builds and dev server for the frontend.
-- **Zustand**: Lightweight state management for the renderer process.
-- **i18next**: Manages internationalization for multi-language support.
-- **Axios**: Used for potential API calls (e.g., geolocation lookups).
-- **ESLint + Prettier**: Keeps the code clean and consistent.
-- **Electron Builder**: Packages the app for Windows (NSIS target).
+3. Start in development mode:
 
-### Project Structure
+   ```
+   npm run dev
+   ```
+
+4. Build for production:
+
+   ```
+   npm run build
+   ```
+
+## Usage
+
+After launching the app, you can:
+
+* Manually start a scan
+* Enable periodic scanning
+* Inspect connections in real time
+* Mark IPs or processes as safe
+* Configure risk criteria in the **Settings** tab
+* View past scans in the **History** tab
+* Export scan results as JSON or CSV
+
+## Configuration
+
+Settings are stored in `config.json` and include:
+
+* Risky countries
+* Banned and trusted IPs
+* Risky providers
+* Trusted processes
+* Scan interval and history size
+* Theme and language preferences
+* Scan mode (Live or Test)
+
+You can reset settings at any time via the UI.
+
+## Ruleset
+
+Risk evaluation is based on a scoring system defined in `ruleset.json`. It contains:
+
+* Named datasets (trusted folders, suspicious folders, known process locations)
+* Rules with multiple conditions and weights
+* Example: unsigned critical processes in wrong locations are penalized
+
+You can edit the `ruleset.json` file to fine-tune detection logic.
+
+## Limitations
+
+* Windows-only (uses `netstat`, `wmic`, PowerShell)
+* Geolocation relies on [ip-api.com](http://ip-api.com), limited to 45 requests/min
+* Process validation may fail for system-protected processes
+
+## Tech Stack
+
+* Electron (main process, IPC)
+* React (frontend UI)
+* Vite (build tool)
+* Zustand (state management)
+* Zod (schema validation)
+* i18next (translations)
+* Axios (HTTP requests)
+* Prettier + ESLint
+
+## Development
+
+Project structure:
 
 ```
-network-checker/
-├── src/
-│   ├── main/               # Electron main process (Node.js)
-│   │   ├── index.ts        # Entry point, creates BrowserWindow
-│   │   ├── preload.ts      # Secure bridge between main and renderer
-│   │   ├── services/       # Core logic for netstat, processes, config, history
-│   │   ├── utils/          # Helper functions (e.g., IP validation)
-│   │   └── ipc/            # IPC handlers for main-renderer communication
-│   ├── renderer/           # React frontend
-│   │   ├── components/     # Reusable UI components (e.g., ConnectionTable)
-│   │   ├── hooks/          # Custom hooks for config, history, scanning, i18n
-│   │   ├── pages/          # Main views: MainPage, MapPage, HistoryPage, SettingsPage
-│   │   ├── store/          # Zustand store for state management
-│   │   ├── styles/         # Global and module-specific CSS
-│   │   └── types/          # TypeScript type definitions for renderer
-│   ├── shared/             # Shared configs (e.g., defaultConfig.ts)
-│   └── types/              # Shared TypeScript types (connection, config, history)
-├── dist/                   # Build output
-├── .eslintrc.json          # ESLint config
-├── .prettierrc             # Prettier config
-├── package.json            # Dependencies and scripts
-├── tsconfig.json           # TypeScript config
-└── vite.config.ts          # Vite config for renderer
+src/
+├── main/         # Electron main process (IPC, services)
+├── renderer/     # React frontend (pages, components, styles)
+├── shared/       # Shared constants and logic
+├── types/        # TypeScript types
+├── assets/       # Static assets (map image, sounds, etc.)
 ```
 
-### How It Works
+Build commands:
 
-1. **Main Process** (`src/main/`):
+```bash
+npm run dev          # Start frontend dev server
+npm run build        # Full production build (tsc + vite + electron-builder)
+npm run typecheck    # Check types only
+npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+```
 
-    - **index.ts**: Sets up the Electron app, creates the `BrowserWindow`, and loads the renderer (dev: `localhost:5173`, prod: `index.html`).
-    - **preload.ts**: Exposes a secure `electron` API to the renderer via `contextBridge`, restricting IPC to specific channels (e.g., `run-netstat`, `load-config`).
-    - **services/**:
-        - `NetstatService.ts`: Runs `netstat -ano` to fetch active connections, parsing them into `Connection` objects (protocol, IPs, ports, PID).
-        - `ProcessService.ts`: Gets process details (name, path, signature status) using `tasklist` and `wmic` commands.
-        - `ConfigService.ts`: Manages `config.json` for user settings (banned IPs, trusted processes, etc.).
-        - `HistoryService.ts`: Handles `history.json` for storing and exporting scan history (JSON/CSV).
-    - **ipc/index.ts**: Defines IPC handlers to bridge main and renderer processes, ensuring secure communication.
+## License
 
-2. **Renderer Process** (`src/renderer/`):
-
-    - **index.tsx**: Entry point for React, initializes i18next and renders the `App` component.
-    - **pages/**:
-        - `MainPage.tsx`: Displays a control panel with a scan button, periodic scan toggle, and a `ConnectionTable` showing scan results.
-        - `MapPage.tsx`: Renders a canvas with a world map (`map.jpg`) and plots connections as pins (red for risky, green for safe) using Mercator projection.
-        - `HistoryPage.tsx`: Shows scan history with expandable entries and export options (JSON/CSV).
-        - `SettingsPage.tsx`: Allows users to manage banned IPs, risky countries/providers, trusted IPs/processes, and app settings (language, theme, scan interval).
-    - **hooks/**:
-        - `useConfig.ts`: Loads/saves config via IPC and syncs with Zustand store.
-        - `useHistory.ts`: Manages scan history (load, save, export, clear) via IPC.
-        - `useScan.ts`: Handles network scanning logic, integrating with `NetstatService` and geolocation lookups.
-        - `useI18n.ts`: Wraps i18next for translations.
-    - **store/index.ts**: Centralized Zustand store for config, connections, scan results, history, and messages.
-
-3. **Key Features**:
-
-    - **Network Scanning**: Uses `netstat` to list active TCP/UDP connections, enriched with process details and geolocation data (IP, country, city, etc.).
-    - **Risk Detection**: Flags connections as risky/suspicious based on user-defined banned IPs, risky countries/providers, or untrusted processes.
-    - **History Management**: Stores scan results in `history.json`, with size limits and export options.
-    - **Interactive Map**: Visualizes connections on a world map with clustering for nearby points and tooltips for details.
-    - **Configurability**: Users can tweak settings like scan intervals, trusted IPs/processes, and risky countries via a settings page.
-    - **i18n**: Supports multiple languages (English, French, Spanish, etc.) via i18next.
-    - **Theming**: Light/dark mode toggle with CSS variables.
-
-4. **Build & Run**:
-    - **Dev**: `npm run dev` for Vite dev server, `npm run start` to launch Electron.
-    - **Build**: `npm run build` compiles TypeScript and Vite, then uses Electron Builder to package for Windows.
-    - **Lint/Format**: `npm run lint` and `npm run format` for code quality.
-
-### Getting Started
-
-1. Clone the repo: `git clone https://github.com/Jango73/network-checker.git`
-2. Install dependencies: `npm install`
-3. Run in dev mode: `npm run dev` or `npm run start`
-4. Build for production: `npm run build`
-
-### Notes for Devs
-
-- **Security**: IPC channels are restricted to prevent unauthorized access. `contextIsolation` and `nodeIntegration: false` are enabled.
-- **Extensibility**: Add new IPC channels in `preload.ts` and `ipc/index.ts` for new features. Extend `Config` and `HistoryEntry` types as needed.
-- **Geolocation**: The app assumes external API calls for geolocation (not shown in code). Integrate with services like IP-API or MaxMind for real-world use.
-- **Performance**: History trimming ensures `history.json` stays under `maxHistorySize` (default 10MB).
+This project is licensed under the GPLv3.
