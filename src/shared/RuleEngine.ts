@@ -25,16 +25,13 @@ type Rule = {
 
 type Condition =
     | { field: string; equals: any }
-    | { field: string; in: string | any[] }
     | { field: string; greaterThan: number }
-    | {
-          field: string;
-          matchDatasetMap: { dataset: string; matchField: string };
-      }
-    | {
-          field: string;
-          notMatchDatasetMap: { dataset: string; matchField: string };
-      };
+    | { field: string; in: string | any[] }
+    | { field: string; notIn: string | any[] }
+    | { field: string; containsAny: string | any[] }
+    | { field: string; notContainsAny: string | any[] }
+    | { field: string; matchDatasetMap: { dataset: string; matchField: string } }
+    | { field: string; notMatchDatasetMap: { dataset: string; matchField: string } };
 
 export class RuleEngine {
     private rules: Rule[];
@@ -83,22 +80,56 @@ export class RuleEngine {
             return Number(value) > Number(condition.greaterThan);
         }
 
-        if ('in' in condition) {
-            if (typeof condition.in === 'string') {
-                if (condition.in.startsWith('@dataset:')) {
-                    const datasetKey = this.extractDatasetKey(condition.in);
+        if ('in' in condition || 'notIn' in condition) {
+            const ref = (condition as any).in ?? (condition as any).notIn;
+            let returnValue = false;
+
+            if (typeof ref === 'string') {
+                if (ref.startsWith('@dataset:')) {
+                    const datasetKey = this.extractDatasetKey(ref);
                     const dataset = this.datasets?.[datasetKey];
-                    return this.isIncludedInDataset(value, dataset);
+                    returnValue = this.isIncludedInDataset(value, dataset);
                 }
-                if (condition.in.startsWith('@config:')) {
-                    const configKey = this.extractDatasetKey(
-                        condition.in
-                    ) as keyof Config;
-                    return this.isIncluded(value, this.config?.[configKey]);
+                if (ref.startsWith('@config:')) {
+                    const configKey = this.extractDatasetKey(ref) as keyof Config;
+                    returnValue = this.isIncluded(value, this.config?.[configKey]);
                 }
-            } else if (Array.isArray(condition.in)) {
-                return this.isIncluded(value, condition.in);
+            } else if (Array.isArray(ref)) {
+                returnValue = this.isIncluded(value, ref);
             }
+
+            if ('notIn' in condition)
+                returnValue = !returnValue;
+
+            return returnValue;
+        }
+
+        if ('containsAny' in condition || 'notContainsAny' in condition) {
+            const ref = (condition as any).containsAny ?? (condition as any).notContainsAny;
+            let returnValue = false;
+            let list: string[] = [];
+
+            if (typeof ref === 'string') {
+                if (ref.startsWith('@dataset:')) {
+                    const datasetKey = this.extractDatasetKey(ref);
+                    const dataset = this.datasets?.[datasetKey];
+                    list = Array.isArray(dataset?.values) ? dataset.values : [];
+                }
+                if (ref.startsWith('@config:')) {
+                    const configKey = this.extractDatasetKey(ref) as keyof Config;
+                    const configList = this.config?.[configKey];
+                    list = Array.isArray(configList) ? configList : [];
+                }
+            } else if (Array.isArray(ref)) {
+                list = ref;
+            }
+
+            returnValue = this.isContained(value, list);
+
+            if ('notContainsAny' in condition)
+                returnValue = !returnValue;
+
+            return returnValue;
         }
 
         if ('matchDatasetMap' in condition) {
@@ -137,12 +168,36 @@ export class RuleEngine {
         return false;
     }
 
+    private isContained(value: any, list: unknown): boolean {
+        return typeof value === 'string' && Array.isArray(list)
+            ? list.some(entry => typeof entry === 'string' && value.includes(entry))
+            : false;
+    }
+
     private resolveField(field: string, context: RuleContext): any {
         return context[field];
     }
 
     private extractDatasetKey(raw: string): string {
         return raw.replace(/^@(?:dataset|config):/, '');
+    }
+
+    private isIncludedInDataset(value: any, dataset: any): boolean {
+        if (!dataset || !dataset.values) return false;
+
+        if (dataset.type === 'regex') {
+            return dataset.values.some((regex: RegExp) => regex.test(value));
+        }
+
+        if (dataset.type === 'array') {
+            return dataset.values.includes(value);
+        }
+
+        if (dataset.type === 'map') {
+            return Object.keys(dataset.values).includes(value.toLowerCase());
+        }
+
+        return false;
     }
 
     private _prepareDatasets(
@@ -178,23 +233,5 @@ export class RuleEngine {
         }
 
         return compiled;
-    }
-
-    private isIncludedInDataset(value: any, dataset: any): boolean {
-        if (!dataset || !dataset.values) return false;
-
-        if (dataset.type === 'regex') {
-            return dataset.values.some((regex: RegExp) => regex.test(value));
-        }
-
-        if (dataset.type === 'array') {
-            return dataset.values.includes(value);
-        }
-
-        if (dataset.type === 'map') {
-            return Object.keys(dataset.values).includes(value.toLowerCase());
-        }
-
-        return false;
     }
 }

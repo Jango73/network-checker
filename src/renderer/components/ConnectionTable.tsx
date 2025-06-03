@@ -103,8 +103,7 @@ export default function ConnectionTable() {
                                         <td>
                                             {result.isRisky ? (
                                                 <span className={styles.risky}>
-                                                    {t('risky')} (
-                                                    {result.suspicionReason})
+                                                    {t('risky')}
                                                 </span>
                                             ) : (
                                                 <span className={styles.safe}>
