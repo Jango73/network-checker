@@ -7,7 +7,7 @@ import { Connection, ScanResult } from '../../types/network';
 import { HistoryEntry } from '../../types/history';
 import alertSound from '@assets/alert.mp3';
 import { isValidIP, isLocalIP } from '@main/utils/ip';
-import { RuleEngine } from '@shared/RuleEngine';
+import { RuleEngine, RuleContext } from '@shared/RuleEngine';
 
 export const useScan = () => {
     const { t } = useI18n();
@@ -171,8 +171,7 @@ export const useScan = () => {
 
                 setConnections(rawConnections);
 
-                const ruleset =
-                    await window.electron.ipcRenderer.invoke('get-ruleset');
+                const ruleset = await window.electron.ipcRenderer.invoke('get-ruleset');
                 const engine = new RuleEngine(ruleset, config);
                 const results: ScanResult[] = [];
                 let requestCount = 0;
@@ -254,21 +253,12 @@ export const useScan = () => {
                     const geoData = await fetchGeoData(conn.remoteAddress);
                     requestCount++;
 
-                    const context = {
+                    const context:RuleContext = {
                         process: processName,
                         processPath,
                         isSigned,
-                        recurrence,
                         country: geoData?.country || '',
                         provider: geoData?.provider || '',
-                        organization: geoData?.organization || '',
-                        nonRiskyHistoryCount: history.filter(
-                            (h: HistoryEntry) =>
-                                h.process.toLowerCase() ===
-                                    processName.toLowerCase() && !h.isRisky
-                        ).length,
-                        config,
-                        datasets: ruleset.datasets,
                     };
 
                     const { score, reasons } = engine.evaluate(context);

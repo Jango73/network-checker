@@ -52,6 +52,17 @@ export default defineConfig({
             '@assets': path.resolve(__dirname, 'src/renderer/assets'),
         },
     },
+    test: {
+        globals: true,
+        environment: 'node',
+        alias: {
+            '@renderer': path.resolve(__dirname, 'src/renderer'),
+            '@main': path.resolve(__dirname, 'src/main'),
+            '@config': path.resolve(__dirname, 'src/config'),
+            '@shared': path.resolve(__dirname, 'src/shared'),
+            '@types': path.resolve(__dirname, 'src/types')
+        }
+    },
     css: {
         modules: {
             localsConvention: 'camelCase',

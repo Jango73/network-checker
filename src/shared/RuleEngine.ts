@@ -6,9 +6,6 @@ export interface RuleContext {
     isSigned: boolean;
     country?: string;
     provider?: string;
-    organization?: string;
-    config: Config;
-    datasets: Record<string, any>;
     [key: string]: any;
 }
 
@@ -52,14 +49,17 @@ export class RuleEngine {
         const reasons: string[] = [];
 
         for (const rule of this.rules) {
-            const allConditionsPass = rule.conditions.every(cond =>
-                this.evaluateCondition(cond, context)
-            );
+            const results = rule.conditions.map(cond => ({
+                cond,
+                value: this.resolveField(cond.field, context),
+                passed: this.evaluateCondition(cond, context)
+            }));
+
+            const allConditionsPass = results.every(r => r.passed);
+
             if (allConditionsPass) {
                 score += rule.weight;
-                if (rule.weight < 0) {
-                    reasons.push(rule.label);
-                }
+                if (rule.weight < 0) reasons.push(rule.label);
             }
         }
 
@@ -163,14 +163,21 @@ export class RuleEngine {
 
     private isIncluded(value: any, list: unknown): boolean {
         if (Array.isArray(list)) {
-            return list.includes(value);
+            return list.some(item =>
+                typeof item === 'string' && typeof value === 'string'
+                    ? item.toLowerCase() === value.toLowerCase()
+                    : item === value
+            );
         }
         return false;
     }
 
     private isContained(value: any, list: unknown): boolean {
         return typeof value === 'string' && Array.isArray(list)
-            ? list.some(entry => typeof entry === 'string' && value.includes(entry))
+            ? list.some(entry =>
+                typeof entry === 'string' &&
+                value.toLowerCase().includes(entry.toLowerCase())
+            )
             : false;
     }
 

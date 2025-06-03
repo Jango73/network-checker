@@ -29,7 +29,8 @@
         "lint": "eslint . --ext .ts,.tsx",
         "lint-fix": "eslint .  --fix --ext .ts,.tsx",
         "format": "prettier --write .",
-        "build:main": "tsc --project tsconfig.json --outDir dist/main"
+        "build:main": "tsc --project tsconfig.json --outDir dist/main",
+        "test": "npx vitest run"
     },
     "devDependencies": {
         "@types/node": "^22.7.4",
