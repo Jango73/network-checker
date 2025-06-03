@@ -39,32 +39,31 @@
         "opera.exe": "Program Files( \\(x86\\))?/Opera/opera\\.exe$",
         "brave.exe": "Program Files( \\(x86\\))?/BraveSoftware/Brave-Browser/Application/brave\\.exe$",
         "code.exe": "Program Files( \\(x86\\))?/Microsoft VS Code/Code\\.exe$",
-        "discord.exe": "AppData/Local/Discord/app-[0-9.]+\\.exe$",
+        "Microsoft.Photos.exe": "Program Files/WindowsApps/Microsoft\\.Windows\\.Photos_[\\d.]+_x64__8wekyb3d8bbwe/Microsoft\\.Photos\\.exe$",
+        "discord.exe": "AppData/Local/Discord/app-[0-9.]+/Discord\\.exe$",
         "spotify.exe": "AppData/Roaming/Spotify/Spotify\\.exe$",
         "notepad.exe": "Windows/(System32|SysWOW64)/notepad\\.exe$",
+        "SearchApp.exe": "Windows/SystemApps/Microsoft.Windows.Search_cw5n1h2txyewy/SearchApp\\.exe$",
         "explorer.exe": "Windows/explorer\\.exe$",
         "taskmgr.exe": "Windows/System32/Taskmgr\\.exe$",
-        "Microsoft.Photos.exe": "Program Files/WindowsApps/Microsoft\\.Windows\\.Photos_[\\d.]+_x64__8wekyb3d8bbwe/Microsoft\\.Photos\\.exe$"
+        "svchost.exe": "Windows/System32/svchost\\.exe$",
+        "lsass.exe": "Windows/System32/lsass\\.exe$",
+        "wininit.exe": "Windows/System32/wininit\\.exe$",
+        "csrss.exe": "Windows/System32/csrss\\.exe$",
+        "smss.exe": "Windows/System32/smss\\.exe$",
+        "winlogon.exe": "Windows/System32/winlogon\\.exe$",
+        "dwm.exe": "Windows/System32/dwm\\.exe$",
+        "services.exe": "Windows/System32/services\\.exe$",
+        "taskhostw.exe": "Windows/System32/taskhostw\\.exe$",
+        "conhost.exe": "Windows/System32/conhost\\.exe$",
+        "rundll32.exe": "Windows/System32/rundll32\\.exe$",
+        "dllhost.exe": "Windows/System32/dllhost\\.exe$",
+        "msmpeng.exe": "Windows/System32/msmpeng\\.exe$",
+        "spoolsv.exe": "Windows/System32/spoolsv\\.exe$",
+        "ctfmon.exe": "Windows/System32/ctfmon\\.exe$",
+        "MpDefenderCoreService.exe": "Windows/System32/MpDefenderCoreService\\.exe$"
       }
-    },
-    "systemProcesses": [
-      "svchost.exe",
-      "lsass.exe",
-      "wininit.exe",
-      "csrss.exe",
-      "smss.exe",
-      "winlogon.exe",
-      "dwm.exe",
-      "services.exe",
-      "taskhostw.exe",
-      "conhost.exe",
-      "rundll32.exe",
-      "dllhost.exe",
-      "msmpeng.exe",
-      "spoolsv.exe",
-      "ctfmon.exe",
-      "MpDefenderCoreService.exe"
-    ]
+    }
   },
   "rules": [
     {
@@ -96,20 +95,6 @@
             "dataset": "processLocations",
             "matchField": "process"
           }
-        }
-      ],
-      "weight": 100
-    },
-    {
-      "label": "systemProcessWithoutAPath",
-      "conditions": [
-        {
-          "field": "process",
-          "in": "@dataset:systemProcesses"
-        },
-        {
-          "field": "processPath",
-          "equals": ""
         }
       ],
       "weight": 100
@@ -170,16 +155,6 @@
         }
       ],
       "weight": 999
-    },
-    {
-      "label": "legitProcessUsingHistory",
-      "conditions": [
-        {
-          "field": "nonRiskyHistoryCount",
-          "greaterThan": 5
-        }
-      ],
-      "weight": 50
     },
     {
       "label": "knownProcessWrongPath",

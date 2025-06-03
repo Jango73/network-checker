@@ -36,7 +36,7 @@ export default function ConnectionTable() {
     processName: string
   ) => {
     if (processName && !config.trustedProcesses.includes(processPath)) {
-      const newTrustedProcesses = [...config.trustedProcesses, processPath];
+      const newTrustedProcesses = [...config.trustedProcesses, processName];
       saveConfig({ ...config, trustedProcesses: newTrustedProcesses });
       addMessage('success', t('processMarkedSafe', { processName }));
     } else if (!processName) {

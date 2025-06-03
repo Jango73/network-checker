@@ -82,17 +82,13 @@ export const useScan = () => {
     const legitProcessFolders = Object.values(
       ruleset.datasets.processLocations?.values || {}
     );
-    const systemProcesses = ruleset.datasets.systemProcesses || [];
 
-    const useSystemProcess = Math.random() < 0.5;
     const useKnownProcess = Math.random() < 0.5;
 
     let processName = '';
     let processPath = '';
 
-    if (useSystemProcess) {
-      processName = getRandomFromArray(systemProcesses);
-    } else if (useKnownProcess) {
+    if (useKnownProcess) {
       processName = getRandomFromArray(legitProcessNames)
     } else {
       processName = generateRandomExecutableName();
@@ -154,24 +150,25 @@ export const useScan = () => {
     try {
       let rawConnections: Connection[] = [];
 
-      const response = await window.electron.ipcRenderer.invoke('run-netstat');
-      if (!response.success)
-        throw new Error(response.error || t('netstatFailed'));
-      rawConnections = response.data.filter(
-        (conn: Connection) =>
-          conn.state === 'ESTABLISHED' &&
-          isValidIP(conn.remoteAddress) &&
-          !isLocalIP(conn.remoteAddress) &&
-          conn.remoteAddress !== '::'
-      );
+      if (useFakeConnection) {
+        for (let i = 1; i <= 10; i++) {
+          const fakeConn = await generateFakeConnection();
+          rawConnections.push(fakeConn);
+        }
+      } else {
+        const response = await window.electron.ipcRenderer.invoke('run-netstat');
+        if (!response.success)
+          throw new Error(response.error || t('netstatFailed'));
+        rawConnections = response.data.filter(
+          (conn: Connection) =>
+            conn.state === 'ESTABLISHED' &&
+            isValidIP(conn.remoteAddress) &&
+            !isLocalIP(conn.remoteAddress) &&
+            conn.remoteAddress !== '::'
+        );
+      }
 
       setConnections(rawConnections);
-
-      if (useFakeConnection) {
-        const fakeConn = await generateFakeConnection();
-        console.log('[useScan] Inserting fake connection: ', fakeConn);
-        rawConnections.push(fakeConn);
-      }
 
       const ruleset = await window.electron.ipcRenderer.invoke('get-ruleset');
       const engine = new RuleEngine(ruleset, config);

@@ -19,7 +19,7 @@ export const usePeriodicScan = () => {
     if (config.periodicScan) {
       // Trigger periodic scans
       scanInterval = setInterval(async () => {
-        await scanNetwork();
+        await scanNetwork(false);
         setLastScanTime(Date.now());
       }, config.scanInterval);
 

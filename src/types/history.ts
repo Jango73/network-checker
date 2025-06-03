@@ -15,6 +15,7 @@ export interface HistoryEntry {
   pid: number;
   process: string;
   processPath: string;
+  isSigned: boolean;
   isRisky: boolean;
   suspicionReason: string;
 }

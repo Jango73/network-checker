@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '@renderer/hooks/useI18n';
+import { useScan } from '@renderer/hooks/useScan';
 import { useStore } from '@renderer/store';
 import { useConfig } from '@renderer/hooks/useConfig';
 import { useTheme } from '@renderer/hooks/useTheme';
@@ -17,7 +18,8 @@ type ArrayConfigKeys =
 export default function SettingsPage() {
   const { t } = useI18n();
   const { config, saveConfig, loadConfig, resetConfig } = useConfig();
-  const { addMessage } = useStore();
+  const { scanNetwork } = useScan();
+  const { isScanning, addMessage } = useStore();
   const { toggleTheme } = useTheme();
   const [form, setForm] = useState({
     bannedIP: '',
@@ -100,6 +102,12 @@ export default function SettingsPage() {
       addMessage('success', t('settingsReset'));
     } catch (error) {
       addMessage('error', (error as Error).message);
+    }
+  };
+
+ const handleScanWithFakeConnClick = async () => {
+    if (!isScanning) {
+      await scanNetwork(true);
     }
   };
 
@@ -320,6 +328,7 @@ export default function SettingsPage() {
       <section className={styles.section}>
         <h2>{t('devZone')}</h2>
         <div className={styles.inputGroup}>
+          <button onClick={() => handleScanWithFakeConnClick()}>Scan with a fake connection</button>
         </div>
       </section>
 

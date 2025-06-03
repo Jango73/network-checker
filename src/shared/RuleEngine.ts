@@ -19,8 +19,7 @@ type RuleSet = {
 
 type Rule = {
     label: string;
-    condition: Condition;
-    extraCondition?: Condition;
+    conditions: Condition[];
     weight: number;
 };
 
@@ -43,9 +42,6 @@ export class RuleEngine {
     }
 
     public evaluate(context: RuleContext): { score: number; reasons: string[] } {
-        console.log("[RuleEngine] --------------------");
-        console.log("[RuleEngine] Evaluating: ", context.process);
-
         let score = -5;
         const reasons: string[] = [];
 
@@ -54,7 +50,6 @@ export class RuleEngine {
                 this.evaluateCondition(cond, context)
             );
             if (allConditionsPass) {
-                console.log("[RuleEngine] Rule passed: ", rule.label);
                 score += rule.weight;
                 if (rule.weight < 0) {
                     reasons.push(rule.label);
@@ -80,14 +75,8 @@ export class RuleEngine {
             if (typeof condition.in === 'string') {
                 if (condition.in.startsWith('@dataset:')) {
                     const datasetKey = this.extractDatasetKey(condition.in);
-                    const dataset = this.datasets?.[datasetKey]; // ← ici au lieu de context.datasets
-                    if (!dataset || !dataset.values) return false;
-
-                    if (dataset.type === 'regex') {
-                        return dataset.values.some((regex: RegExp) => regex.test(value));
-                    }
-
-                    return this.isIncluded(value, dataset.values);
+                    const dataset = this.datasets?.[datasetKey];
+                    return this.isIncludedInDataset(value, dataset);
                 }
                 if (condition.in.startsWith('@config:')) {
                     const configKey = this.extractDatasetKey(condition.in) as keyof Config;
@@ -152,11 +141,12 @@ export class RuleEngine {
                     values: value.values.map((r: string) => new RegExp(r, 'i')),
                 };
             } else if (value.type === 'map') {
+                const entries = Object.entries(value.values as Record<string, string>);
                 compiled[key] = {
                     type: 'map',
                     values: Object.fromEntries(
-                        Object.entries(value.values).map(([k, v]) => [k.toLowerCase(), new RegExp(v, 'i')])
-                    )
+                        entries.map(([k, v]) => [k.toLowerCase(), new RegExp(v, 'i')])
+                    ),
                 };
             } else {
                 compiled[key] = {
@@ -167,5 +157,23 @@ export class RuleEngine {
         }
 
         return compiled;
+    }
+
+    private isIncludedInDataset(value: any, dataset: any): boolean {
+        if (!dataset || !dataset.values) return false;
+
+        if (dataset.type === 'regex') {
+            return dataset.values.some((regex: RegExp) => regex.test(value));
+        }
+
+        if (dataset.type === 'array') {
+            return dataset.values.includes(value);
+        }
+
+        if (dataset.type === 'map') {
+            return Object.keys(dataset.values).includes(value.toLowerCase());
+        }
+
+        return false;
     }
 }

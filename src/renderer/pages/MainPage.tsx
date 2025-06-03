@@ -36,12 +36,6 @@ export default function MainPage() {
     saveConfig({ ...config, periodicScan: !config.periodicScan });
   };
 
- const handleScanWithFakeConnClick = async () => {
-    if (!isScanning) {
-      await scanNetwork(true);
-    }
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.controls}>
@@ -68,7 +62,6 @@ export default function MainPage() {
             </span>
           </div>
         )}
-        <button onClick={() => handleScanWithFakeConnClick()}>Scan with a fake connection</button>
       </div>
       <ConnectionTable />
     </div>

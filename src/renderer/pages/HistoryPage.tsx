@@ -72,6 +72,7 @@ export default function HistoryPage() {
                       pid={entry.pid}
                       process={entry.process}
                       processPath={entry.processPath}
+                      isSigned={entry.isSigned}
                       isRisky={entry.isRisky}
                       suspicionReason={entry.suspicionReason}
                     />
