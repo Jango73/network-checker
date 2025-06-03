@@ -377,7 +377,7 @@ export default function SettingsPage() {
                 <h2>{t('devZone')}</h2>
                 <div className={styles.inputGroup}>
                     <button onClick={() => handleScanWithFakeConnClick()}>
-                        Scan with a fake connection
+                        Scan with fake connections
                     </button>
                 </div>
             </section>

@@ -67,6 +67,26 @@
     },
     "rules": [
         {
+            "label": "bannedIP",
+            "conditions": [
+                {
+                    "field": "ip",
+                    "in": "@config:bannedIPs"
+                }
+            ],
+            "weight": -999
+        },
+        {
+            "label": "trustedIP",
+            "conditions": [
+                {
+                    "field": "ip",
+                    "in": "@config:trustedIPs"
+                }
+            ],
+            "weight": 999
+        },
+        {
             "label": "suspiciousPath",
             "conditions": [
                 {
@@ -182,6 +202,36 @@
                 }
             ],
             "weight": -80
+        },
+        {
+            "label": "riskyCountry",
+            "conditions": [
+                {
+                    "field": "country",
+                    "in": "@config:riskyCountries"
+                }
+            ],
+            "weight": -60
+        },
+        {
+            "label": "safeCountry",
+            "conditions": [
+                {
+                    "field": "country",
+                    "notIn": "@config:riskyCountries"
+                }
+            ],
+            "weight": 10
+        },
+        {
+            "label": "riskyProvider",
+            "conditions": [
+                {
+                    "field": "provider",
+                    "containsAny": "@config:riskyProviders"
+                }
+            ],
+            "weight": -40
         }
     ]
 }
