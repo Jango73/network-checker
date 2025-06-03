@@ -1,187 +1,187 @@
 {
-  "datasets": {
-    "legitFolders": {
-      "type": "regex",
-      "values": [
-        "/AppData/Local/Programs/",
-        "/Steam/",
-        "/Epic Games/",
-        "/Program Files( \\(x86\\))?/Microsoft/Edge/Application/",
-        "/Program Files( \\(x86\\))?/Google/Chrome/Application/",
-        "/Program Files( \\(x86\\))?/Mozilla Firefox/",
-        "/Program Files( \\(x86\\))?/BraveSoftware/Brave-Browser/",
-        "/Program Files( \\(x86\\))?/Opera/",
-        "/Program Files( \\(x86\\))?/Microsoft/Office/root/Office[0-9]+/",
-        "/Program Files( \\(x86\\))?/Adobe/Acrobat.*/",
-        "/Program Files( \\(x86\\))?/Common Files/",
-        "/Windows/System32/",
-        "/Windows/SysWOW64/"
-      ]
-    },
-    "suspiciousFolders": {
-      "type": "regex",
-      "values": [
-        "/Temp/",
-        "/Downloads/",
-        "/AppData/Local/Temp/",
-        "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/",
-        "/Users/[^/]+/AppData/Local/[^/]+/Temp/",
-        "/Public/",
-        "/Recycle\\.Bin/"
-      ]
-    },
-    "processLocations": {
-      "type": "map",
-      "values": {
-        "chrome.exe": "Program Files( \\(x86\\))?/Google/Chrome/Application/chrome\\.exe$",
-        "firefox.exe": "Program Files( \\(x86\\))?/Mozilla Firefox/firefox\\.exe$",
-        "msedge.exe": "Program Files( \\(x86\\))?/Microsoft/Edge/Application/msedge\\.exe$",
-        "opera.exe": "Program Files( \\(x86\\))?/Opera/opera\\.exe$",
-        "brave.exe": "Program Files( \\(x86\\))?/BraveSoftware/Brave-Browser/Application/brave\\.exe$",
-        "code.exe": "Program Files( \\(x86\\))?/Microsoft VS Code/Code\\.exe$",
-        "Microsoft.Photos.exe": "Program Files/WindowsApps/Microsoft\\.Windows\\.Photos_[\\d.]+_x64__8wekyb3d8bbwe/Microsoft\\.Photos\\.exe$",
-        "discord.exe": "AppData/Local/Discord/app-[0-9.]+/Discord\\.exe$",
-        "spotify.exe": "AppData/Roaming/Spotify/Spotify\\.exe$",
-        "notepad.exe": "Windows/(System32|SysWOW64)/notepad\\.exe$",
-        "SearchApp.exe": "Windows/SystemApps/Microsoft.Windows.Search_cw5n1h2txyewy/SearchApp\\.exe$",
-        "explorer.exe": "Windows/explorer\\.exe$",
-        "taskmgr.exe": "Windows/System32/Taskmgr\\.exe$",
-        "svchost.exe": "Windows/System32/svchost\\.exe$",
-        "lsass.exe": "Windows/System32/lsass\\.exe$",
-        "wininit.exe": "Windows/System32/wininit\\.exe$",
-        "csrss.exe": "Windows/System32/csrss\\.exe$",
-        "smss.exe": "Windows/System32/smss\\.exe$",
-        "winlogon.exe": "Windows/System32/winlogon\\.exe$",
-        "dwm.exe": "Windows/System32/dwm\\.exe$",
-        "services.exe": "Windows/System32/services\\.exe$",
-        "taskhostw.exe": "Windows/System32/taskhostw\\.exe$",
-        "conhost.exe": "Windows/System32/conhost\\.exe$",
-        "rundll32.exe": "Windows/System32/rundll32\\.exe$",
-        "dllhost.exe": "Windows/System32/dllhost\\.exe$",
-        "msmpeng.exe": "Windows/System32/msmpeng\\.exe$",
-        "spoolsv.exe": "Windows/System32/spoolsv\\.exe$",
-        "ctfmon.exe": "Windows/System32/ctfmon\\.exe$",
-        "MpDefenderCoreService.exe": "Windows/System32/MpDefenderCoreService\\.exe$"
-      }
-    }
-  },
-  "rules": [
-    {
-      "label": "suspiciousPath",
-      "conditions": [
-        {
-          "field": "processPath",
-          "in": "@dataset:suspiciousFolders"
+    "datasets": {
+        "legitFolders": {
+            "type": "regex",
+            "values": [
+                "/AppData/Local/Programs/",
+                "/Steam/",
+                "/Epic Games/",
+                "/Program Files( \\(x86\\))?/Microsoft/Edge/Application/",
+                "/Program Files( \\(x86\\))?/Google/Chrome/Application/",
+                "/Program Files( \\(x86\\))?/Mozilla Firefox/",
+                "/Program Files( \\(x86\\))?/BraveSoftware/Brave-Browser/",
+                "/Program Files( \\(x86\\))?/Opera/",
+                "/Program Files( \\(x86\\))?/Microsoft/Office/root/Office[0-9]+/",
+                "/Program Files( \\(x86\\))?/Adobe/Acrobat.*/",
+                "/Program Files( \\(x86\\))?/Common Files/",
+                "/Windows/System32/",
+                "/Windows/SysWOW64/"
+            ]
+        },
+        "suspiciousFolders": {
+            "type": "regex",
+            "values": [
+                "/Temp/",
+                "/Downloads/",
+                "/AppData/Local/Temp/",
+                "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/",
+                "/Users/[^/]+/AppData/Local/[^/]+/Temp/",
+                "/Public/",
+                "/Recycle\\.Bin/"
+            ]
+        },
+        "processLocations": {
+            "type": "map",
+            "values": {
+                "chrome.exe": "Program Files( \\(x86\\))?/Google/Chrome/Application/chrome\\.exe$",
+                "firefox.exe": "Program Files( \\(x86\\))?/Mozilla Firefox/firefox\\.exe$",
+                "msedge.exe": "Program Files( \\(x86\\))?/Microsoft/Edge/Application/msedge\\.exe$",
+                "opera.exe": "Program Files( \\(x86\\))?/Opera/opera\\.exe$",
+                "brave.exe": "Program Files( \\(x86\\))?/BraveSoftware/Brave-Browser/Application/brave\\.exe$",
+                "code.exe": "Program Files( \\(x86\\))?/Microsoft VS Code/Code\\.exe$",
+                "Microsoft.Photos.exe": "Program Files/WindowsApps/Microsoft\\.Windows\\.Photos_[\\d.]+_x64__8wekyb3d8bbwe/Microsoft\\.Photos\\.exe$",
+                "discord.exe": "AppData/Local/Discord/app-[0-9.]+/Discord\\.exe$",
+                "spotify.exe": "AppData/Roaming/Spotify/Spotify\\.exe$",
+                "notepad.exe": "Windows/(System32|SysWOW64)/notepad\\.exe$",
+                "SearchApp.exe": "Windows/SystemApps/Microsoft.Windows.Search_cw5n1h2txyewy/SearchApp\\.exe$",
+                "explorer.exe": "Windows/explorer\\.exe$",
+                "taskmgr.exe": "Windows/System32/Taskmgr\\.exe$",
+                "svchost.exe": "Windows/System32/svchost\\.exe$",
+                "lsass.exe": "Windows/System32/lsass\\.exe$",
+                "wininit.exe": "Windows/System32/wininit\\.exe$",
+                "csrss.exe": "Windows/System32/csrss\\.exe$",
+                "smss.exe": "Windows/System32/smss\\.exe$",
+                "winlogon.exe": "Windows/System32/winlogon\\.exe$",
+                "dwm.exe": "Windows/System32/dwm\\.exe$",
+                "services.exe": "Windows/System32/services\\.exe$",
+                "taskhostw.exe": "Windows/System32/taskhostw\\.exe$",
+                "conhost.exe": "Windows/System32/conhost\\.exe$",
+                "rundll32.exe": "Windows/System32/rundll32\\.exe$",
+                "dllhost.exe": "Windows/System32/dllhost\\.exe$",
+                "msmpeng.exe": "Windows/System32/msmpeng\\.exe$",
+                "spoolsv.exe": "Windows/System32/spoolsv\\.exe$",
+                "ctfmon.exe": "Windows/System32/ctfmon\\.exe$",
+                "MpDefenderCoreService.exe": "Windows/System32/MpDefenderCoreService\\.exe$"
+            }
         }
-      ],
-      "weight": -40
     },
-    {
-      "label": "legitPath",
-      "conditions": [
+    "rules": [
         {
-          "field": "processPath",
-          "in": "@dataset:legitFolders"
-        }
-      ],
-      "weight": 80
-    },
-    {
-      "label": "legitPathForKnownProcesses",
-      "conditions": [
-        {
-          "field": "processPath",
-          "matchDatasetMap": {
-            "dataset": "processLocations",
-            "matchField": "process"
-          }
-        }
-      ],
-      "weight": 100
-    },
-    {
-      "label": "criticalProcessInBadLocation",
-      "conditions": [
-        {
-          "field": "process",
-          "in": ["svchost.exe", "cmd.exe", "rundll32.exe"]
+            "label": "suspiciousPath",
+            "conditions": [
+                {
+                    "field": "processPath",
+                    "in": "@dataset:suspiciousFolders"
+                }
+            ],
+            "weight": -40
         },
         {
-          "field": "processPath",
-          "notMatchDatasetMap": {
-            "dataset": "processLocations",
-            "matchField": "process"
-          }
-        }
-      ],
-      "weight": -50
-    },
-    {
-      "label": "signedProcess",
-      "conditions": [
-        {
-          "field": "isSigned",
-          "equals": true
-        }
-      ],
-      "weight": 40
-    },
-    {
-      "label": "unsignedProcess",
-      "conditions": [
-        {
-          "field": "isSigned",
-          "equals": false
-        }
-      ],
-      "weight": -40
-    },
-    {
-      "label": "processInTrustedProcesses",
-      "conditions": [
-        {
-          "field": "process",
-          "in": "@config:trustedProcesses"
-        }
-      ],
-      "weight": 999
-    },
-    {
-      "label": "pathInTrustedProcesses",
-      "conditions": [
-        {
-          "field": "processPath",
-          "in": "@config:trustedProcesses"
-        }
-      ],
-      "weight": 999
-    },
-    {
-      "label": "knownProcessWrongPath",
-      "conditions": [
-        {
-          "field": "process",
-          "in": "@dataset:processLocations"
+            "label": "legitPath",
+            "conditions": [
+                {
+                    "field": "processPath",
+                    "in": "@dataset:legitFolders"
+                }
+            ],
+            "weight": 80
         },
         {
-          "field": "processPath",
-          "notMatchDatasetMap": {
-            "dataset": "processLocations",
-            "matchField": "process"
-          }
-        }
-      ],
-      "weight": -70
-    },
-    {
-      "label": "emptyProcessPath",
-      "conditions": [
+            "label": "legitPathForKnownProcesses",
+            "conditions": [
+                {
+                    "field": "processPath",
+                    "matchDatasetMap": {
+                        "dataset": "processLocations",
+                        "matchField": "process"
+                    }
+                }
+            ],
+            "weight": 100
+        },
         {
-          "field": "processPath",
-          "equals": ""
+            "label": "criticalProcessInBadLocation",
+            "conditions": [
+                {
+                    "field": "process",
+                    "in": ["svchost.exe", "cmd.exe", "rundll32.exe"]
+                },
+                {
+                    "field": "processPath",
+                    "notMatchDatasetMap": {
+                        "dataset": "processLocations",
+                        "matchField": "process"
+                    }
+                }
+            ],
+            "weight": -50
+        },
+        {
+            "label": "signedProcess",
+            "conditions": [
+                {
+                    "field": "isSigned",
+                    "equals": true
+                }
+            ],
+            "weight": 40
+        },
+        {
+            "label": "unsignedProcess",
+            "conditions": [
+                {
+                    "field": "isSigned",
+                    "equals": false
+                }
+            ],
+            "weight": -40
+        },
+        {
+            "label": "processInTrustedProcesses",
+            "conditions": [
+                {
+                    "field": "process",
+                    "in": "@config:trustedProcesses"
+                }
+            ],
+            "weight": 999
+        },
+        {
+            "label": "pathInTrustedProcesses",
+            "conditions": [
+                {
+                    "field": "processPath",
+                    "in": "@config:trustedProcesses"
+                }
+            ],
+            "weight": 999
+        },
+        {
+            "label": "knownProcessWrongPath",
+            "conditions": [
+                {
+                    "field": "process",
+                    "in": "@dataset:processLocations"
+                },
+                {
+                    "field": "processPath",
+                    "notMatchDatasetMap": {
+                        "dataset": "processLocations",
+                        "matchField": "process"
+                    }
+                }
+            ],
+            "weight": -70
+        },
+        {
+            "label": "emptyProcessPath",
+            "conditions": [
+                {
+                    "field": "processPath",
+                    "equals": ""
+                }
+            ],
+            "weight": -80
         }
-      ],
-      "weight": -80
-    }
-  ]
+    ]
 }

@@ -8,23 +8,23 @@ import './styles/global.css';
 
 // Apply theme based on config
 const applyTheme = (darkMode: boolean) => {
-  document.documentElement.classList.toggle('dark', darkMode);
+    document.documentElement.classList.toggle('dark', darkMode);
 };
 
 // Initialize i18next and apply initial theme
 initI18n().then(() => {
-  const root = createRoot(document.getElementById('root')!);
+    const root = createRoot(document.getElementById('root')!);
 
-  // Temporary component to load config and apply theme
-  const InitApp = () => {
-    const { config } = useConfig();
+    // Temporary component to load config and apply theme
+    const InitApp = () => {
+        const { config } = useConfig();
 
-    useEffect(() => {
-      applyTheme(config.darkMode);
-    }, [config.darkMode]);
+        useEffect(() => {
+            applyTheme(config.darkMode);
+        }, [config.darkMode]);
 
-    return <App />;
-  };
+        return <App />;
+    };
 
-  root.render(<InitApp />);
+    root.render(<InitApp />);
 });

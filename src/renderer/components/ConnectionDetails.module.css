@@ -1,5 +1,5 @@
 .details {
-  padding: 8px;
-  border-top: 1px solid var(--border);
-  background-color: var(--background);
+    padding: 8px;
+    border-top: 1px solid var(--border);
+    background-color: var(--background);
 }

@@ -1,93 +1,93 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
 }
 
 .controls {
-  display: flex;
-  gap: 16px;
-  align-items: center;
+    display: flex;
+    gap: 16px;
+    align-items: center;
 }
 
 .progress {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .progress progress {
-  width: 200px;
+    width: 200px;
 }
 
 .interval {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 14px;
 }
 
 .interval input {
-  width: 60px;
+    width: 60px;
 }
 
 .message {
-  transition: opacity 0.3s;
-  padding: 8px;
-  margin: 8px 0;
-  border-radius: 4px;
-  color: #fff;
+    transition: opacity 0.3s;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 4px;
+    color: #fff;
 }
 
 .map {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }
 
 .canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .message.error {
-  background-color: var(--error);
+    background-color: var(--error);
 }
 
 .message.success {
-  background-color: var(--success);
+    background-color: var(--success);
 }
 
 .message.warning {
-  background-color: var(--warning);
+    background-color: var(--warning);
 }
 
 .message.info {
-  background-color: var(--primary);
+    background-color: var(--primary);
 }
 
 .tooltip {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  line-height: 1.5;
-  pointer-events: none;
-  z-index: 10;
-  opacity: 0;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
 }
 
 .tooltip[style*='display: block'] {
-  opacity: 1;
+    opacity: 1;
 }

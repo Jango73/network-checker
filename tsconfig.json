@@ -1,27 +1,27 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "@renderer/*": ["src/renderer/*"],
-      "@main/*": ["src/main/*"],
-      "@shared/*": ["src/shared/*"],
-      "@types/*": ["src/types/*"],
-      "@assets/*": ["src/assets/*"]
-    }
-  },
-  "include": ["src/**/*", "tests/**/*", "src/renderer/types/**/*"],
-  "exclude": ["node_modules", "dist"]
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "jsx": "react-jsx",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "baseUrl": ".",
+        "paths": {
+            "@renderer/*": ["src/renderer/*"],
+            "@main/*": ["src/main/*"],
+            "@shared/*": ["src/shared/*"],
+            "@types/*": ["src/types/*"],
+            "@assets/*": ["src/assets/*"]
+        }
+    },
+    "include": ["src/**/*", "tests/**/*", "src/renderer/types/**/*"],
+    "exclude": ["node_modules", "dist"]
 }

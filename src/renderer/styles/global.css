@@ -1,121 +1,121 @@
 /* Variables CSS for light theme */
 :root {
-  --background: #ffffff;
-  --text: #333333;
-  --primary: #0060C0;
-  --primary-hover: #0060C0;
-  --secondary: #6c757d;
-  --error: #e02020;
-  --error-hover: #c02020;
-  --success: #30b040;
-  --warning: #ffc107;
-  --border: #dee2e6;
-  --card-bg: #f0f0f0;
+    --background: #ffffff;
+    --text: #333333;
+    --primary: #0060c0;
+    --primary-hover: #0060c0;
+    --secondary: #6c757d;
+    --error: #e02020;
+    --error-hover: #c02020;
+    --success: #30b040;
+    --warning: #ffc107;
+    --border: #dee2e6;
+    --card-bg: #f0f0f0;
 }
 
 /* Variables CSS for dark theme */
 .dark {
-  --background: #1a1a1a;
-  --text: #e0e0e0;
-  --primary: #60b0f0;
-  --primary-hover: #50a0d0;
-  --secondary: #adb5bd;
-  --error: #e02020;
-  --error-hover: #c02020;
-  --success: #30b040;
-  --warning: #ff922b;
-  --border: #495057;
-  --card-bg: #303030;
+    --background: #1a1a1a;
+    --text: #e0e0e0;
+    --primary: #60b0f0;
+    --primary-hover: #50a0d0;
+    --secondary: #adb5bd;
+    --error: #e02020;
+    --error-hover: #c02020;
+    --success: #30b040;
+    --warning: #ff922b;
+    --border: #495057;
+    --card-bg: #303030;
 }
 
 /* Global styles */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 html,
 body {
-  background-color: var(--background);
-  color: var(--text);
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  height: 100%;
-  width: 100%;
+    background-color: var(--background);
+    color: var(--text);
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+        Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    height: 100%;
+    width: 100%;
 }
 
 a {
-  color: var(--primary);
-  text-decoration: none;
+    color: var(--primary);
+    text-decoration: none;
 }
 
 a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 button {
-  background-color: var(--primary);
-  color: #ffffff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
+    background-color: var(--primary);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
 }
 
 button:hover:not(:disabled) {
-  background-color: var(--primary-hover);
+    background-color: var(--primary-hover);
 }
 
 button:disabled {
-  background-color: var(--secondary);
-  cursor: not-allowed;
+    background-color: var(--secondary);
+    cursor: not-allowed;
 }
 
 button.danger {
-  background-color: var(--error);
+    background-color: var(--error);
 }
 
 button.danger:hover:not(:disabled) {
-  background-color: var(--error-hover);
+    background-color: var(--error-hover);
 }
 
 button.active {
-  background-color: var(--primary);
-  color: var(--text);
+    background-color: var(--primary);
+    color: var(--text);
 }
 
 input,
 select {
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background-color: var(--card-bg);
-  color: var(--text);
-  font-size: 14px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text);
+    font-size: 14px;
 }
 
 input:focus,
 select:focus {
-  outline: none;
-  border-color: var(--primary);
+    outline: none;
+    border-color: var(--primary);
 }
 
 .checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text);
 }
 
 .checkbox input {
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
 }

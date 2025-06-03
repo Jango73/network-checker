@@ -27,8 +27,14 @@ type Condition =
     | { field: string; equals: any }
     | { field: string; in: string | any[] }
     | { field: string; greaterThan: number }
-    | { field: string; matchDatasetMap: { dataset: string; matchField: string } }
-    | { field: string; notMatchDatasetMap: { dataset: string; matchField: string } };
+    | {
+          field: string;
+          matchDatasetMap: { dataset: string; matchField: string };
+      }
+    | {
+          field: string;
+          notMatchDatasetMap: { dataset: string; matchField: string };
+      };
 
 export class RuleEngine {
     private rules: Rule[];
@@ -41,12 +47,15 @@ export class RuleEngine {
         this.config = config;
     }
 
-    public evaluate(context: RuleContext): { score: number; reasons: string[] } {
+    public evaluate(context: RuleContext): {
+        score: number;
+        reasons: string[];
+    } {
         let score = -5;
         const reasons: string[] = [];
 
         for (const rule of this.rules) {
-            const allConditionsPass = rule.conditions.every((cond) =>
+            const allConditionsPass = rule.conditions.every(cond =>
                 this.evaluateCondition(cond, context)
             );
             if (allConditionsPass) {
@@ -60,7 +69,10 @@ export class RuleEngine {
         return { score, reasons };
     }
 
-    private evaluateCondition(condition: Condition, context: RuleContext): boolean {
+    private evaluateCondition(
+        condition: Condition,
+        context: RuleContext
+    ): boolean {
         const value = this.resolveField(condition.field, context);
 
         if ('equals' in condition) {
@@ -79,7 +91,9 @@ export class RuleEngine {
                     return this.isIncludedInDataset(value, dataset);
                 }
                 if (condition.in.startsWith('@config:')) {
-                    const configKey = this.extractDatasetKey(condition.in) as keyof Config;
+                    const configKey = this.extractDatasetKey(
+                        condition.in
+                    ) as keyof Config;
                     return this.isIncluded(value, this.config?.[configKey]);
                 }
             } else if (Array.isArray(condition.in)) {
@@ -131,7 +145,9 @@ export class RuleEngine {
         return raw.replace(/^@(?:dataset|config):/, '');
     }
 
-    private _prepareDatasets(datasets: Record<string, any>): Record<string, any> {
+    private _prepareDatasets(
+        datasets: Record<string, any>
+    ): Record<string, any> {
         const compiled: Record<string, any> = {};
 
         for (const [key, value] of Object.entries(datasets)) {
@@ -141,11 +157,16 @@ export class RuleEngine {
                     values: value.values.map((r: string) => new RegExp(r, 'i')),
                 };
             } else if (value.type === 'map') {
-                const entries = Object.entries(value.values as Record<string, string>);
+                const entries = Object.entries(
+                    value.values as Record<string, string>
+                );
                 compiled[key] = {
                     type: 'map',
                     values: Object.fromEntries(
-                        entries.map(([k, v]) => [k.toLowerCase(), new RegExp(v, 'i')])
+                        entries.map(([k, v]) => [
+                            k.toLowerCase(),
+                            new RegExp(v, 'i'),
+                        ])
                     ),
                 };
             } else {

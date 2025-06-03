@@ -1,48 +1,48 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .controls {
-  display: flex;
-  gap: 16px;
-  align-items: center;
+    display: flex;
+    gap: 16px;
+    align-items: center;
 }
 
 .progress {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .progress progress {
-  width: 200px;
+    width: 200px;
 }
 
 .interval {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 14px;
 }
 
 .interval input {
-  width: 60px;
+    width: 60px;
 }
 
 .message {
-  transition: opacity 0.3s;
+    transition: opacity 0.3s;
 }
 
 .checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text);
 }
 
 .checkbox input {
-  cursor: pointer;
+    cursor: pointer;
 }
