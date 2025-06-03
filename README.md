@@ -1,6 +1,7 @@
 # Network Checker
 
 **Network Checker** is a Windows desktop application built with Electron and React. It scans active network connections, enriches them with metadata (IP, country, ISP, process, signature status), and evaluates their risk using a customizable rule-based engine. The app features an interactive UI with map visualization, history tracking, alerts, and export options.
+Available in english, french, spanish, italian, german, dutch, russian, chinese, korean, japanese.
 
 ## Features
 
