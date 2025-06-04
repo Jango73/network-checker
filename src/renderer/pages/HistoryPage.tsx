@@ -71,7 +71,7 @@ export default function HistoryPage() {
                 </select>
             </div>
             {pageCount > 1 && (
-                <div className={styles.pagination}>
+                <div className="pagination">
                     <button onClick={() => setPage(0)} disabled={page === 0}>
                         {'|<'}
                     </button>

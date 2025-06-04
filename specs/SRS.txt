@@ -55,7 +55,7 @@ The application must provide a responsive, tab-based interface with the followin
   - Display error messages for invalid IP addresses or provider names.
   - Include a "Reset to Defaults" button to restore default settings.
 - **About Tab**:
-  - Display static text with credits (coding by Grok, assembly by Jango73 with GitHub link).
+  - Display static text with credits.
   - Include licensing information (GPLv3) and map source details (Creative Commons, Wikimedia link).
 
 ##### 4.2 Network Scanning

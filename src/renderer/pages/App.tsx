@@ -97,6 +97,12 @@ export default function App() {
                     >
                         {t('settings')}
                     </div>
+                    <div
+                        className={`${styles.navLink} ${activeTab === 'about' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('about')}
+                    >
+                        {t('about')}
+                    </div>
                 </nav>
                 <main className={styles.main}>
                     {activeTab === 'main' && <MainPage />}

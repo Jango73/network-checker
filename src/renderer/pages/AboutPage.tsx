@@ -7,7 +7,7 @@ export default function AboutPage() {
     return (
         <div className={styles.container}>
             <h1>{t('about')}</h1>
-            <div className={styles.card}>
+            <div className="card">
                 <h2>{t('appInfo')}</h2>
                 <p>
                     Master (directives and assembly):&nbsp;
@@ -19,7 +19,7 @@ export default function AboutPage() {
                         Jango73
                     </a>
                     <br />
-                    Slave (coding): Grok
+                    Slave (coding): Grok (mostly) & ChatGPT
                     <br />
                 </p>
                 <p>
@@ -47,7 +47,7 @@ export default function AboutPage() {
                     .
                 </p>
             </div>
-            <div className={styles.card}>
+            <div className="card">
                 <h2>{t('description')}</h2>
                 <p>{t('aboutDescription')}</p>
             </div>

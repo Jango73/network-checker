@@ -66,7 +66,6 @@ export default function ConnectionTable() {
                         <th>{t('country')}</th>
                         <th>{t('city')}</th>
                         <th>{t('provider')}</th>
-                        <th>{t('organization')}</th>
                         <th>{t('pid')}</th>
                         <th>{t('process')}</th>
                         <th>{t('status')}</th>
@@ -97,7 +96,6 @@ export default function ConnectionTable() {
                                         <td>{result.country || '-'}</td>
                                         <td>{result.city || '-'}</td>
                                         <td>{result.provider || '-'}</td>
-                                        <td>{result.organization || '-'}</td>
                                         <td>{result.pid}</td>
                                         <td>{result.process || '-'}</td>
                                         <td>
