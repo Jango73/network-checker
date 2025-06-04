@@ -45,6 +45,8 @@ interface StoreState {
     pathRecurrence: Map<string, number>;
     incrementPathRecurrence: (path: string) => void;
     getPathRecurrence: (path: string) => number;
+    historyFilter: 'all' | 'safe' | 'risky';
+    setHistoryFilter: (filter: 'all' | 'safe' | 'risky') => void;
 }
 
 let messageIdCounter = 1;
@@ -124,4 +126,7 @@ export const useStore = create<StoreState>((set, get) => ({
     getPathRecurrence: (path: string) => {
         return get().pathRecurrence.get(path) || 0;
     },
+
+    historyFilter: 'all',
+    setHistoryFilter: (filter) => set({ historyFilter: filter }),
 }));

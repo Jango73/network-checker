@@ -1,13 +1,23 @@
 import { useState } from 'react';
 import { useI18n } from '@renderer/hooks/useI18n';
 import { useHistory } from '@renderer/hooks/useHistory';
+import { useStore } from '@renderer/store';
 import ConnectionDetails from '@renderer/components/ConnectionDetails';
 import styles from './HistoryPage.module.css';
+
+type RiskFilter = 'all' | 'safe' | 'risky';
 
 export default function HistoryPage() {
     const { t } = useI18n();
     const { history, clearHistory, exportHistory } = useHistory();
+    const riskFilter = useStore(state => state.historyFilter);
+    const setRiskFilter = useStore(state => state.setHistoryFilter);
     const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
+
+    const filteredHistory = history.filter(entry => {
+        if (riskFilter === 'all') return true;
+        return riskFilter === 'risky' ? entry.isRisky : !entry.isRisky;
+    });
 
     /**
      * Toggle expansion of a history entry.
@@ -42,12 +52,21 @@ export default function HistoryPage() {
                 >
                     {t('clearHistory')}
                 </button>
+                <select
+                    className={styles.filterSelect}
+                    value={riskFilter}
+                    onChange={e => setRiskFilter(e.target.value as RiskFilter)}
+                >
+                    <option value="all">{t('filterAll')}</option>
+                    <option value="safe">{t('filterSafe')}</option>
+                    <option value="risky">{t('filterRisky')}</option>
+                </select>
             </div>
-            {history.length === 0 ? (
+            {filteredHistory.length === 0 ? (
                 <p className={styles.empty}>{t('noHistory')}</p>
             ) : (
                 <ul className={styles.list}>
-                    {history.map(entry => {
+                    {filteredHistory.map(entry => {
                         const uniqueKey = `${entry.timestamp}-${entry.ip}`;
                         return (
                             <li key={uniqueKey} className={styles.entry}>
@@ -70,17 +89,17 @@ export default function HistoryPage() {
                                     </span>
                                 </div>
                                 {expandedEntry === uniqueKey && (
-                                    <div className={styles.details}>
-                                        <ConnectionDetails
-                                            ip={entry.ip}
-                                            country={entry.country}
-                                            city={entry.city}
-                                            provider={entry.provider}
-                                            organization={entry.organization}
-                                            lat={entry.lat}
-                                            lon={entry.lon}
-                                            pid={entry.pid}
-                                            process={entry.process}
+                                <div className={styles.details}>
+                                    <ConnectionDetails
+                                        ip={entry.ip}
+                                        country={entry.country}
+                                        city={entry.city}
+                                        provider={entry.provider}
+                                        organization={entry.organization}
+                                        lat={entry.lat}
+                                        lon={entry.lon}
+                                        pid={entry.pid}
+                                        process={entry.process}
                                             processPath={entry.processPath}
                                             isSigned={entry.isSigned}
                                             isRisky={entry.isRisky}
