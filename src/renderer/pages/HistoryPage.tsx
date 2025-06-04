@@ -21,7 +21,10 @@ export default function HistoryPage() {
         return riskFilter === 'risky' ? entry.isRisky : !entry.isRisky;
     });
     const pageCount = Math.ceil(filteredHistory.length / pageSize);
-    const visibleHistory = filteredHistory.slice(page * pageSize, (page + 1) * pageSize);
+    const visibleHistory = filteredHistory.slice(
+        page * pageSize,
+        (page + 1) * pageSize
+    );
 
     useEffect(() => {
         setPage(0);
@@ -66,16 +69,25 @@ export default function HistoryPage() {
                     <button onClick={() => setPage(0)} disabled={page === 0}>
                         {'|<'}
                     </button>
-                    <button onClick={() => setPage(p => p - 1)} disabled={page === 0}>
+                    <button
+                        onClick={() => setPage(p => p - 1)}
+                        disabled={page === 0}
+                    >
                         {'<'}
                     </button>
                     <span>
                         {t('page')} {page + 1} / {pageCount}
                     </span>
-                    <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount - 1}>
+                    <button
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={page >= pageCount - 1}
+                    >
                         {'>'}
                     </button>
-                    <button onClick={() => setPage(pageCount - 1)} disabled={page >= pageCount - 1}>
+                    <button
+                        onClick={() => setPage(pageCount - 1)}
+                        disabled={page >= pageCount - 1}
+                    >
                         {'>|'}
                     </button>
                     &nbsp;&nbsp;
@@ -83,7 +95,9 @@ export default function HistoryPage() {
                     <select
                         className={styles.filterSelect}
                         value={riskFilter}
-                        onChange={e => setRiskFilter(e.target.value as RiskFilter)}
+                        onChange={e =>
+                            setRiskFilter(e.target.value as RiskFilter)
+                        }
                     >
                         <option value="all">{t('filterAll')}</option>
                         <option value="safe">{t('filterSafe')}</option>
@@ -118,17 +132,17 @@ export default function HistoryPage() {
                                     </span>
                                 </div>
                                 {expandedEntry === uniqueKey && (
-                                <div className={styles.details}>
-                                    <ConnectionDetails
-                                        ip={entry.ip}
-                                        country={entry.country}
-                                        city={entry.city}
-                                        provider={entry.provider}
-                                        organization={entry.organization}
-                                        lat={entry.lat}
-                                        lon={entry.lon}
-                                        pid={entry.pid}
-                                        process={entry.process}
+                                    <div className={styles.details}>
+                                        <ConnectionDetails
+                                            ip={entry.ip}
+                                            country={entry.country}
+                                            city={entry.city}
+                                            provider={entry.provider}
+                                            organization={entry.organization}
+                                            lat={entry.lat}
+                                            lon={entry.lon}
+                                            pid={entry.pid}
+                                            process={entry.process}
                                             processPath={entry.processPath}
                                             isSigned={entry.isSigned}
                                             isRisky={entry.isRisky}

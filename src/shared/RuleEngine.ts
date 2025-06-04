@@ -27,8 +27,14 @@ type Condition =
     | { field: string; notIn: string | any[] }
     | { field: string; containsAny: string | any[] }
     | { field: string; notContainsAny: string | any[] }
-    | { field: string; matchDatasetMap: { dataset: string; matchField: string } }
-    | { field: string; notMatchDatasetMap: { dataset: string; matchField: string } };
+    | {
+          field: string;
+          matchDatasetMap: { dataset: string; matchField: string };
+      }
+    | {
+          field: string;
+          notMatchDatasetMap: { dataset: string; matchField: string };
+      };
 
 export class RuleEngine {
     private rules: Rule[];
@@ -52,7 +58,7 @@ export class RuleEngine {
             const results = rule.conditions.map(cond => ({
                 cond,
                 value: this.resolveField(cond.field, context),
-                passed: this.evaluateCondition(cond, context)
+                passed: this.evaluateCondition(cond, context),
             }));
 
             const allConditionsPass = results.every(r => r.passed);
@@ -91,21 +97,27 @@ export class RuleEngine {
                     returnValue = this.isIncludedInDataset(value, dataset);
                 }
                 if (ref.startsWith('@config:')) {
-                    const configKey = this.extractDatasetKey(ref) as keyof Config;
-                    returnValue = this.isIncluded(value, this.config?.[configKey]);
+                    const configKey = this.extractDatasetKey(
+                        ref
+                    ) as keyof Config;
+                    returnValue = this.isIncluded(
+                        value,
+                        this.config?.[configKey]
+                    );
                 }
             } else if (Array.isArray(ref)) {
                 returnValue = this.isIncluded(value, ref);
             }
 
-            if ('notIn' in condition)
-                returnValue = !returnValue;
+            if ('notIn' in condition) returnValue = !returnValue;
 
             return returnValue;
         }
 
         if ('containsAny' in condition || 'notContainsAny' in condition) {
-            const ref = (condition as any).containsAny ?? (condition as any).notContainsAny;
+            const ref =
+                (condition as any).containsAny ??
+                (condition as any).notContainsAny;
             let returnValue = false;
             let list: string[] = [];
 
@@ -116,7 +128,9 @@ export class RuleEngine {
                     list = Array.isArray(dataset?.values) ? dataset.values : [];
                 }
                 if (ref.startsWith('@config:')) {
-                    const configKey = this.extractDatasetKey(ref) as keyof Config;
+                    const configKey = this.extractDatasetKey(
+                        ref
+                    ) as keyof Config;
                     const configList = this.config?.[configKey];
                     list = Array.isArray(configList) ? configList : [];
                 }
@@ -126,8 +140,7 @@ export class RuleEngine {
 
             returnValue = this.isContained(value, list);
 
-            if ('notContainsAny' in condition)
-                returnValue = !returnValue;
+            if ('notContainsAny' in condition) returnValue = !returnValue;
 
             return returnValue;
         }
@@ -174,10 +187,11 @@ export class RuleEngine {
 
     private isContained(value: any, list: unknown): boolean {
         return typeof value === 'string' && Array.isArray(list)
-            ? list.some(entry =>
-                typeof entry === 'string' &&
-                value.toLowerCase().includes(entry.toLowerCase())
-            )
+            ? list.some(
+                  entry =>
+                      typeof entry === 'string' &&
+                      value.toLowerCase().includes(entry.toLowerCase())
+              )
             : false;
     }
 

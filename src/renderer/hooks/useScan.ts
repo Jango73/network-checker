@@ -171,7 +171,8 @@ export const useScan = () => {
 
                 setConnections(rawConnections);
 
-                const ruleset = await window.electron.ipcRenderer.invoke('get-ruleset');
+                const ruleset =
+                    await window.electron.ipcRenderer.invoke('get-ruleset');
                 const engine = new RuleEngine(ruleset, config);
                 const results: ScanResult[] = [];
                 let requestCount = 0;
@@ -253,7 +254,7 @@ export const useScan = () => {
                     const geoData = await fetchGeoData(conn.remoteAddress);
                     requestCount++;
 
-                    const context:RuleContext = {
+                    const context: RuleContext = {
                         process: processName,
                         processPath,
                         isSigned,

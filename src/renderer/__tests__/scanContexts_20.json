@@ -1,92 +1,92 @@
 [
-  {
-    "desc": "Signed chrome in legit path, France",
-    "process": "chrome.exe",
-    "processPath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
-    "isSigned": true,
-    "country": "France",
-    "provider": "Orange",
-    "expectedScore": 225
-  },
-  {
-    "desc": "Unsigned process in temp folder, Nigeria",
-    "process": "unknown.exe",
-    "processPath": "C:/Users/User/AppData/Local/Temp/unknown.exe",
-    "isSigned": false,
-    "country": "Nigeria",
-    "provider": "Choopa",
-    "expectedScore": -185
-  },
-  {
-    "desc": "svchost.exe in wrong location, signed, Canada",
-    "process": "svchost.exe",
-    "processPath": "C:/Temp/svchost.exe",
-    "isSigned": true,
-    "country": "Canada",
-    "provider": "AWS",
-    "expectedScore": -115
-  },
-  {
-    "desc": "Notepad.exe in legit path, USA",
-    "process": "notepad.exe",
-    "processPath": "C:/Windows/System32/notepad.exe",
-    "isSigned": true,
-    "country": "USA",
-    "provider": "Google",
-    "expectedScore": 225
-  },
-  {
-    "desc": "Unsigned process in legit folder, Germany",
-    "process": "custom.exe",
-    "processPath": "C:/Program Files/Common Files/custom.exe",
-    "isSigned": false,
-    "country": "Germany",
-    "provider": "Hetzner",
-    "expectedScore": 45
-  },
-  {
-    "desc": "Empty process path, unsigned, Brazil",
-    "process": "unknown.exe",
-    "processPath": "",
-    "isSigned": false,
-    "country": "Brazil",
-    "provider": "Azure",
-    "expectedScore": -115
-  },
-  {
-    "desc": "Firefox in wrong path, signed, Australia",
-    "process": "firefox.exe",
-    "processPath": "C:/Downloads/firefox.exe",
-    "isSigned": true,
-    "country": "Australia",
-    "provider": "AWS",
-    "expectedScore": -65
-  },
-  {
-    "desc": "Trusted process path, signed, UK",
-    "process": "app.exe",
-    "processPath": "C:/Program Files/MyApp/app.exe",
-    "isSigned": true,
-    "country": "UK",
-    "provider": "Google",
-    "expectedScore": 45
-  },
-  {
-    "desc": "Signed, Japan",
-    "process": "code.exe",
-    "processPath": "C:/Program Files/Microsoft VS Code/Code.exe",
-    "isSigned": true,
-    "country": "Japan",
-    "provider": "NTT",
-    "expectedScore": 145
-  },
-  {
-    "desc": "Unsigned process in suspicious folder, Thailand",
-    "process": "malware.exe",
-    "processPath": "C:/Users/Public/malware.exe",
-    "isSigned": false,
-    "country": "Thailand",
-    "provider": "WorldStream",
-    "expectedScore": -185
-  }
+    {
+        "desc": "Signed chrome in legit path, France",
+        "process": "chrome.exe",
+        "processPath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+        "isSigned": true,
+        "country": "France",
+        "provider": "Orange",
+        "expectedScore": 225
+    },
+    {
+        "desc": "Unsigned process in temp folder, Nigeria",
+        "process": "unknown.exe",
+        "processPath": "C:/Users/User/AppData/Local/Temp/unknown.exe",
+        "isSigned": false,
+        "country": "Nigeria",
+        "provider": "Choopa",
+        "expectedScore": -185
+    },
+    {
+        "desc": "svchost.exe in wrong location, signed, Canada",
+        "process": "svchost.exe",
+        "processPath": "C:/Temp/svchost.exe",
+        "isSigned": true,
+        "country": "Canada",
+        "provider": "AWS",
+        "expectedScore": -115
+    },
+    {
+        "desc": "Notepad.exe in legit path, USA",
+        "process": "notepad.exe",
+        "processPath": "C:/Windows/System32/notepad.exe",
+        "isSigned": true,
+        "country": "USA",
+        "provider": "Google",
+        "expectedScore": 225
+    },
+    {
+        "desc": "Unsigned process in legit folder, Germany",
+        "process": "custom.exe",
+        "processPath": "C:/Program Files/Common Files/custom.exe",
+        "isSigned": false,
+        "country": "Germany",
+        "provider": "Hetzner",
+        "expectedScore": 45
+    },
+    {
+        "desc": "Empty process path, unsigned, Brazil",
+        "process": "unknown.exe",
+        "processPath": "",
+        "isSigned": false,
+        "country": "Brazil",
+        "provider": "Azure",
+        "expectedScore": -115
+    },
+    {
+        "desc": "Firefox in wrong path, signed, Australia",
+        "process": "firefox.exe",
+        "processPath": "C:/Downloads/firefox.exe",
+        "isSigned": true,
+        "country": "Australia",
+        "provider": "AWS",
+        "expectedScore": -65
+    },
+    {
+        "desc": "Trusted process path, signed, UK",
+        "process": "app.exe",
+        "processPath": "C:/Program Files/MyApp/app.exe",
+        "isSigned": true,
+        "country": "UK",
+        "provider": "Google",
+        "expectedScore": 45
+    },
+    {
+        "desc": "Signed, Japan",
+        "process": "code.exe",
+        "processPath": "C:/Program Files/Microsoft VS Code/Code.exe",
+        "isSigned": true,
+        "country": "Japan",
+        "provider": "NTT",
+        "expectedScore": 145
+    },
+    {
+        "desc": "Unsigned process in suspicious folder, Thailand",
+        "process": "malware.exe",
+        "processPath": "C:/Users/Public/malware.exe",
+        "isSigned": false,
+        "country": "Thailand",
+        "provider": "WorldStream",
+        "expectedScore": -185
+    }
 ]

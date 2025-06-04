@@ -128,5 +128,5 @@ export const useStore = create<StoreState>((set, get) => ({
     },
 
     historyFilter: 'all',
-    setHistoryFilter: (filter) => set({ historyFilter: filter }),
+    setHistoryFilter: filter => set({ historyFilter: filter }),
 }));

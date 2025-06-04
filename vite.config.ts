@@ -60,8 +60,8 @@ export default defineConfig({
             '@main': path.resolve(__dirname, 'src/main'),
             '@config': path.resolve(__dirname, 'src/config'),
             '@shared': path.resolve(__dirname, 'src/shared'),
-            '@types': path.resolve(__dirname, 'src/types')
-        }
+            '@types': path.resolve(__dirname, 'src/types'),
+        },
     },
     css: {
         modules: {
