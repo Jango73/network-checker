@@ -132,3 +132,8 @@ npm run format       # Format code with Prettier
 ## License
 
 This project is licensed under the GPLv3.
+
+
+## Notes
+
+The app does not run in deployment mode (I've tried). If someone wants to do it one day, you are welcome. It's mental overload for me.
