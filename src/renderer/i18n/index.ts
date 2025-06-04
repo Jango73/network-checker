@@ -39,6 +39,7 @@ const resources = {
             filterAll: "All",
             filterSafe: "Safe only",
             filterRisky: "Risky only",
+            page: "Page",
             ipMarkedSafe: 'IP {{ip}} marked as safe',
             processMarkedSafe: 'Process {{processName}} marked as safe',
             cannotMarkEmptyProcess: 'Cannot mark empty process name as safe',

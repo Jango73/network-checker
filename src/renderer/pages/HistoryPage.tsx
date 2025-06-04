@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@renderer/hooks/useI18n';
 import { useHistory } from '@renderer/hooks/useHistory';
 import { useStore } from '@renderer/store';
@@ -13,11 +13,19 @@ export default function HistoryPage() {
     const riskFilter = useStore(state => state.historyFilter);
     const setRiskFilter = useStore(state => state.setHistoryFilter);
     const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
+    const [page, setPage] = useState(0);
+    const pageSize = 20;
 
     const filteredHistory = history.filter(entry => {
         if (riskFilter === 'all') return true;
         return riskFilter === 'risky' ? entry.isRisky : !entry.isRisky;
     });
+    const pageCount = Math.ceil(filteredHistory.length / pageSize);
+    const visibleHistory = filteredHistory.slice(page * pageSize, (page + 1) * pageSize);
+
+    useEffect(() => {
+        setPage(0);
+    }, [riskFilter]);
 
     /**
      * Toggle expansion of a history entry.
@@ -62,11 +70,30 @@ export default function HistoryPage() {
                     <option value="risky">{t('filterRisky')}</option>
                 </select>
             </div>
+            {pageCount > 1 && (
+                <div className={styles.pagination}>
+                    <button onClick={() => setPage(0)} disabled={page === 0}>
+                        {'|<'}
+                    </button>
+                    <button onClick={() => setPage(p => p - 1)} disabled={page === 0}>
+                        {'<'}
+                    </button>
+                    <span>
+                        {t('page')} {page + 1} / {pageCount}
+                    </span>
+                    <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount - 1}>
+                        {'>'}
+                    </button>
+                    <button onClick={() => setPage(pageCount - 1)} disabled={page >= pageCount - 1}>
+                        {'>|'}
+                    </button>
+                </div>
+            )}
             {filteredHistory.length === 0 ? (
                 <p className={styles.empty}>{t('noHistory')}</p>
             ) : (
                 <ul className={styles.list}>
-                    {filteredHistory.map(entry => {
+                    {visibleHistory.map(entry => {
                         const uniqueKey = `${entry.timestamp}-${entry.ip}`;
                         return (
                             <li key={uniqueKey} className={styles.entry}>
