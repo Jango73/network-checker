@@ -36,10 +36,11 @@ const resources = {
             suspicious: 'Suspicious',
             safe: 'Safe',
             confirmClearHistory: 'Are you sure you want to clear the history?',
-            filterAll: "All",
-            filterSafe: "Safe only",
-            filterRisky: "Risky only",
-            page: "Page",
+            filter: 'Filter',
+            filterAll: 'All',
+            filterSafe: 'Safe only',
+            filterRisky: 'Risky only',
+            page: 'Page',
             ipMarkedSafe: 'IP {{ip}} marked as safe',
             processMarkedSafe: 'Process {{processName}} marked as safe',
             cannotMarkEmptyProcess: 'Cannot mark empty process name as safe',
@@ -99,6 +100,7 @@ const resources = {
     fr: {
         translation: {
             welcome: 'Vérificateur de réseau',
+            nextScan: 'Prochain scan dans',
             scan: 'Scanner le réseau',
             main: 'Principal',
             map: 'Carte',
@@ -130,6 +132,11 @@ const resources = {
             safe: 'Sûr',
             confirmClearHistory:
                 'Êtes-vous sûr(e) de vouloir effacer l’historique ?',
+            filter: 'Filtrer',
+            filterAll: 'Tous',
+            filterSafe: 'Seulement les sûrs',
+            filterRisky: 'Seulement les risqués',
+            page: 'Page',
             ipMarkedSafe: 'IP {{ip}} marquée comme sûre',
             processMarkedSafe: 'Processus {{processName}} marqué comme sûr',
             cannotMarkEmptyProcess:
@@ -140,7 +147,7 @@ const resources = {
             scanFailed: 'Échec du scan : {{error}}',
             periodicScan: 'Scan périodique',
             riskyConnectionDetected:
-                'Connexion risquée détectée pour l’IP {{ip}}: {{processName}} à {{processPath}} ({{reason}})',
+                'Connexion risquée détectée pour l’IP {{ip}} : {{processName}} à {{processPath}} ({{reason}})',
             apiRateLimitExceeded: 'Limite de requêtes API dépassée',
             geoLookupFailed:
                 'Échec de la recherche de géolocalisation pour l’IP {{ip}} : {{error}}',
@@ -194,6 +201,7 @@ const resources = {
     es: {
         translation: {
             welcome: 'Comprobador de red',
+            nextScan: 'Próximo escaneo en',
             scan: 'Escanear red',
             main: 'Principal',
             map: 'Mapa',
@@ -225,6 +233,11 @@ const resources = {
             safe: 'Seguro',
             confirmClearHistory:
                 '¿Estás seguro de que quieres borrar el historial?',
+            filter: 'Filtrar',
+            filterAll: 'Todos',
+            filterSafe: 'Solo seguros',
+            filterRisky: 'Solo riesgosos',
+            page: 'Página',
             ipMarkedSafe: 'IP {{ip}} marcada como segura',
             processMarkedSafe: 'Proceso {{processName}} marcado como seguro',
             cannotMarkEmptyProcess:
@@ -286,6 +299,7 @@ const resources = {
     it: {
         translation: {
             welcome: 'Controllore di rete',
+            nextScan: 'Prossima scansione tra',
             scan: 'Scansiona rete',
             main: 'Principale',
             map: 'Mappa',
@@ -317,6 +331,11 @@ const resources = {
             safe: 'Sicuro',
             confirmClearHistory:
                 'Sei sicuro di voler cancellare la cronologia?',
+            filter: 'Filtro',
+            filterAll: 'Tutti',
+            filterSafe: 'Solo sicuri',
+            filterRisky: 'Solo rischiosi',
+            page: 'Pagina',
             ipMarkedSafe: 'IP {{ip}} segnato come sicuro',
             processMarkedSafe: 'Processo {{processName}} segnato come sicuro',
             cannotMarkEmptyProcess:
@@ -383,6 +402,7 @@ const resources = {
     de: {
         translation: {
             welcome: 'Netzwerkprüfer',
+            nextScan: 'Nächster Scan in',
             scan: 'Netzwerk scannen',
             main: 'Hauptseite',
             map: 'Karte',
@@ -414,6 +434,11 @@ const resources = {
             safe: 'Sicher',
             confirmClearHistory:
                 'Bist du sicher, dass du den Verlauf löschen willst?',
+            filter: 'Filtern',
+            filterAll: 'Alle',
+            filterSafe: 'Nur sichere',
+            filterRisky: 'Nur riskante',
+            page: 'Seite',
             ipMarkedSafe: 'IP {{ip}} als sicher markiert',
             processMarkedSafe: 'Prozess {{processName}} als sicher markiert',
             cannotMarkEmptyProcess:
@@ -476,6 +501,7 @@ const resources = {
     nl: {
         translation: {
             welcome: 'Netwerkscanner',
+            nextScan: 'Volgende scan over',
             scan: 'Netwerk scannen',
             main: 'Hoofdmenu',
             map: 'Kaart',
@@ -507,6 +533,11 @@ const resources = {
             safe: 'Veilig',
             confirmClearHistory:
                 'Weet je zeker dat je de geschiedenis wilt wissen?',
+            filter: 'Filter',
+            filterAll: 'Alles',
+            filterSafe: 'Alleen veilig',
+            filterRisky: 'Alleen riskant',
+            page: 'Pagina',
             ipMarkedSafe: 'IP {{ip}} gemarkeerd als veilig',
             processMarkedSafe: 'Proces {{processName}} gemarkeerd als veilig',
             cannotMarkEmptyProcess:
@@ -572,6 +603,7 @@ const resources = {
     ru: {
         translation: {
             welcome: 'Проверяльщик сети',
+            nextScan: 'Следующее сканирование через',
             scan: 'Сканировать сеть',
             main: 'Главная',
             map: 'Карта',
@@ -602,6 +634,11 @@ const resources = {
             suspicious: 'Подозрительный',
             safe: 'Безопасный',
             confirmClearHistory: 'Вы уверены, что хотите очистить историю?',
+            filter: 'Фильтр',
+            filterAll: 'Все',
+            filterSafe: 'Только безопасные',
+            filterRisky: 'Только рискованные',
+            page: 'Страница',
             ipMarkedSafe: 'IP {{ip}} отмечен как безопасный',
             processMarkedSafe: 'Процесс {{processName}} отмечен как безопасный',
             cannotMarkEmptyProcess:
@@ -665,6 +702,7 @@ const resources = {
     zh: {
         translation: {
             welcome: '网络检查器',
+            nextScan: '下次扫描时间',
             scan: '扫描网络',
             main: '主页',
             map: '地图',
@@ -695,6 +733,11 @@ const resources = {
             suspicious: '可疑',
             safe: '安全',
             confirmClearHistory: '你确定要清除历史记录吗？',
+            filter: '筛选',
+            filterAll: '全部',
+            filterSafe: '仅显示安全',
+            filterRisky: '仅显示有风险',
+            page: '页面',
             ipMarkedSafe: 'IP {{ip}} 已标记为安全',
             processMarkedSafe: '进程 {{processName}} 已标记为安全',
             cannotMarkEmptyProcess: '无法将空的进程名标记为安全',
@@ -753,6 +796,7 @@ const resources = {
     ko: {
         translation: {
             welcome: '네트워크 검사기',
+            nextScan: '다음 스캔까지',
             scan: '네트워크 스캔',
             main: '메인',
             map: '지도',
@@ -783,6 +827,11 @@ const resources = {
             suspicious: '의심스러움',
             safe: '안전',
             confirmClearHistory: '기록을 정말 지우시겠습니까?',
+            filter: '필터',
+            filterAll: '전체',
+            filterSafe: '안전만',
+            filterRisky: '위험만',
+            page: '페이지',
             ipMarkedSafe: 'IP {{ip}}가 안전으로 표시됨',
             processMarkedSafe: '프로세스 {{processName}}이 안전으로 표시됨',
             cannotMarkEmptyProcess:
@@ -843,6 +892,7 @@ const resources = {
     ja: {
         translation: {
             welcome: 'ネットワークチェッカー',
+            nextScan: '次のスキャンまで',
             scan: 'ネットワークをスキャン',
             main: 'メイン',
             map: 'マップ',
@@ -873,6 +923,11 @@ const resources = {
             suspicious: '疑わしい',
             safe: '安全',
             confirmClearHistory: '履歴を本当に消去しますか？',
+            filter: 'フィルター',
+            filterAll: 'すべて',
+            filterSafe: '安全のみ',
+            filterRisky: 'リスクありのみ',
+            page: 'ページ',
             ipMarkedSafe: 'IP {{ip}} が安全としてマークされました',
             processMarkedSafe:
                 'プロセス {{processName}} が安全としてマークされました',

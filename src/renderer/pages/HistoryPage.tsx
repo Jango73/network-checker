@@ -60,15 +60,6 @@ export default function HistoryPage() {
                 >
                     {t('clearHistory')}
                 </button>
-                <select
-                    className={styles.filterSelect}
-                    value={riskFilter}
-                    onChange={e => setRiskFilter(e.target.value as RiskFilter)}
-                >
-                    <option value="all">{t('filterAll')}</option>
-                    <option value="safe">{t('filterSafe')}</option>
-                    <option value="risky">{t('filterRisky')}</option>
-                </select>
             </div>
             {pageCount > 1 && (
                 <div className="pagination">
@@ -87,6 +78,17 @@ export default function HistoryPage() {
                     <button onClick={() => setPage(pageCount - 1)} disabled={page >= pageCount - 1}>
                         {'>|'}
                     </button>
+                    &nbsp;&nbsp;
+                    {t('filter')}
+                    <select
+                        className={styles.filterSelect}
+                        value={riskFilter}
+                        onChange={e => setRiskFilter(e.target.value as RiskFilter)}
+                    >
+                        <option value="all">{t('filterAll')}</option>
+                        <option value="safe">{t('filterSafe')}</option>
+                        <option value="risky">{t('filterRisky')}</option>
+                    </select>
                 </div>
             )}
             {filteredHistory.length === 0 ? (
